@@ -1,0 +1,47 @@
+.search {
+
+  &__query {
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    height:41px;
+    display:flex;
+    border-bottom:1px solid #ddd;
+  }
+
+  .search-box {
+    height:40px;
+    flex:1;
+  }
+
+  .search-box__loader {
+    display:none
+  }
+
+  &__results {
+    position:absolute;
+    top:41px;
+    left:0;
+    right:0;
+  }
+
+  .hits-hit {
+    text-align:center;
+
+    a {
+      text-decoration:none;
+    }
+    &__poster {
+      max-width:100px;
+      max-height:140px;
+      display:inline-block;
+    }
+    &__title {
+      font-size:12px;
+      text-align:center;
+      margin-top:5px;
+    }
+  }
+
+}
