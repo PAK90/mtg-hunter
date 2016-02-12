@@ -1,5 +1,8 @@
 import * as React from "react";
+import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
+import "searchkit/theming/theme.scss";
+import "./styles/customisations.scss";
 
 import {
   SearchBox,
@@ -37,15 +40,22 @@ const MovieHitsItem = (props)=> {
   )
 }
 
+const CardHitsItem = (props)=> {
+  const {bemBlocks, result} = props
+  return (
+    <div className={bemBlocks.item().mix(bemBlocks.container("item"))} data-qa="hit">
+      {result._source.name}
+    </div>
+  )
+}
+
+
 export class App extends React.Component<any, any> {
 
   constructor() {
     super()
-    const host = "http://demo.searchkit.co/api/movies"
-    this.searchkit = new SearchkitManager(host)
-    this.searchkit.translateFunction = (key)=> {
-      return {"pagination.next":"Next Page", "pagination.previous":"Previous Page"}[key]
-    }
+    const host = "http://localhost:9200/cards/card"
+    this.searchkit = new SearchkitManager(host)   
   }
 
   render(){
@@ -58,31 +68,23 @@ export class App extends React.Component<any, any> {
 
           <div className="layout__top-bar top-bar">
             <div className="top-bar__content">
-              <div className="my-logo">Searchkit Acme co</div>
+              <div className="my-logo">Gatherer cards</div>
               <SearchBox
-                translations={{"searchbox.placeholder":"search movies"}}
+                translations={{"searchbox.placeholder":"search cards"}}
                 queryOptions={{"minimum_should_match":"70%"}}
                 autofocus={true}
                 searchOnChange={true}
-                queryFields={["actors^1","type^2","languages","title^5", "genres^2"]}/>
+                queryFields={["artist","name","text"]}/>
             </div>
           </div>
 
           <div className="layout__body">
 
-                <div className="layout__filters">
-                    <HierarchicalMenuFilter fields={["type.raw", "genres.raw"]} title="Categories" id="categories"/>
-              <RangeFilter min={0} max={100} field="metaScore" id="metascore" title="Metascore" showHistogram={true}/>
-              <RangeFilter min={0} max={10} field="imdbRating" id="imdbRating" title="IMDB Rating" showHistogram={true}/>
-              <RefinementListFilter id="actors" title="Actors" field="actors.raw" size={10}/>
-                    <RefinementListFilter translations={{"facets.view_more":"View more writers"}} id="writers" title="Writers" field="writers.raw" operator="OR" size={10}/>
-                    <RefinementListFilter id="countries" title="Countries" field="countries.raw" operator="OR" size={10}/>
-              <NumericRefinementListFilter id="runtimeMinutes" title="Length" field="runtimeMinutes" options={[
-                {title:"All"},
-                {title:"up to 20", from:0, to:20},
-                {title:"21 to 60", from:21, to:60},
-                {title:"60 or more", from:61, to:1000}
-              ]}/>
+              <div className="layout__filters">                              
+                <RefinementListFilter id="colors" title="Colors" field="colors.raw" size={5}/>
+                <RefinementListFilter id="layout" title="Layout" field="layout.raw" size={5}/>
+                <RefinementListFilter id="type" title="Type" field="type.raw" size={5}/>
+                <RefinementListFilter id="codes" title="Codes" field="codes.raw" size={5}/>
             </div>
 
                 <div className="layout__results results-list">
@@ -90,14 +92,8 @@ export class App extends React.Component<any, any> {
               <div className="results-list__action-bar action-bar">
 
                 <div className="action-bar__info">
-                        <HitsStats translations={{
-                    "hitstats.results_found":"{hitCount} results found"
-                  }}/>
-                        <SortingSelector options={[
-                            {label:"Relevance", field:"_score", order:"desc",defaultOption:true},
-                            {label:"Latest Releases", field:"released", order:"desc"},
-                            {label:"Earliest Releases", field:"released", order:"asc"}
-                        ]}/>
+                    <HitsStats />
+                      
                     </div>
 
                 <div className="action-bar__filters">
@@ -107,7 +103,7 @@ export class App extends React.Component<any, any> {
 
               </div>
                     <Hits hitsPerPage={12} highlightFields={["title"]}
-                    itemComponent={MovieHitsItem} sourceFilter={["title", "poster", "imdbId"]}
+                    itemComponent={CardHitsItem}
                     scrollTo="body"
               />
               <NoHits suggestionsField={"title"}/>
@@ -122,4 +118,4 @@ export class App extends React.Component<any, any> {
     )}
 }
 
-React.render(<App />, document.getElementById('app'));
+ReactDOM.render(<App />, document.getElementById('app'));
