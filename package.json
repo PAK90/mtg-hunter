@@ -33,11 +33,14 @@
     "webpack-dev-server": "^1.14.0"
   },
   "dependencies": {
+    "bluebird": "^3.3.0",
     "classnames": "^2.2.1",
     "deep-equal": "^1.0.1",
+    "elasticsearch": "^10.1.3",
     "highcharts-release": "^4.2.1",
     "invariant": "^2.2.0",
     "lodash": "^4.3.0",
+    "moment": "^2.11.2",
     "mtg-json": "^1.0.1",
     "normalize.css": "^3.0.3",
     "react": "^0.14.3",
