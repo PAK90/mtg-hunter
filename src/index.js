@@ -40,15 +40,13 @@ const MovieHitsItem = (props)=> {
 
 export class App extends React.Component<any, any> {
 
-  searchkit:SearchkitManager
-
   constructor() {
+    super()
     const host = "http://demo.searchkit.co/api/movies"
     this.searchkit = new SearchkitManager(host)
     this.searchkit.translateFunction = (key)=> {
       return {"pagination.next":"Next Page", "pagination.previous":"Previous Page"}[key]
     }
-    super()
   }
 
   render(){
@@ -126,4 +124,4 @@ export class App extends React.Component<any, any> {
     )}
 }
 
-ReactDOM.render(<Application />, document.getElementById('app'));
+React.render(<App />, document.getElementById('app'));
