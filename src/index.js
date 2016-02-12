@@ -81,7 +81,7 @@ export class App extends React.Component<any, any> {
           <div className="layout__body">
 
               <div className="layout__filters">                              
-                <RefinementListFilter id="colors" title="Colors" field="color.raw" size={5}/>
+                <RefinementListFilter id="colors" title="Colors" field="colors.raw" size={5}/>
                 <RefinementListFilter id="layout" title="Layout" field="layout.raw" size={5}/>
                 <RefinementListFilter id="type" title="Type" field="type.raw" size={5}/>
                 <RefinementListFilter id="codes" title="Codes" field="codes.raw" size={5}/>
