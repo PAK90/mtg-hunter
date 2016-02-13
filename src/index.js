@@ -31,12 +31,23 @@ const CardHitsItem = (props)=> {
   return (
     <div className={bemBlocks.item().mix(bemBlocks.container("item"))} data-qa="hit">
       <a href={url} target="_blank">
-        <img data-qa="name" className={bemBlocks.item("name")} src={imgUrl} width="223" height="310"/>
+        <img data-qa="name" className={bemBlocks.item("name")} src={imgUrl} width="223" /*height="310"*//>
       </a>
       <a href={url} target="_blank">
         <div data-qa="name" className={bemBlocks.item("name")} dangerouslySetInnerHTML={{__html:_.get(result,"highlight.name",false) || result._source.name}}>
         </div>
       </a>
+    </div>
+  )
+}
+
+const SymbolRefineList = (props)=> {
+  const {bemBlocks} = props;
+  return (
+    <div data-qa="option" className={props.bemBlocks.option().state({selected:props.selected}).mix(bemBlocks.container("item"))} onClick={props.toggleFilter}>
+      <div data-qa="checkbox" className={props.bemBlocks.option("checkbox").state({selected:props.selected})}>{props.selected}</div>
+      <img src = {'./src/img/' + props.label.toUpperCase() + '.png'} height="15px" style={{paddingLeft:'20px'}}/>
+      <div className={props.bemBlocks.option("count")}>{props.count}</div>
     </div>
   )
 }
@@ -71,30 +82,26 @@ export class App extends React.Component<any, any> {
 
           <div className="layout__body">
 
-              <div className="layout__filters">
-                
-                <RangeFilter id="cmc" min={0} max={15} title="Converted Cost" field="cmc" showHistogram={true}/>
-                <RefinementListFilter id="colors" title="Colors" field="colors.raw" size={6} operator="AND"/>
-                <RefinementListFilter id="layout" title="Layout" field="layout.raw" size={5} operator="AND"/>
-                <RefinementListFilter id="type" title="Type" field="types.raw" size={5} operator="AND"/>
-                <RefinementListFilter id="type" title="Subtype" field="subtypes.raw" size={5} operator="AND"/>
-                <RefinementListFilter id="codes" title="Set" field="codes.raw" size={5} operator="AND"/>
+            <div className="layout__filters">
+              <RangeFilter id="cmc" min={0} max={15} title="Converted Cost" field="cmc" showHistogram={true}/>
+              <RefinementListFilter id="colors" title="Colors" field="colors.raw" size={6} operator="AND"/>
+              <RefinementListFilter id="symbols" title="Symbols" field="symbols" size={5} operator="AND" itemComponent={SymbolRefineList}/>
+              <RefinementListFilter id="type" title="Type" field="types.raw" size={5} operator="AND"/>
+              <RefinementListFilter id="subtype" title="Subtype" field="subtypes.raw" size={5} operator="AND"/>
+              <RefinementListFilter id="codes" title="Set" field="codes.raw" size={5} operator="AND"/>
             </div>
 
-                <div className="layout__results results-list">
-
+            <div className="layout__results results-list">
               <div className="results-list__action-bar action-bar">
-
                 <div className="action-bar__info">
-                    <HitsStats />
-                    <SortingSelector options={[
-                      {label:"Name", field: "name.raw", order: "asc", defaultOption:true},
-                      {label:"Relevance", field:"_score", order:"desc"},
-                      {label:"Colour", field:"colors", order:"desc"},
-                      {label:"Converted Cost", field:"cmc", order:"asc"}
-                    ]}/>
-                      
-                    </div>
+                  <HitsStats />
+                  <SortingSelector options={[
+                    {label:"Name", field: "name.raw", order: "asc", defaultOption:true},
+                    {label:"Relevance", field:"_score", order:"desc"},
+                    {label:"Colour", field:"colors", order:"desc"},
+                    {label:"Converted Cost", field:"cmc", order:"asc"}
+                  ]}/>
+                </div>
 
                 <div className="action-bar__filters">
                   <SelectedFilters/>
@@ -102,16 +109,15 @@ export class App extends React.Component<any, any> {
                 </div>
 
               </div>
-                    <Hits hitsPerPage={12} highlightFields={["name"]}
-                    itemComponent={CardHitsItem}
-                    scrollTo="body"
-              />
+              <Hits hitsPerPage={12} highlightFields={["name"]}
+                itemComponent={CardHitsItem}
+                scrollTo="body" />
               <NoHits suggestionsField={"name"}/>
               <InitialLoader/>
-                    <Pagination showNumbers={true}/>
-                </div>
-          </div>
+              <Pagination showNumbers={true}/>
             </div>
+          </div>
+        </div>
       </div>
       </SearchkitProvider>
       </div>

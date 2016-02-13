@@ -24,3 +24,8 @@ html {
   color:#08c;
   display:none;
 }
+
+/* Gives result list unlimited space to grow. */
+.layout__body {
+  max-width: none;
+}

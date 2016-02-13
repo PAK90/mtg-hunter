@@ -95,7 +95,7 @@ module.exports = class Indexer {
       commands.push({index:{_index:this.index, _type:this.type, _id:doc.id }})
       commands.push(doc)
     }
-    console.log(commands)
+    console.log('Sending commands...')
     return this.client.bulk({requestTimeout: Infinity, body:commands}).then((res)=> {
       console.log(`indexed ${res.items.length} items in ${res.took}ms`)
     }).catch((e)=> {

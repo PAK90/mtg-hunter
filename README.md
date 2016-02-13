@@ -11,7 +11,7 @@ vagrant up
 To stop it for any reason, do ```vagrant halt```.
 To populate the elasticsearch server with delicious data, run the indexer script.
 ```bash
-npm run-script indexer
+npm run-script index
 ```
 This will print an awful lot of data, and take up to a minute. To confirm this has succeeded, use the [Sense plugin for Chrome](https://chrome.google.com/webstore/detail/sense-beta/lhjgkmllcaadmopgmanpapmpjgmfcfig?hl=en) to confirm the ~16,000 cards are present. The default settings and query will do just fine (localhost:9200 and ```match_all```).
 
