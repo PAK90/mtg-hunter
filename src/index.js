@@ -84,8 +84,10 @@ export class App extends React.Component<any, any> {
 
             <div className="layout__filters">
               <RangeFilter id="cmc" min={0} max={15} title="Converted Cost" field="cmc" showHistogram={true}/>
-              <RefinementListFilter id="colors" title="Colors" field="colors.raw" size={6} operator="AND"/>
+              <RefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator="AND"/>
               <RefinementListFilter id="symbols" title="Symbols" field="symbols" size={5} operator="AND" itemComponent={SymbolRefineList}/>
+              <RefinementListFilter id="colourCount" title="Colour Count" field="colourCount" size={6} operator="AND"/>
+              <RefinementListFilter id="rarity" title="Rarity" field="rarity.raw" size={5} operator="AND"/>
               <RefinementListFilter id="type" title="Type" field="types.raw" size={5} operator="AND"/>
               <RefinementListFilter id="subtype" title="Subtype" field="subtypes.raw" size={5} operator="AND"/>
               <RefinementListFilter id="codes" title="Set" field="codes.raw" size={5} operator="AND"/>

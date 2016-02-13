@@ -11,11 +11,25 @@ function symbolize(manaCost) {
     symbolArray.push(symbol[1].replace("/","")); // Remove / from R/W and others like it.
   }
   return symbolArray;
-};
+}
+function countColours(symbols) {
+  var colours = ['w','u','r','b','g'];
+  var count = 0;
+  for (var i = 0; i < symbols.length; i++) {
+    for (var j = 0; j < colours.length; j++) {
+      if (_.includes(symbols[i],colours[j])) {
+        count++;
+      }
+    }    
+  }
+  return count;
+}
 let cardDocs = _.map(cards, (card)=> {
 	card.codes = _.map(card.multiverseids, "setCode");
+  card.colourCount = card.colors ? card.colors.length : 0; // If it doesn't have colours it won't exist so hopefully it's false-y and will go to 0.
   card.colors = card.colors || "Colourless";
   card.symbols = _.uniq(symbolize(card.manaCost)); // Extract all symbols from {} that aren't numeric. Remove duplicates with _.uniq.
+  //card.colourCount = countColours(card.symbols); // Count unique colours. ['w','ug'] = 3, ['r','u','w'] = 3, ['c'] = 0 since colourless isn't a colour.
 	return card;
 });
 
