@@ -24,31 +24,22 @@ import {
   InitialLoader
 } from "searchkit";
 
-const MovieHitsItem = (props)=> {
-  const {bemBlocks, result} = props
-  let url = "http://www.imdb.com/title/" + result._source.imdbId
+const CardHitsItem = (props)=> {
+  const {bemBlocks, result} = props;
+  let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + result._source.multiverseids[multiverseids.length - 1].multiverseid;
+  let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/' + result._source.multiverseids[multiverseids.length - 1].multiverseid + 'jpg';
   return (
     <div className={bemBlocks.item().mix(bemBlocks.container("item"))} data-qa="hit">
       <a href={url} target="_blank">
-        <img data-qa="poster" className={bemBlocks.item("poster")} src={result._source.poster} width="170" height="240"/>
+        <img data-qa="name" className={bemBlocks.item("name")} src={imgUrl} width="170" height="240"/>
       </a>
       <a href={url} target="_blank">
-        <div data-qa="title" className={bemBlocks.item("title")} dangerouslySetInnerHTML={{__html:_.get(result,"highlight.title",false) || result._source.title}}>
+        <div data-qa="name" className={bemBlocks.item("name")} dangerouslySetInnerHTML={{__html:_.get(result,"highlight.name",false) || result._source.name}}>
         </div>
       </a>
     </div>
   )
 }
-
-const CardHitsItem = (props)=> {
-  const {bemBlocks, result} = props
-  return (
-    <div className={bemBlocks.item().mix(bemBlocks.container("item"))} data-qa="hit">
-      {result._source.name}
-    </div>
-  )
-}
-
 
 export class App extends React.Component<any, any> {
 
@@ -102,11 +93,11 @@ export class App extends React.Component<any, any> {
                 </div>
 
               </div>
-                    <Hits hitsPerPage={12} highlightFields={["title"]}
+                    <Hits hitsPerPage={12} highlightFields={["name"]}
                     itemComponent={CardHitsItem}
                     scrollTo="body"
               />
-              <NoHits suggestionsField={"title"}/>
+              <NoHits suggestionsField={"name"}/>
               <InitialLoader/>
                     <Pagination showNumbers={true}/>
                 </div>
