@@ -1,5 +1,5 @@
 "use strict"
-let cards = require("./data/allCardsWithSets.js");
+let cards = require("./data/allCardsWithSetsExt.js");
 let indexer = require("./indexer");
 let _ = require("lodash");
 let cardDocs = _.map(cards, (card)=> {

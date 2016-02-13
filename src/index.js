@@ -26,12 +26,12 @@ import {
 
 const CardHitsItem = (props)=> {
   const {bemBlocks, result} = props;
-  let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + result._source.multiverseids[multiverseids.length - 1].multiverseid;
-  let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/' + result._source.multiverseids[multiverseids.length - 1].multiverseid + 'jpg';
+  let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid;
+  let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/' + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid + '.jpg';
   return (
     <div className={bemBlocks.item().mix(bemBlocks.container("item"))} data-qa="hit">
       <a href={url} target="_blank">
-        <img data-qa="name" className={bemBlocks.item("name")} src={imgUrl} width="170" height="240"/>
+        <img data-qa="name" className={bemBlocks.item("name")} src={imgUrl} width="223" height="310"/>
       </a>
       <a href={url} target="_blank">
         <div data-qa="name" className={bemBlocks.item("name")} dangerouslySetInnerHTML={{__html:_.get(result,"highlight.name",false) || result._source.name}}>
@@ -59,23 +59,26 @@ export class App extends React.Component<any, any> {
 
           <div className="layout__top-bar top-bar">
             <div className="top-bar__content">
-              <div className="my-logo">Gatherer cards</div>
+              <div className="my-logo">Gatherer V2</div>
               <SearchBox
                 translations={{"searchbox.placeholder":"search cards"}}
                 queryOptions={{"minimum_should_match":"70%"}}
                 autofocus={true}
                 searchOnChange={true}
-                queryFields={["artist","name","text"]}/>
+                queryFields={["type","name"]}/>
             </div>
           </div>
 
           <div className="layout__body">
 
-              <div className="layout__filters">                              
-                <RefinementListFilter id="colors" title="Colors" field="colors.raw" size={5}/>
-                <RefinementListFilter id="layout" title="Layout" field="layout.raw" size={5}/>
-                <RefinementListFilter id="type" title="Type" field="type.raw" size={5}/>
-                <RefinementListFilter id="codes" title="Codes" field="codes.raw" size={5}/>
+              <div className="layout__filters">
+                
+                <RangeFilter id="cmc" min={0} max={15} title="Converted Cost" field="cmc" showHistogram={true}/>
+                <RefinementListFilter id="colors" title="Colors" field="colors.raw" size={6} operator="AND"/>
+                <RefinementListFilter id="layout" title="Layout" field="layout.raw" size={5} operator="AND"/>
+                <RefinementListFilter id="type" title="Type" field="types.raw" size={5} operator="AND"/>
+                <RefinementListFilter id="type" title="Subtype" field="subtypes.raw" size={5} operator="AND"/>
+                <RefinementListFilter id="codes" title="Set" field="codes.raw" size={5} operator="AND"/>
             </div>
 
                 <div className="layout__results results-list">
@@ -84,6 +87,12 @@ export class App extends React.Component<any, any> {
 
                 <div className="action-bar__info">
                     <HitsStats />
+                    <SortingSelector options={[
+                      {label:"Name", field: "name.raw", order: "asc", defaultOption:true},
+                      {label:"Relevance", field:"_score", order:"desc"},
+                      {label:"Colour", field:"colors", order:"desc"},
+                      {label:"Converted Cost", field:"cmc", order:"asc"}
+                    ]}/>
                       
                     </div>
 
