@@ -66,7 +66,7 @@ export class App extends React.Component<any, any> {
       <div>
       <SearchkitProvider searchkit={this.searchkit}>
       <div>
-        <div className="sk-layout">
+        <div className="sk-layout sk-layout__size-l">
 
           <div className="sk-layout__top-bar sk-top-bar">
             <div className="sk-top-bar__content">
