@@ -66,10 +66,10 @@ export class App extends React.Component<any, any> {
       <div>
       <SearchkitProvider searchkit={this.searchkit}>
       <div>
-        <div className="layout">
+        <div className="sk-layout">
 
-          <div className="layout__top-bar top-bar">
-            <div className="top-bar__content">
+          <div className="sk-layout__top-bar sk-top-bar">
+            <div className="sk-top-bar__content">
               <div className="my-logo">Gatherer V2</div>
               <SearchBox
                 translations={{"searchbox.placeholder":"search cards"}}
@@ -80,9 +80,9 @@ export class App extends React.Component<any, any> {
             </div>
           </div>
 
-          <div className="layout__body">
+          <div className="sk-layout__body">
 
-            <div className="layout__filters">
+            <div className="sk-layout__filters">
               <RangeFilter id="cmc" min={0} max={15} title="Converted Cost" field="cmc" showHistogram={true}/>
               <RefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator="AND"/>
               <RefinementListFilter id="symbols" title="Symbols" field="symbols" size={5} operator="AND" itemComponent={SymbolRefineList}/>
@@ -93,9 +93,9 @@ export class App extends React.Component<any, any> {
               <RefinementListFilter id="codes" title="Set" field="codes.raw" size={5} operator="AND"/>
             </div>
 
-            <div className="layout__results results-list">
-              <div className="results-list__action-bar action-bar">
-                <div className="action-bar__info">
+            <div className="sk-layout__results sk-results-list">
+              <div className="sk-results-list__action-bar sk-action-bar">
+                <div className="sk-action-bar__info">
                   <HitsStats />
                   <SortingSelector options={[
                     {label:"Name", field: "name.raw", order: "asc", defaultOption:true},
@@ -105,13 +105,14 @@ export class App extends React.Component<any, any> {
                   ]}/>
                 </div>
 
-                <div className="action-bar__filters">
+                <div className="sk-action-bar__filters">
                   <SelectedFilters/>
                   <ResetFilters/>
                 </div>
 
               </div>
               <Hits hitsPerPage={12} highlightFields={["name"]}
+                mod="sk-hits-grid"
                 itemComponent={CardHitsItem}
                 scrollTo="body" />
               <NoHits suggestionsField={"name"}/>
