@@ -72,7 +72,7 @@ export class App extends React.Component<any, any> {
             <div className="top-bar__content">
               <div className="my-logo">Gatherer V2</div>
               <SearchBox
-                translations={{"searchbox.placeholder":"search cards"}}
+                translations={{"searchbox.placeholder":"search card names"}}
                 queryOptions={{"minimum_should_match":"70%"}}
                 autofocus={true}
                 searchOnChange={true}
