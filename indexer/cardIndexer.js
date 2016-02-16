@@ -26,6 +26,7 @@ function countColours(symbols) {
 }
 let cardDocs = _.map(cards, (card)=> {
 	card.codes = _.map(card.multiverseids, "setCode");
+  card.codeNames = _.map(card.multiverseids, "setName");
   card.colourCount = card.colors ? card.colors.length : 0; // If it doesn't have colours it won't exist so hopefully it's false-y and will go to 0.
   card.colors = card.colors || "Colourless";
   card.symbols = _.uniq(symbolize(card.manaCost)); // Extract all symbols from {} that aren't numeric. Remove duplicates with _.uniq.
@@ -58,7 +59,8 @@ let mapping = {
   type:stringWithRaw,
   supertype:stringWithRaw,
   types:stringWithRaw,
-  codes:stringWithRaw  
+  codes:stringWithRaw,
+  codeNames:stringWithRaw
 };
 
 let cardIndexer = new indexer(
