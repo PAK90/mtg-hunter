@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "lint": "eslint src",
-    "index":"node --harmony indexer/cardIndexer"
+    "index": "node --harmony indexer/cardIndexer"
   },
   "repository": "git:",
   "author": "Pēteris Arvīds Kļaviņš",
@@ -44,6 +44,7 @@
     "moment": "^2.11.2",
     "mtg-json": "^1.0.1",
     "normalize.css": "^3.0.3",
+    "query-string": "^3.0.0",
     "react": "^0.14.3",
     "react-addons-css-transition-group": "^0.14.3",
     "react-autosuggest": "^3.4.0",

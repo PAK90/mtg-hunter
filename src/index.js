@@ -24,7 +24,7 @@ import {
   RangeFilter,
   InitialLoader,
   ViewSwitcherHits,
-  ViewSwitcherToggle  
+  ViewSwitcherToggle
 } from "searchkit";
 
 String.prototype.replaceAll = function(s,r){return this.split(s).join(r)};
@@ -107,7 +107,7 @@ export class App extends React.Component<any, any> {
   }
 
   CardHitsListItem = (props)=> {
-    const {bemBlocks, result} = props  
+    const {bemBlocks, result} = props
     const source = result._source
     // Add onHover for the image to enlarge with Velocity.
     let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid;
@@ -132,11 +132,11 @@ export class App extends React.Component<any, any> {
                 <br/>
               </span>
             )
-          })}</h3>        
+          })}</h3>
         </div>
       </div>
     )
-  }
+  };
 
   render(){
 
