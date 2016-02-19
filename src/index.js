@@ -38,10 +38,6 @@ const CardHitsGridItem = (props)=> {
       <a href={url} target="_blank">
         <img data-qa="name" className={bemBlocks.item("name")} src={imgUrl} width="223" /*height="310"*//>
       </a>
-      <a href={url} target="_blank">
-        <div data-qa="name" className={bemBlocks.item("name")} dangerouslySetInnerHTML={{__html:_.get(result,"highlight.name",false) || result._source.name}}>
-        </div>
-      </a>
     </div>
   )
 }
@@ -70,11 +66,14 @@ function generateTitleCostSymbols(source) {
 function generateTextCostSymbols(source) {
   var tagged;
   if (source !== undefined) {
-    source = source.replace(/\//g,''); // Get rid of / in any costs first, but only if inside some {} brackets.
+    // Get rid of / in any costs first, but only if inside {} brackets (so as not to affect +1/+1).
+    source = source.replace(/(\/)(?=\w\})/g,'');
+    // Then generate the tags through setting the innerHtml. This is the only way to preserve the text around the img tags.
     tagged = <div dangerouslySetInnerHTML={{__html: source.replace(/\{([0-z,½,∞]+)\}/g, (fullMatch, firstMatch) =>
-        `<img src=./src/img/${firstMatch.toLowerCase()}.png height=15px/>`
+        `<img src=./src/img/${firstMatch.toLowerCase()}.png height=12px/>`
       )}}></div>
-    /*tagged = tagged.split("\n").map(function(item) {
+    // Lastly, go into that new html and turn all newlines into linebreaks. Sadly this erases the img tags as objects.
+    /*tagged = tagged.props.dangerouslySetInnerHTML.__html.split("\n").map(function(item) {
             return (
               <span>
                 {item}
@@ -108,16 +107,22 @@ export class App extends React.Component<any, any> {
     super();
     const host = "http://localhost:9200/cards/card";
     this.searchkit = new SearchkitManager(host);
-    this.state = {hoveredId: ''};
+    this.state = {hoveredId: '',
+      matchPercent: '90%',
+      searchField: 'name'};
   }
 
   handleHoverIn(source) {
     this.setState({hoveredId: source.id});
-    console.log(this.state.hoveredId);
   }
+
   handleHoverOut(source) {
     this.setState({hoveredId: ''});
-    console.log(this.state.hoveredId);
+  }
+
+  handleSearchChange(e) {
+    console.log(e);
+    this.setState({searchField: e.target.value})
   }
 
   /*
@@ -129,6 +134,15 @@ export class App extends React.Component<any, any> {
               </span>
             )*/
 
+  getSetIcons(source) {
+    // Loop through all multiverseIds, which have their own set code and rarity.
+    var setImages = source.multiverseids.map(function(multis, i) {
+      var rarity = multis.rarity.charAt(0) == "B" ? "C" : multis.rarity.charAt(0)
+      return <img src={'./src/img/sets/' + multis.setCode + '-' + rarity + '.jpg'}/>
+    })
+    return setImages;
+  }
+
   CardHitsListItem = (props)=> {
     const {bemBlocks, result} = props
     const source = result._source
@@ -138,6 +152,7 @@ export class App extends React.Component<any, any> {
     // Generate the mana symbols in both cost and the card text.
     source.tagCost = generateTitleCostSymbols(source.manaCost);
     source.taggedText = generateTextCostSymbols(source.text);
+    // For some reason, hovering over the image scrolls the page back up...
     return (
       <div className={bemBlocks.item().mix(bemBlocks.container("item"))} data-qa="hit">
         <div className={bemBlocks.item("name")}>
@@ -148,7 +163,11 @@ export class App extends React.Component<any, any> {
         </div>
         <div className={bemBlocks.item("details")}>
           <h2 className={bemBlocks.item("title")}>{source.name} {source.tagCost} ({source.cmc ? source.cmc : 0})</h2>
+          <h3 className={bemBlocks.item("subtitle")}><b>{source.type}</b></h3>
           <h3 className={bemBlocks.item("subtitle")}>{source.taggedText}</h3>
+        </div>
+        <div>
+          <p style={{textAlign:'right'}}>{this.getSetIcons(source)}</p>
         </div>
       </div>
     )
@@ -167,10 +186,16 @@ export class App extends React.Component<any, any> {
               <div className="my-logo">Gatherer V2</div>
               <SearchBox
                 translations={{"searchbox.placeholder":"search card names"}}
-                queryOptions={{"minimum_should_match":"70%"}}
+                queryOptions={{"minimum_should_match":this.state.matchPercent}}
                 autofocus={true}
                 searchOnChange={true}
-                queryFields={["type","name"]}/>
+                queryFields={[this.state.searchField]}/>
+                <select name="searchField" onChange={this.handleSearchChange.bind(this)}>
+                  <option value="name">Name</option>
+                  <option value="text">Body text</option>
+                  <option value="flavor">Flavour text</option>
+                  <option value="type">Type</option>
+                </select>
             </div>
           </div>
 
@@ -180,7 +205,7 @@ export class App extends React.Component<any, any> {
               <RangeFilter id="cmc" min={0} max={15} title="Converted Cost" field="cmc" showHistogram={true}/>
               <RefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator="AND"/>
               <RefinementListFilter id="symbols" title="Symbols" field="symbols" size={5} operator="AND" itemComponent={SymbolRefineList}/>
-              <RefinementListFilter id="colourCount" title="Colour Count" field="colourCount" size={6} operator="AND"/>
+              <RefinementListFilter id="colourCount" title="Colour Count" field="colourCount" size={6} operator="AND" orderKey="_term"/>
               <RefinementListFilter id="rarity" title="Rarity" field="rarity.raw" size={5} operator="AND"/>
               <RefinementListFilter id="type" title="Type" field="types.raw" size={5} operator="AND"/>
               <RefinementListFilter id="subtype" title="Subtype" field="subtypes.raw" size={5} operator="AND"/>
