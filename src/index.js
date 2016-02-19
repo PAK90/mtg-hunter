@@ -50,7 +50,7 @@ const CardHitsGridItem = (props)=> {
 
 //"Enchant creature↵Enchanted creature gets +1/+1 for each creature you control.↵Cycling {G/W} ({G/W}, Discard this card: Draw a card.)"
 
-function generateCostSymbols(source) {
+function generateTitleCostSymbols(source) {
   // Take the manacost and return a bunch of img divs.
   var tagged;
   if (source !== undefined) {
@@ -63,13 +63,27 @@ function generateCostSymbols(source) {
           return <img key={i} src={src} height='15px'/>;
       });
     }
-    /*tagged = source.replace(/\{([0-z,½,∞]+)\}/g, function(basename) {
-      var src = './src/img/' + basename.substring(1, basename.length - 1).toLowerCase() + '.png';
-      return <img src="$1" height='15px'/>});*/
   }
   return tagged;
 }
 
+function generateTextCostSymbols(source) {
+  var tagged;
+  if (source !== undefined) {
+    source = source.replace(/\//g,''); // Get rid of / in any costs first, but only if inside some {} brackets.
+    tagged = <div dangerouslySetInnerHTML={{__html: source.replace(/\{([0-z,½,∞]+)\}/g, (fullMatch, firstMatch) =>
+        `<img src=./src/img/${firstMatch.toLowerCase()}.png height=15px/>`
+      )}}></div>
+    /*tagged = tagged.split("\n").map(function(item) {
+            return (
+              <span>
+                {item}
+                <br/>
+              </span>
+            )})*/
+  }
+  return tagged;
+}
 
 const SymbolRefineList = (props:FilterItemComponentProps, showCheckbox)=> {
   const {bemBlocks, toggleFilter, translate, selected, label, count} = props;
@@ -94,17 +108,26 @@ export class App extends React.Component<any, any> {
     super();
     const host = "http://localhost:9200/cards/card";
     this.searchkit = new SearchkitManager(host);
-    var hoveredId = '';
+    this.state = {hoveredId: ''};
   }
 
   handleHoverIn(source) {
-    this.hoveredId = source.id;
-    console.log(this.hoveredId);
+    this.setState({hoveredId: source.id});
+    console.log(this.state.hoveredId);
   }
   handleHoverOut(source) {
-    this.hoveredId = '';
-    console.log(this.hoveredId);
+    this.setState({hoveredId: ''});
+    console.log(this.state.hoveredId);
   }
+
+  /*
+  .split("\n").map(function(item) {
+            return (
+              <span>
+                {item}
+                <br/>
+              </span>
+            )*/
 
   CardHitsListItem = (props)=> {
     const {bemBlocks, result} = props
@@ -113,26 +136,19 @@ export class App extends React.Component<any, any> {
     let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid;
     let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/' + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid + '.jpg';
     // Generate the mana symbols in both cost and the card text.
-    source.tagCost = generateCostSymbols(source.manaCost);
-    //source.taggedText = generateCostSymbols(source.text);
+    source.tagCost = generateTitleCostSymbols(source.manaCost);
+    source.taggedText = generateTextCostSymbols(source.text);
     return (
       <div className={bemBlocks.item().mix(bemBlocks.container("item"))} data-qa="hit">
         <div className={bemBlocks.item("name")}>
         <a href={url} target="_blank">
-          <img data-qa="name" src={imgUrl} width={this.hoveredId == source.id ? "223" : "100"} onMouseOver={this.handleHoverIn.bind(this, source)}
+          <img data-qa="name" src={imgUrl} width={this.state.hoveredId == source.id ? "223" : "100"} onMouseOver={this.handleHoverIn.bind(this, source)}
                           onMouseOut={this.handleHoverOut.bind(this, source)}/>
         </a>
         </div>
         <div className={bemBlocks.item("details")}>
           <h2 className={bemBlocks.item("title")}>{source.name} {source.tagCost} ({source.cmc ? source.cmc : 0})</h2>
-          <h3 className={bemBlocks.item("subtitle")}>{source.text.split("\n").map(function(item) {
-            return (
-              <span>
-                {item}
-                <br/>
-              </span>
-            )
-          })}</h3>
+          <h3 className={bemBlocks.item("subtitle")}>{source.taggedText}</h3>
         </div>
       </div>
     )
@@ -209,9 +225,5 @@ export class App extends React.Component<any, any> {
       </div>
     )}
 }
-/*<Hits hitsPerPage={12} highlightFields={["name"]}
-                mod="sk-hits-grid"
-                itemComponent={CardHitsGridItem}
-                scrollTo="body" />*/
 
 ReactDOM.render(<App />, document.getElementById('app'));
