@@ -10,7 +10,6 @@ import {
   SearchBox,
   Hits,
   HitsStats,
-  RefinementListFilter,
   Pagination,
   ResetFilters,
   MenuFilter,
@@ -28,6 +27,7 @@ import {
   ViewSwitcherHits,
   ViewSwitcherToggle
 } from "searchkit";
+import {RefinementListFilter} from './modRefineListFilter.js';
 
 String.prototype.replaceAll = function(s,r){return this.split(s).join(r)};
 
@@ -104,7 +104,8 @@ const SetRefineList = (props:FilterItemComponentProps, showCheckbox)=> {
     <FastClick handler={toggleFilter}>
       <div className={className} data-qa="option">
         {showCheckbox ? <input type="checkbox" data-qa="checkbox" checked={selected} readOnly className={block("checkbox").state({ selected }) } ></input> : undefined}
-        <img src = {'./src/img/sets/' + props.label.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-R.jpg'} />
+        <img src = {'./src/img/sets/' + props.label.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-R.jpg'}
+          style={{objectFit: 'contain', padding: '2px'}} />
         <div data-qa="label" className={block("text")}>{label}</div>
         <div data-qa="count" className={block("count")} style={{flex:'1'}}>{count}</div>
       </div>
@@ -119,7 +120,8 @@ export class App extends React.Component<any, any> {
     const host = "http://localhost:9200/cards/card";
     this.searchkit = new SearchkitManager(host);
     this.state = {hoveredId: '',
-      matchPercent: '95%'};
+      matchPercent: '95%',
+      operator: "AND"};
   }
 
   handleHoverIn(source) {
@@ -136,13 +138,19 @@ export class App extends React.Component<any, any> {
     this.searchkit.performSearch();
   }
 
+  handleOperatorChange(e){
+    this.setState({operator: e.target.value})
+  }
+
   getSetIcons(source) {
     // Loop through all multiverseIds, which have their own set code and rarity.
     var setImages = source.multiverseids.map(function(multis, i) {
       let rarity = multis.rarity.charAt(0) == "B" ? "C" : multis.rarity.charAt(0)
       let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + multis.multiverseid;
       return (<a href={url} target="_blank">
-              <img src={'./src/img/sets/' + multis.setName.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-' + rarity + '.jpg'} title={multis.setName}/>
+              <img src={'./src/img/sets/' + multis.setName.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-' + rarity + '.jpg'} 
+                title={multis.setName}
+                style={{padding: '2px'}}/>
               </a> )
     })
     return setImages;
@@ -171,8 +179,8 @@ export class App extends React.Component<any, any> {
           <h3 className={bemBlocks.item("subtitle")}><b>{source.type}</b></h3>
           <h3 className={bemBlocks.item("subtitle")}>{source.taggedText}</h3>
         </div>
-        <div>
-          <p style={{textAlign:'right'}}>{this.getSetIcons(source)}</p>
+        <div style={{minWidth: '100px', width: '150px', position: 'absolute', right:'10px'}}>
+          <p style={{textAlign:'center'}}>{this.getSetIcons(source)}</p>
         </div>
       </div>
     )
@@ -209,13 +217,17 @@ export class App extends React.Component<any, any> {
 
             <div className="sk-layout__filters">
               <RangeFilter id="cmc" min={0} max={15} title="Converted Cost" field="cmc" showHistogram={true}/>
-              <RefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator="AND"/>
-              <RefinementListFilter id="symbols" title="Symbols" field="symbols" size={5} operator="AND" itemComponent={SymbolRefineList}/>
-              <RefinementListFilter id="colourCount" title="Colour Count" field="colourCount" size={6} operator="AND" orderKey="_term"/>
-              <RefinementListFilter id="rarity" title="Rarity" field="rarity.raw" size={5} operator="AND"/>
-              <RefinementListFilter id="type" title="Type" field="types.raw" size={5} operator="AND"/>
-              <RefinementListFilter id="subtype" title="Subtype" field="subtypes.raw" size={5} operator="AND"/>
-              <RefinementListFilter id="setcodes" title="Set" field="codeNames.raw" size={5} operator="AND" itemComponent={SetRefineList}/>
+              <select value={this.state.operator} onChange={this.handleOperatorChange.bind(this) }>
+                <option value="AND">AND</option>
+                <option value="OR">OR</option>
+              </select>
+              <RefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator={this.state.operator}/>
+              <RefinementListFilter id="symbols" title="Symbols" field="symbols" size={5} operator={this.state.operator} itemComponent={SymbolRefineList}/>
+              <RefinementListFilter id="colourCount" title="Colour Count" field="colourCount" size={6} operator={this.state.operator} orderKey="_term"/>
+              <RefinementListFilter id="rarity" title="Rarity" field="rarity.raw" size={5} operator={this.state.operator}/>
+              <RefinementListFilter id="type" title="Type" field="types.raw" size={5} operator={this.state.operator}/>
+              <RefinementListFilter id="subtype" title="Subtype" field="subtypes.raw" size={5} operator={this.state.operator}/>
+              <RefinementListFilter id="setcodes" title="Set" field="codeNames.raw" size={5} operator={this.state.operator} itemComponent={SetRefineList}/>
             </div>
 
             <div className="sk-layout__results sk-results-list">
