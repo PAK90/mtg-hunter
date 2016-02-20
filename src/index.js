@@ -68,19 +68,11 @@ function generateTextCostSymbols(source) {
   if (source !== undefined) {
     // Get rid of / in any costs first, but only if inside {} brackets (so as not to affect +1/+1).
     source = source.replace(/(\/)(?=\w\})/g,'');
-    //tagged = nl2br(source);
     // Then generate the tags through setting the innerHtml. This is the only way to preserve the text around the img tags.
-    tagged = <div dangerouslySetInnerHTML={{__html: ent.encode(source).replace(/\r?\n/g, <br/>).replace(/\{([0-z,½,∞]+)\}/g, (fullMatch, firstMatch) =>
+    // Encode the source in html, to prevent XSS nastiness. Then replace the newlines with <br/>. Then insert the <img> tags.
+    tagged = <div dangerouslySetInnerHTML={{__html: ent.encode(source).replace(/&#10;/g, '<br/>').replace(/\{([0-z,½,∞]+)\}/g, (fullMatch, firstMatch) =>
         `<img src=./src/img/${firstMatch.toLowerCase()}.png height=12px/>`
       )}}></div>
-    // Lastly, go into that new html and turn all newlines into linebreaks. Sadly this erases the img tags as objects.
-    /*tagged = tagged.props.dangerouslySetInnerHTML.__html.split("\n").map(function(item) {
-            return (
-              <span>
-                {item}
-                <br/>
-              </span>
-            )})*/
   }
   return tagged;
 }
@@ -112,7 +104,7 @@ const SetRefineList = (props:FilterItemComponentProps, showCheckbox)=> {
     <FastClick handler={toggleFilter}>
       <div className={className} data-qa="option">
         {showCheckbox ? <input type="checkbox" data-qa="checkbox" checked={selected} readOnly className={block("checkbox").state({ selected }) } ></input> : undefined}
-        <img src = {'./src/img/sets/' + props.label.toUpperCase() + '-R.png'} />
+        <img src = {'./src/img/sets/' + props.label.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-R.jpg'} />
         <div data-qa="label" className={block("text")}>{label}</div>
         <div data-qa="count" className={block("count")} style={{flex:'1'}}>{count}</div>
       </div>
@@ -141,16 +133,8 @@ export class App extends React.Component<any, any> {
   handleSearchChange(e) {
     this.searchkit.getQueryAccessor().options.queryFields = [e.target.value];
     this.searchkit.getQueryAccessor().options.prefixQueryFields = [e.target.value];
+    this.searchkit.performSearch();
   }
-
-  /*
-  .split("\n").map(function(item) {
-            return (
-              <span>
-                {item}
-                <br/>
-              </span>
-            )*/
 
   getSetIcons(source) {
     // Loop through all multiverseIds, which have their own set code and rarity.
@@ -158,7 +142,7 @@ export class App extends React.Component<any, any> {
       let rarity = multis.rarity.charAt(0) == "B" ? "C" : multis.rarity.charAt(0)
       let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + multis.multiverseid;
       return (<a href={url} target="_blank">
-              <img src={'./src/img/sets/' + multis.setCode + '-' + rarity + '.jpg'} title={multis.setName}/>
+              <img src={'./src/img/sets/' + multis.setName.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-' + rarity + '.jpg'} title={multis.setName}/>
               </a> )
     })
     return setImages;
@@ -216,6 +200,7 @@ export class App extends React.Component<any, any> {
                   <option value="text">Body text</option>
                   <option value="flavor">Flavour text</option>
                   <option value="type">Type</option>
+                  <option value="artist">Artist</option>
                 </select>
             </div>
           </div>
