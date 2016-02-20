@@ -3,6 +3,8 @@ import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import "searchkit/theming/theme.scss";
 import "./styles/customisations.scss";
+var ent = require('ent');
+const nl2br = require('react-nl2br');
 
 import {
   SearchBox,
@@ -42,8 +44,6 @@ const CardHitsGridItem = (props)=> {
   )
 }
 
-
-
 //"Enchant creature↵Enchanted creature gets +1/+1 for each creature you control.↵Cycling {G/W} ({G/W}, Discard this card: Draw a card.)"
 
 function generateTitleCostSymbols(source) {
@@ -68,8 +68,9 @@ function generateTextCostSymbols(source) {
   if (source !== undefined) {
     // Get rid of / in any costs first, but only if inside {} brackets (so as not to affect +1/+1).
     source = source.replace(/(\/)(?=\w\})/g,'');
+    //tagged = nl2br(source);
     // Then generate the tags through setting the innerHtml. This is the only way to preserve the text around the img tags.
-    tagged = <div dangerouslySetInnerHTML={{__html: source.replace(/\{([0-z,½,∞]+)\}/g, (fullMatch, firstMatch) =>
+    tagged = <div dangerouslySetInnerHTML={{__html: ent.encode(source).replace(/\r?\n/g, <br/>).replace(/\{([0-z,½,∞]+)\}/g, (fullMatch, firstMatch) =>
         `<img src=./src/img/${firstMatch.toLowerCase()}.png height=12px/>`
       )}}></div>
     // Lastly, go into that new html and turn all newlines into linebreaks. Sadly this erases the img tags as objects.
@@ -101,6 +102,24 @@ const SymbolRefineList = (props:FilterItemComponentProps, showCheckbox)=> {
   )
 }
 
+const SetRefineList = (props:FilterItemComponentProps, showCheckbox)=> {
+  const {bemBlocks, toggleFilter, translate, selected, label, count} = props;
+  const block = bemBlocks.option;
+  const className = block()
+                    .state({selected})
+                    .mix(bemBlocks.container("item"));
+  return (
+    <FastClick handler={toggleFilter}>
+      <div className={className} data-qa="option">
+        {showCheckbox ? <input type="checkbox" data-qa="checkbox" checked={selected} readOnly className={block("checkbox").state({ selected }) } ></input> : undefined}
+        <img src = {'./src/img/sets/' + props.label.toUpperCase() + '-R.png'} />
+        <div data-qa="label" className={block("text")}>{label}</div>
+        <div data-qa="count" className={block("count")} style={{flex:'1'}}>{count}</div>
+      </div>
+    </FastClick>
+  )
+}
+
 export class App extends React.Component<any, any> {
 
   constructor() {
@@ -108,8 +127,7 @@ export class App extends React.Component<any, any> {
     const host = "http://localhost:9200/cards/card";
     this.searchkit = new SearchkitManager(host);
     this.state = {hoveredId: '',
-      matchPercent: '90%',
-      searchField: 'name'};
+      matchPercent: '95%'};
   }
 
   handleHoverIn(source) {
@@ -121,8 +139,8 @@ export class App extends React.Component<any, any> {
   }
 
   handleSearchChange(e) {
-    console.log(e);
-    this.setState({searchField: e.target.value})
+    this.searchkit.getQueryAccessor().options.queryFields = [e.target.value];
+    this.searchkit.getQueryAccessor().options.prefixQueryFields = [e.target.value];
   }
 
   /*
@@ -137,8 +155,11 @@ export class App extends React.Component<any, any> {
   getSetIcons(source) {
     // Loop through all multiverseIds, which have their own set code and rarity.
     var setImages = source.multiverseids.map(function(multis, i) {
-      var rarity = multis.rarity.charAt(0) == "B" ? "C" : multis.rarity.charAt(0)
-      return <img src={'./src/img/sets/' + multis.setCode + '-' + rarity + '.jpg'}/>
+      let rarity = multis.rarity.charAt(0) == "B" ? "C" : multis.rarity.charAt(0)
+      let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + multis.multiverseid;
+      return (<a href={url} target="_blank">
+              <img src={'./src/img/sets/' + multis.setCode + '-' + rarity + '.jpg'} title={multis.setName}/>
+              </a> )
     })
     return setImages;
   }
@@ -157,7 +178,7 @@ export class App extends React.Component<any, any> {
       <div className={bemBlocks.item().mix(bemBlocks.container("item"))} data-qa="hit">
         <div className={bemBlocks.item("name")}>
         <a href={url} target="_blank">
-          <img data-qa="name" src={imgUrl} width={this.state.hoveredId == source.id ? "223" : "100"} onMouseOver={this.handleHoverIn.bind(this, source)}
+          <img src={imgUrl} width={this.state.hoveredId == source.id ? "223" : "100"} onMouseOver={this.handleHoverIn.bind(this, source)}
                           onMouseOut={this.handleHoverOut.bind(this, source)}/>
         </a>
         </div>
@@ -189,7 +210,7 @@ export class App extends React.Component<any, any> {
                 queryOptions={{"minimum_should_match":this.state.matchPercent}}
                 autofocus={true}
                 searchOnChange={true}
-                queryFields={[this.state.searchField]}/>
+                queryFields={["name"]}/>
                 <select name="searchField" onChange={this.handleSearchChange.bind(this)}>
                   <option value="name">Name</option>
                   <option value="text">Body text</option>
@@ -209,7 +230,7 @@ export class App extends React.Component<any, any> {
               <RefinementListFilter id="rarity" title="Rarity" field="rarity.raw" size={5} operator="AND"/>
               <RefinementListFilter id="type" title="Type" field="types.raw" size={5} operator="AND"/>
               <RefinementListFilter id="subtype" title="Subtype" field="subtypes.raw" size={5} operator="AND"/>
-              <RefinementListFilter id="setcodes" title="Set" field="codeNames.raw" size={5} operator="AND"/>
+              <RefinementListFilter id="setcodes" title="Set" field="codeNames.raw" size={5} operator="AND" itemComponent={SetRefineList}/>
             </div>
 
             <div className="sk-layout__results sk-results-list">
@@ -220,7 +241,7 @@ export class App extends React.Component<any, any> {
                   <SortingSelector options={[
                     {label:"Name", field: "name.raw", order: "asc", defaultOption:true},
                     {label:"Relevance", field:"_score", order:"desc"},
-                    {label:"Colour", field:"colors", order:"desc"},
+                    {label:"Colour", field:"colors", order:"asc"},
                     {label:"Converted Cost", field:"cmc", order:"asc"}
                   ]}/>
                 </div>
@@ -237,7 +258,7 @@ export class App extends React.Component<any, any> {
                     {key:"grid", title:"Grid", itemComponent:CardHitsGridItem, defaultOption:true},
                     {key:"list", title:"List", itemComponent:this.CardHitsListItem}
                   ]}
-                  scrollTo="body"
+                  scrollTo={false}
               />
               <NoHits suggestionsField={"name"}/>
               <InitialLoader/>
