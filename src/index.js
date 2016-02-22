@@ -28,6 +28,7 @@ import {
   ViewSwitcherToggle
 } from "searchkit";
 import {RefinementListFilter} from './modRefineListFilter.js';
+import {CardDetailPanel} from './CardDetailPanel.js';
 
 String.prototype.replaceAll = function(s,r){return this.split(s).join(r)};
 
