@@ -1,4 +1,4 @@
-MtG Gatherer v2; a better Magic card database.
+MtG Hunter; a better Magic card database.
 ==
 First [get Node.js](https://nodejs.org/en/download). Node's package manager, npm, comes with the node installer. Then, in the project directory, install all the npm goodness.
 ```bash

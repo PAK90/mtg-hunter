@@ -38,7 +38,7 @@ const CardHitsGridItem = (props)=> {
   return (
     <div className={bemBlocks.item().mix(bemBlocks.container("item"))} data-qa="hit">
       <a href={url} target="_blank">
-        <img data-qa="name" className={bemBlocks.item("name")} src={imgUrl} width="223" /*height="310"*//>
+        <img style={{borderRadius: '12px', boxShadow: '3px 3px 6px 0 rgba(0, 0, 0, 0.4)'}} src={imgUrl} width="223" /*height="310"*//>
       </a>
     </div>
   )
@@ -100,6 +100,7 @@ const SetRefineList = (props:FilterItemComponentProps, showCheckbox)=> {
   const className = block()
                     .state({selected})
                     .mix(bemBlocks.container("item"));
+  // objectFit: contain is to preserve the shape of the set icons; otherwise they got distorted.
   return (
     <FastClick handler={toggleFilter}>
       <div className={className} data-qa="option">
@@ -145,7 +146,7 @@ export class App extends React.Component<any, any> {
   getSetIcons(source) {
     // Loop through all multiverseIds, which have their own set code and rarity.
     var setImages = source.multiverseids.map(function(multis, i) {
-      let rarity = multis.rarity.charAt(0) == "B" ? "C" : multis.rarity.charAt(0)
+      let rarity = multis.rarity.charAt(0) == "B" ? "C" : multis.rarity.charAt(0); // Replace 'basic' rarity with common.
       let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + multis.multiverseid;
       return (<a href={url} target="_blank">
               <img src={'./src/img/sets/' + multis.setName.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-' + rarity + '.jpg'} 
@@ -165,12 +166,14 @@ export class App extends React.Component<any, any> {
     // Generate the mana symbols in both cost and the card text.
     source.tagCost = generateTitleCostSymbols(source.manaCost);
     source.taggedText = generateTextCostSymbols(source.text);
-    // For some reason, hovering over the image scrolls the page back up...
+    // In the style for the set icons, 'relative' enables cards like Forest to grow the div around them to fit all the symbols.
+    // In the future, might want an 'open/close' <p> tag for that, since it's pretty useless seeing all those symbols anyway.
+    // The <p> tag helps to align the symbols in the centre, and probably other important css-y stuff.
     return (
       <div className={bemBlocks.item().mix(bemBlocks.container("item"))} data-qa="hit">
         <div className={bemBlocks.item("name")}>
         <a href={url} target="_blank">
-          <img src={imgUrl} width={this.state.hoveredId == source.id ? "223" : "100"} onMouseOver={this.handleHoverIn.bind(this, source)}
+          <img src={imgUrl} style={{borderRadius: this.state.hoveredId == source.id ? "10" : "3"}} width={this.state.hoveredId == source.id ? "223" : "100"} onMouseOver={this.handleHoverIn.bind(this, source)}
                           onMouseOut={this.handleHoverOut.bind(this, source)}/>
         </a>
         </div>
@@ -179,7 +182,7 @@ export class App extends React.Component<any, any> {
           <h3 className={bemBlocks.item("subtitle")}><b>{source.type}</b></h3>
           <h3 className={bemBlocks.item("subtitle")}>{source.taggedText}</h3>
         </div>
-        <div style={{minWidth: '100px', width: '150px', position: 'absolute', right:'10px'}}>
+        <div style={{width: '150px', position: 'relative', right:'10px'}}>
           <p style={{textAlign:'center'}}>{this.getSetIcons(source)}</p>
         </div>
       </div>

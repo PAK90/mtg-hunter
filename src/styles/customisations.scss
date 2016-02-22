@@ -30,19 +30,18 @@ html {
   max-width: none;
 }
 
-/* Ensures minimum width. */
-.sk-hits-list-hit__details {
-  min-width: 150px;
-  position: relative;
-}
-
-/* Lets the set symbols 'align right'.*/
+/* Lets the set symbols 'align right' (key part being position: relative).*/
 .sk-hits-list-hit {
+  background: #f4f4f4;
+  border-radius: 3px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
   width: 100%;
   position: relative;
 }
 
-/* Ensures the text doesn't overlap with set symbols. */
-.sk-hits-list-hit__subtitle {
-  margin-right: 150px
+/* Ensures minimum width of card text in List mode. */
+.sk-hits-list-hit__details {
+  min-width: 150px;
+  position: relative;
+  padding: 0 10 0 10;
 }
