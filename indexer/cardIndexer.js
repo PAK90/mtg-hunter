@@ -26,11 +26,12 @@ function countColours(symbols) {
 }
 let cardDocs = _.map(cards, (card)=> {
 	card.codes = _.map(card.multiverseids, "setCode");
+  card.formats = _.map(card.legalities, "format");
   card.codeNames = _.map(card.multiverseids, "setName");
   card.colourCount = card.colors ? card.colors.length : 0; // If it doesn't have colours it won't exist so hopefully it's false-y and will go to 0.
   card.colors = card.colors || "Colourless";
   card.symbols = _.uniq(symbolize(card.manaCost)); // Extract all symbols from {} that aren't numeric. Remove duplicates with _.uniq.
-  //card.colourCount = countColours(card.symbols); // Count unique colours. ['w','ug'] = 3, ['r','u','w'] = 3, ['c'] = 0 since colourless isn't a colour.
+  //card.colourCount = countColours(card.symbols); // Count unique colours. ['w','ug'] = 3, ['r','u','w'] = 3, ['c'] = 0 since colourless isn't a colour. Replaced by line 30.
 	return card;
 });
 
@@ -60,7 +61,8 @@ let mapping = {
   supertype:stringWithRaw,
   types:stringWithRaw,
   codes:stringWithRaw,
-  codeNames:stringWithRaw
+  codeNames:stringWithRaw,
+  formats:stringWithRaw
 };
 
 let cardIndexer = new indexer(

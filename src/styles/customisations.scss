@@ -4,6 +4,8 @@ html {
   font-family:"Open Sans";
 }
 
+$divheight:250px;
+
 .my-logo {
   color:white;
   flex:0 0 250px;
@@ -44,4 +46,26 @@ html {
   min-width: 150px;
   position: relative;
   padding: 0 10 0 10;
+}
+
+/* The thing holding complete card details. */
+.cardDetailContainer {
+  background-color: orange;
+  display: block;
+  .cardDiv {
+    background-color: blue;
+    position: absolute;
+    z-index: 2;
+    bottom: 0;
+    width: 100%; 
+    height: $divheight; 
+    position: fixed;
+    bottom: $divheight*-1;
+    transition: 0.3s;
+
+    &.visible {
+      background-color: green;
+      transform:translate3d(0, $divheight*-1, 0);
+    }
+  }
 }

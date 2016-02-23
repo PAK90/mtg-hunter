@@ -28,22 +28,9 @@ import {
   ViewSwitcherToggle
 } from "searchkit";
 import {RefinementListFilter} from './modRefineListFilter.js';
-import {CardDetailPanel} from './CardDetailPanel.js';
+import CardDetailPanel from './CardDetailPanel';
 
 String.prototype.replaceAll = function(s,r){return this.split(s).join(r)};
-
-const CardHitsGridItem = (props)=> {
-  const {bemBlocks, result} = props;
-  let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid;
-  let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/' + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid + '.jpg';
-  return (
-    <div className={bemBlocks.item().mix(bemBlocks.container("item"))} data-qa="hit">
-      <a href={url} target="_blank">
-        <img style={{borderRadius: '12px', boxShadow: '3px 3px 6px 0 rgba(0, 0, 0, 0.4)'}} src={imgUrl} width="223" /*height="310"*//>
-      </a>
-    </div>
-  )
-}
 
 //"Enchant creature↵Enchanted creature gets +1/+1 for each creature you control.↵Cycling {G/W} ({G/W}, Discard this card: Draw a card.)"
 
@@ -122,16 +109,17 @@ export class App extends React.Component<any, any> {
     const host = "http://localhost:9200/cards/card";
     this.searchkit = new SearchkitManager(host);
     this.state = {hoveredId: '',
+      clickedCard: '',
       matchPercent: '95%',
       operator: "AND"};
   }
 
   handleHoverIn(source) {
-    this.setState({hoveredId: source.id});
+    this.setState({clickedCard: source.name});
   }
 
   handleHoverOut(source) {
-    this.setState({hoveredId: ''});
+    this.setState({clickedCard: ''});
   }
 
   handleSearchChange(e) {
@@ -158,9 +146,27 @@ export class App extends React.Component<any, any> {
     return setImages;
   }
 
+  CardHitsGridItem = (props)=> {
+    const {bemBlocks, result} = props;
+    const source = result._source;
+    let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid;
+    let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/' + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid + '.jpg';
+    return (
+      <div className={bemBlocks.item().mix(bemBlocks.container("item"))} data-qa="hit">
+        <a href={url} target="_blank">
+          <img style={{borderRadius: '12px', boxShadow: '3px 3px 6px 0 rgba(0, 0, 0, 0.4)'}} 
+            src={imgUrl} 
+            width="223"
+            onMouseOver={this.handleHoverIn.bind(this, source)}
+            onMouseOut={this.handleHoverOut.bind(this, source)}/>
+        </a>
+      </div>
+    )
+  }
+
   CardHitsListItem = (props)=> {
-    const {bemBlocks, result} = props
-    const source = result._source
+    const {bemBlocks, result} = props;
+    const source = result._source;
     // Add onHover for the image to enlarge with Velocity.
     let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid;
     let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/' + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid + '.jpg';
@@ -174,8 +180,11 @@ export class App extends React.Component<any, any> {
       <div className={bemBlocks.item().mix(bemBlocks.container("item"))} data-qa="hit">
         <div className={bemBlocks.item("name")}>
         <a href={url} target="_blank">
-          <img src={imgUrl} style={{borderRadius: this.state.hoveredId == source.id ? "10" : "3"}} width={this.state.hoveredId == source.id ? "223" : "100"} onMouseOver={this.handleHoverIn.bind(this, source)}
-                          onMouseOut={this.handleHoverOut.bind(this, source)}/>
+          <img src={imgUrl} 
+            style={{borderRadius: this.state.hoveredId == source.id ? "10" : "3"}} 
+            width={this.state.hoveredId == source.id ? "223" : "100"} 
+            onMouseOver={this.handleHoverIn.bind(this, source)}
+            onMouseOut={this.handleHoverOut.bind(this, source)}/>
         </a>
         </div>
         <div className={bemBlocks.item("details")}>
@@ -191,7 +200,6 @@ export class App extends React.Component<any, any> {
   };
 
   render(){
-
     return (
       <div>
       <SearchkitProvider searchkit={this.searchkit}>
@@ -200,7 +208,8 @@ export class App extends React.Component<any, any> {
 
           <div className="sk-layout__top-bar sk-top-bar">
             <div className="sk-top-bar__content">
-              <div className="my-logo">Gatherer V2</div>
+              <div className="my-logo">MtG:Hunter</div>
+              <CardDetailPanel sentContent={<p><i>Information about </i>{this.state.clickedCard}</p>} selectedCardName={this.state.clickedCard} />
               <SearchBox
                 translations={{"searchbox.placeholder":"search card names"}}
                 queryOptions={{"minimum_should_match":this.state.matchPercent}}
@@ -232,6 +241,7 @@ export class App extends React.Component<any, any> {
               <RefinementListFilter id="type" title="Type" field="types.raw" size={5} operator={this.state.operator}/>
               <RefinementListFilter id="subtype" title="Subtype" field="subtypes.raw" size={5} operator={this.state.operator}/>
               <RefinementListFilter id="setcodes" title="Set" field="codeNames.raw" size={5} operator={this.state.operator} itemComponent={SetRefineList}/>
+              <RefinementListFilter id="formats" title="Formats" field="formats.raw" size={5} operator={this.state.operator}/>
             </div>
 
             <div className="sk-layout__results sk-results-list">
@@ -254,9 +264,9 @@ export class App extends React.Component<any, any> {
 
               </div>
               <ViewSwitcherHits
-                  hitsPerPage={12}
+                  hitsPerPage={18}
                   hitComponents = {[
-                    {key:"grid", title:"Grid", itemComponent:CardHitsGridItem, defaultOption:true},
+                    {key:"grid", title:"Grid", itemComponent:this.CardHitsGridItem, defaultOption:true},
                     {key:"list", title:"List", itemComponent:this.CardHitsListItem}
                   ]}
                   scrollTo={false}
