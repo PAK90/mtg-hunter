@@ -32,11 +32,14 @@ module.exports = {
     new webpack.HotModuleReplacementPlugin(),
     new ExtractTextPlugin('style.css')
   ],
+  exclude: [
+    path.resolve(__dirname, "./node_modules"),
+  ],
   module: {
     noParse: /node_modules\/json-schema\/lib\/validate\.js/,
     loaders: [
       {
-        test: /\.js$/,
+        test: /\.jsx?$/,
         loaders: ['react-hot', 'babel'],
         include: path.join(__dirname, 'src')
       },

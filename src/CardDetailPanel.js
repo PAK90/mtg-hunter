@@ -24,14 +24,22 @@ var CardDetailPanel = React.createClass({
         document.addEventListener("click", this.hide.bind(this));
     },
 
-    hide: function() {
-        document.removeEventListener("click", this.hide.bind(this));
-        this.setState({ visible: false });
+    hide: function(e) {
+    	let target = e.target;
+    	let thisDiv = document.getElementById('ignore');
+    	let gridImgs = document.getElementsByClassName('gridImg');
+    	let listImgs = document.getElementsByClassName('listImg');
+    	let setIcons = document.getElementsByClassName('setIcon');
+    	if (target !== ignore && !ignore.contains(target) && !_.includes(gridImgs,target) && !_.includes(listImgs,target) && !_.includes(setIcons,target)) {
+	        document.removeEventListener("click", this.hide.bind(this));
+	        this.setState({ visible: false, selectedCardName: '' });
+	    }
     },
 
 	render: function() {
+		// The ignore ID is for the hide function not to hide on clicking other cards or the card div.
 		return <div className="cardDetailContainer">
-		 	<div ref="base" className={(this.state.visible ? "visible " : "") + "cardDiv"}>
+		 	<div ref="base" id='ignore' className={(this.state.visible ? "visible " : "") + "cardDiv"}>
 		 		<div>{this.props.sentContent}(Click anywhere to dismiss.)</div>
 		 	</div>
 		</div>

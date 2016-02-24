@@ -4,6 +4,7 @@ import * as _ from "lodash";
 import "searchkit/theming/theme.scss";
 import "./styles/customisations.scss";
 var ent = require('ent');
+var Accordion = require('react-native-accordion');
 const nl2br = require('react-nl2br');
 
 import {
@@ -114,12 +115,21 @@ export class App extends React.Component<any, any> {
       operator: "AND"};
   }
 
-  handleHoverIn(source) {
+  hide() {
+    this.setState({clickedCard: ''});
+  }
+
+  handleClick(source) {
     this.setState({clickedCard: source.name});
+    //document.addEventListener("click", this.hide.bind(this));
+  }
+
+  handleHoverIn(source) {
+    //this.setState({hoveredId: source.id});
   }
 
   handleHoverOut(source) {
-    this.setState({clickedCard: ''});
+    //this.setState({hoveredId: ''});
   }
 
   handleSearchChange(e) {
@@ -137,12 +147,13 @@ export class App extends React.Component<any, any> {
     var setImages = source.multiverseids.map(function(multis, i) {
       let rarity = multis.rarity.charAt(0) == "B" ? "C" : multis.rarity.charAt(0); // Replace 'basic' rarity with common.
       let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + multis.multiverseid;
-      return (<a href={url} target="_blank">
-              <img src={'./src/img/sets/' + multis.setName.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-' + rarity + '.jpg'} 
+      return (
+              <img className='setIcon' src={'./src/img/sets/' + multis.setName.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-' + rarity + '.jpg'} 
                 title={multis.setName}
-                style={{padding: '2px'}}/>
-              </a> )
-    })
+                style={{padding: '2px'}}
+                onClick={this.handleClick.bind(this, source)}/>
+               )
+    }.bind(this))
     return setImages;
   }
 
@@ -152,16 +163,24 @@ export class App extends React.Component<any, any> {
     let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid;
     let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/' + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid + '.jpg';
     return (
-      <div className={bemBlocks.item().mix(bemBlocks.container("item"))} data-qa="hit">
-        <a href={url} target="_blank">
-          <img style={{borderRadius: '12px', boxShadow: '3px 3px 6px 0 rgba(0, 0, 0, 0.4)'}} 
+      <div className={bemBlocks.item().mix(bemBlocks.container("item"))}>
+          <img className='gridImg' style={{borderRadius: '12px', boxShadow: '3px 3px 6px 0 rgba(0, 0, 0, 0.4)'}} 
             src={imgUrl} 
             width="223"
+            onClick={this.handleClick.bind(this, source)}
             onMouseOver={this.handleHoverIn.bind(this, source)}
             onMouseOut={this.handleHoverOut.bind(this, source)}/>
-        </a>
       </div>
     )
+  }
+
+  Details = (source)=> {
+    if (this.state.clickedCard != '') {
+      return <div><p>Look! More stuff about {this.state.clickedCard}</p></div>
+    }
+    else {
+      return <div/>
+    }
   }
 
   CardHitsListItem = (props)=> {
@@ -176,16 +195,15 @@ export class App extends React.Component<any, any> {
     // In the style for the set icons, 'relative' enables cards like Forest to grow the div around them to fit all the symbols.
     // In the future, might want an 'open/close' <p> tag for that, since it's pretty useless seeing all those symbols anyway.
     // The <p> tag helps to align the symbols in the centre, and probably other important css-y stuff.
-    return (
+    var header = (
       <div className={bemBlocks.item().mix(bemBlocks.container("item"))} data-qa="hit">
         <div className={bemBlocks.item("name")}>
-        <a href={url} target="_blank">
-          <img src={imgUrl} 
+          <img className='listImg' src={imgUrl} 
             style={{borderRadius: this.state.hoveredId == source.id ? "10" : "3"}} 
             width={this.state.hoveredId == source.id ? "223" : "100"} 
+            onClick={this.handleClick.bind(this, source)}
             onMouseOver={this.handleHoverIn.bind(this, source)}
-            onMouseOut={this.handleHoverOut.bind(this, source)}/>
-        </a>
+            onMouseOut={this.handleHoverOut.bind(this, source)} />
         </div>
         <div className={bemBlocks.item("details")}>
           <h2 className={bemBlocks.item("title")}>{source.name} {source.tagCost} ({source.cmc ? source.cmc : 0})</h2>
@@ -195,7 +213,10 @@ export class App extends React.Component<any, any> {
         <div style={{width: '150px', position: 'relative', right:'10px'}}>
           <p style={{textAlign:'center'}}>{this.getSetIcons(source)}</p>
         </div>
-      </div>
+      </div>);
+    var content = (<h2 className={bemBlocks.item("title")}>Look, more text!</h2>);
+    return (
+      <Accordion header={header} content={content} easing='easeOutCubic'/>
     )
   };
 
@@ -209,7 +230,6 @@ export class App extends React.Component<any, any> {
           <div className="sk-layout__top-bar sk-top-bar">
             <div className="sk-top-bar__content">
               <div className="my-logo">MtG:Hunter</div>
-              <CardDetailPanel sentContent={<p><i>Information about </i>{this.state.clickedCard}</p>} selectedCardName={this.state.clickedCard} />
               <SearchBox
                 translations={{"searchbox.placeholder":"search card names"}}
                 queryOptions={{"minimum_should_match":this.state.matchPercent}}
@@ -263,14 +283,14 @@ export class App extends React.Component<any, any> {
                 </div>
 
               </div>
-              <ViewSwitcherHits
-                  hitsPerPage={18}
-                  hitComponents = {[
-                    {key:"grid", title:"Grid", itemComponent:this.CardHitsGridItem, defaultOption:true},
-                    {key:"list", title:"List", itemComponent:this.CardHitsListItem}
-                  ]}
-                  scrollTo={false}
-              />
+                <ViewSwitcherHits
+                    hitsPerPage={18}
+                    hitComponents = {[
+                      {key:"grid", title:"Grid", itemComponent:this.CardHitsGridItem},
+                      {key:"list", title:"List", itemComponent:this.CardHitsListItem, defaultOption:true}
+                    ]}
+                    scrollTo={false}
+                />
               <NoHits suggestionsField={"name"}/>
               <InitialLoader/>
               <Pagination showNumbers={true}/>

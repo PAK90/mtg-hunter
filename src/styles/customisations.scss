@@ -4,7 +4,7 @@ html {
   font-family:"Open Sans";
 }
 
-$divheight:250px;
+$divheight:500px;
 
 .my-logo {
   color:white;
@@ -53,18 +53,18 @@ $divheight:250px;
   background-color: orange;
   display: block;
   .cardDiv {
-    background-color: blue;
+    background-color: black;
     position: absolute;
     z-index: 2;
     bottom: 0;
     width: 100%; 
     height: $divheight; 
-    position: fixed;
+    position: relative;
     bottom: $divheight*-1;
     transition: 0.3s;
 
     &.visible {
-      background-color: green;
+      background-color: lightgray;
       transform:translate3d(0, $divheight*-1, 0);
     }
   }
