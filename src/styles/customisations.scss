@@ -48,6 +48,35 @@ $divheight:500px;
   padding: 0 10 0 10;
 }
 
+/* The card images in list view. */
+.listImg {
+  transition: 0.3s;
+  &.clicked {
+    width: 223px;
+  }
+}
+.listImg:hover {
+  animation: border-pulsate 2s infinite;
+}
+
+@keyframes border-pulsate {
+  0%   { box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.0); }
+  50%  { border-color: 0 3px 3px 0 rgba(0, 0, 0, 0.4); }
+  100% { border-color: 0 3px 3px 0 rgba(0, 0, 0, 0.8); }
+}
+
+/* The set symbols in list view. */
+.setIcon {
+  padding: 4px;
+  background-color: transparent;
+  border: 6px lightgray;
+  border-radius: 3px;
+  transition: 0.3s;
+  &.clicked {
+    background-color: lightgray;
+  }
+}
+
 /* The thing holding complete card details. */
 .cardDetailContainer {
   background-color: orange;

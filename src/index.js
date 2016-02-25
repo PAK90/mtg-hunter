@@ -4,7 +4,6 @@ import * as _ from "lodash";
 import "searchkit/theming/theme.scss";
 import "./styles/customisations.scss";
 var ent = require('ent');
-var Accordion = require('react-native-accordion');
 const nl2br = require('react-nl2br');
 
 import {
@@ -30,6 +29,7 @@ import {
 } from "searchkit";
 import {RefinementListFilter} from './modRefineListFilter.js';
 import CardDetailPanel from './CardDetailPanel';
+import CardHitsListItem from './CardHitsListItem';
 
 String.prototype.replaceAll = function(s,r){return this.split(s).join(r)};
 
@@ -120,16 +120,24 @@ export class App extends React.Component<any, any> {
   }
 
   handleClick(source) {
-    this.setState({clickedCard: source.name});
+    // If clicked on a different card, change the name.
+    if (this.state.clickedCard != source.name)
+    {
+      this.setState({clickedCard: source.name});
+    }
+    // Else, we clicked on the same card, so shrink.
+    else {
+      this.setState({clickedCard: ''});
+    }
     //document.addEventListener("click", this.hide.bind(this));
   }
 
   handleHoverIn(source) {
-    //this.setState({hoveredId: source.id});
+    this.setState({hoveredId: source.id});
   }
 
   handleHoverOut(source) {
-    //this.setState({hoveredId: ''});
+    this.setState({hoveredId: ''});
   }
 
   handleSearchChange(e) {
@@ -182,43 +190,6 @@ export class App extends React.Component<any, any> {
       return <div/>
     }
   }
-
-  CardHitsListItem = (props)=> {
-    const {bemBlocks, result} = props;
-    const source = result._source;
-    // Add onHover for the image to enlarge with Velocity.
-    let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid;
-    let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/' + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid + '.jpg';
-    // Generate the mana symbols in both cost and the card text.
-    source.tagCost = generateTitleCostSymbols(source.manaCost);
-    source.taggedText = generateTextCostSymbols(source.text);
-    // In the style for the set icons, 'relative' enables cards like Forest to grow the div around them to fit all the symbols.
-    // In the future, might want an 'open/close' <p> tag for that, since it's pretty useless seeing all those symbols anyway.
-    // The <p> tag helps to align the symbols in the centre, and probably other important css-y stuff.
-    var header = (
-      <div className={bemBlocks.item().mix(bemBlocks.container("item"))} data-qa="hit">
-        <div className={bemBlocks.item("name")}>
-          <img className='listImg' src={imgUrl} 
-            style={{borderRadius: this.state.hoveredId == source.id ? "10" : "3"}} 
-            width={this.state.hoveredId == source.id ? "223" : "100"} 
-            onClick={this.handleClick.bind(this, source)}
-            onMouseOver={this.handleHoverIn.bind(this, source)}
-            onMouseOut={this.handleHoverOut.bind(this, source)} />
-        </div>
-        <div className={bemBlocks.item("details")}>
-          <h2 className={bemBlocks.item("title")}>{source.name} {source.tagCost} ({source.cmc ? source.cmc : 0})</h2>
-          <h3 className={bemBlocks.item("subtitle")}><b>{source.type}</b></h3>
-          <h3 className={bemBlocks.item("subtitle")}>{source.taggedText}</h3>
-        </div>
-        <div style={{width: '150px', position: 'relative', right:'10px'}}>
-          <p style={{textAlign:'center'}}>{this.getSetIcons(source)}</p>
-        </div>
-      </div>);
-    var content = (<h2 className={bemBlocks.item("title")}>Look, more text!</h2>);
-    return (
-      <Accordion header={header} content={content} easing='easeOutCubic'/>
-    )
-  };
 
   render(){
     return (
@@ -287,7 +258,7 @@ export class App extends React.Component<any, any> {
                     hitsPerPage={18}
                     hitComponents = {[
                       {key:"grid", title:"Grid", itemComponent:this.CardHitsGridItem},
-                      {key:"list", title:"List", itemComponent:this.CardHitsListItem, defaultOption:true}
+                      {key:"list", title:"List", itemComponent:CardHitsListItem, defaultOption:true}
                     ]}
                     scrollTo={false}
                 />
