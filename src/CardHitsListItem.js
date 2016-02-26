@@ -13,8 +13,12 @@ var CardHitsListItem = React.createClass({
 	    // At some point, have all multiverse-specific stuff (id, flavour text, original text) as states.
 	    // Then, when you click the symbol, all we have to do is load that multi's data into the states which are already in the renderer.
         return {
-            currentMultiId: result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid,
-            clickedCard: ''
+            clickedCard: '',
+            currentMultiId: source.multiverseids[result._source.multiverseids.length - 1].multiverseid,
+            currentArtist: source.multiverseids[result._source.multiverseids.length - 1].artist,
+            currentFlavor: source.multiverseids[result._source.multiverseids.length - 1].flavor,
+            currentOriginalText: source.multiverseids[result._source.multiverseids.length - 1].originalText,
+            currentSetName: source.multiverseids[result._source.multiverseids.length - 1].setName
         };
     },
 
@@ -33,7 +37,11 @@ var CardHitsListItem = React.createClass({
 
 	handleSetIconClick(multi) {
 		// Set the new multiId. Eventually this will work for flavour and original text too.
-		this.setState({currentMultiId: multi.multiverseid});
+		this.setState({currentMultiId: multi.multiverseid,
+			currentArtist: multi.artist,
+			currentFlavor: multi.flavor,
+			currentOriginalText: multi.originalText,
+			currentSetName: multi.setName});
 	},
 
     getSetIcons: function(source) {
@@ -42,7 +50,7 @@ var CardHitsListItem = React.createClass({
       		let rarity = multis.rarity.charAt(0) == "B" ? "C" : multis.rarity.charAt(0); // Replace 'basic' rarity with common.
       		let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + multis.multiverseid;
       		return (
-            	<img className={(this.state.currentMultiId == multis.multiverseid ? "clicked " : "") + "setIcon"} src={'./src/img/sets/' + multis.setName.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-' + rarity + '.jpg'} 
+            	<img className={(this.state.currentMultiId == multis.multiverseid ? "clicked " : "") + "setIcon " + rarity } src={'./src/img/sets/' + multis.setName.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-' + rarity + '.jpg'} 
 	                title={multis.setName}
 	                onClick={this.handleSetIconClick.bind(this, multis)}/>
 	            )
@@ -92,17 +100,15 @@ var CardHitsListItem = React.createClass({
 	    source.tagCost = this.generateTitleCostSymbols(source.manaCost);
 	    source.taggedText = this.generateTextCostSymbols(source.text);
 	    // In the style for the set icons, 'relative' enables cards like Forest to grow the div around them to fit all the symbols.
-	/*
-	            onMouseOver={this.handleHoverIn.bind(this, source)}
-	            onMouseOut={this.handleHoverOut.bind(this, source)}*/
 	    // In the future, might want an 'open/close' <p> tag for that, since it's pretty useless seeing all those symbols anyway.
 	    // The <p> tag helps to align the symbols in the centre, and probably other important css-y stuff.
+	    // this.state.clickedCard is '' when unclicked, which is apparently false-y enough to use for a bool.
 	    return (
 	    	<div className={bemBlocks.item().mix(bemBlocks.container("item"))} data-qa="hit">
 	        	<div className='listImg'>
-	          		<img className={(this.state.clickedCard == source.name ? "clicked " : "") + "listImg"}
+	          		<img className={(this.state.clickedCard ? "clicked " : "") + "listImg"}
 	            		src={imgUrl} 
-	            		style={{borderRadius: this.state.hoveredId == source.id ? "10" : "3"}} 
+	            		style={{borderRadius: this.state.clickedCard ? "10" : "3"}} 
 	            		width="100"
 	            		onClick={this.handleClick.bind(this, source)} />
 	        	</div>
@@ -110,6 +116,11 @@ var CardHitsListItem = React.createClass({
 	         		<h2 className={bemBlocks.item("title")}>{source.name} {source.tagCost} ({source.cmc ? source.cmc : 0})</h2>
 			        <h3 className={bemBlocks.item("subtitle")}><b>{source.type}</b></h3>
 			        <h3 className={bemBlocks.item("subtitle")}>{source.taggedText}</h3>
+			        <span className={bemBlocks.item("subtitle")}><b>{this.state.clickedCard && this.state.currentFlavor ? 'Flavour: ' : ''}</b></span><span className={bemBlocks.item("subtitle")}>{this.state.clickedCard && this.state.currentFlavor ? nl2br(this.state.currentFlavor) : ''}</span>
+			        <br/>
+			        <span className={bemBlocks.item("subtitle")}><b>{this.state.clickedCard ? 'Set: ' : ''}</b></span><span className={bemBlocks.item("subtitle")}>{this.state.clickedCard ? this.state.currentSetName : ''}</span>
+			        <br/>
+			        <span className={bemBlocks.item("subtitle")}><b>{this.state.clickedCard ? 'Artist: ' : ''}</b></span><span className={bemBlocks.item("subtitle")}>{this.state.clickedCard ? this.state.currentArtist : ''}</span>
 	        	</div>
 	        	<div style={{width: '150px', position: 'relative', right:'10px'}}>
 	          		<p style={{textAlign:'center'}}>{this.getSetIcons(source)}</p>

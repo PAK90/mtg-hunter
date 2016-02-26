@@ -210,9 +210,9 @@ export class App extends React.Component<any, any> {
                 <select name="searchField" onChange={this.handleSearchChange.bind(this)}>
                   <option value="name">Name</option>
                   <option value="text">Body text</option>
-                  <option value="flavor">Flavour text</option>
+                  <option value="flavors">Flavour text</option>
                   <option value="type">Type</option>
-                  <option value="artist">Artist</option>
+                  <option value="artists">Artist</option>
                 </select>
             </div>
           </div>

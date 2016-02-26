@@ -68,13 +68,27 @@ $divheight:500px;
 /* The set symbols in list view. */
 .setIcon {
   padding: 4px;
-  background-color: transparent;
-  border: 6px lightgray;
+  box-shadow: inset 0 0 0 0px grey;
   border-radius: 3px;
-  transition: 0.3s;
-  &.clicked {
-    background-color: lightgray;
+  transition: 0.4s;
+  &.clicked.R, &.R:hover {    
+    box-shadow: inset 0 0 0 20px rgb(227, 203, 140);
   }
+  &.clicked.U, &.U:hover {
+    box-shadow: inset 0 0 0 20px rgb(194, 218, 231);
+  }
+  &.clicked.M, &.M:hover {
+    box-shadow: inset 0 0 0 20px rgba(244, 146, 38, 0.78);
+  }
+  &.clicked.C, &.C:hover {
+    box-shadow: inset 0 0 0 20px rgb(191, 191, 191);
+  }
+  &.clicked.S, &.S:hover {
+    box-shadow: inset 0 0 0 20px rgb(213, 192, 219);
+  }
+}
+.setIcon:hover {
+  background-color: lightgray;
 }
 
 /* The thing holding complete card details. */
