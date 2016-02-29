@@ -111,7 +111,7 @@ export class App extends React.Component<any, any> {
     this.searchkit = new SearchkitManager(host);
     this.state = {hoveredId: '',
       clickedCard: '',
-      matchPercent: '95%',
+      matchPercent: '100%',
       operator: "AND"};
   }
 
@@ -172,9 +172,8 @@ export class App extends React.Component<any, any> {
     let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/' + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid + '.jpg';
     return (
       <div className={bemBlocks.item().mix(bemBlocks.container("item"))}>
-          <img className='gridImg' style={{borderRadius: '12px', boxShadow: '3px 3px 6px 0 rgba(0, 0, 0, 0.4)'}} 
+          <img className='gridImg'  
             src={imgUrl} 
-            width="223"
             onClick={this.handleClick.bind(this, source)}
             onMouseOver={this.handleHoverIn.bind(this, source)}
             onMouseOut={this.handleHoverOut.bind(this, source)}/>
@@ -202,14 +201,14 @@ export class App extends React.Component<any, any> {
             <div className="sk-top-bar__content">
               <div className="my-logo">MtG:Hunter</div>
               <SearchBox
-                translations={{"searchbox.placeholder":"search card names"}}
-                queryOptions={{"minimum_should_match":this.state.matchPercent}}
+                translations={{"searchbox.placeholder": "search card names"}}
+                queryOptions={{"minimum_should_match": this.state.matchPercent}}
                 autofocus={true}
                 searchOnChange={true}
                 queryFields={["name"]}/>
                 <select name="searchField" onChange={this.handleSearchChange.bind(this)}>
                   <option value="name">Name</option>
-                  <option value="text">Body text</option>
+                  <option value="namelessText">Body text</option>
                   <option value="flavors">Flavour text</option>
                   <option value="type">Type</option>
                   <option value="artists">Artist</option>
@@ -228,7 +227,8 @@ export class App extends React.Component<any, any> {
               <RefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator={this.state.operator}/>
               <RefinementListFilter id="symbols" title="Symbols" field="symbols" size={5} operator={this.state.operator} itemComponent={SymbolRefineList}/>
               <RefinementListFilter id="colourCount" title="Colour Count" field="colourCount" size={6} operator={this.state.operator} orderKey="_term"/>
-              <RefinementListFilter id="rarity" title="Rarity" field="rarity.raw" size={5} operator={this.state.operator}/>
+              <RefinementListFilter id="rarity" title="Rarity" field="rarities.raw" size={5} operator={this.state.operator}/>
+              <RefinementListFilter id="supertype" title="Supertype" field="supertypes.raw" size={5} operator={this.state.operator}/>
               <RefinementListFilter id="type" title="Type" field="types.raw" size={5} operator={this.state.operator}/>
               <RefinementListFilter id="subtype" title="Subtype" field="subtypes.raw" size={5} operator={this.state.operator}/>
               <RefinementListFilter id="setcodes" title="Set" field="codeNames.raw" size={5} operator={this.state.operator} itemComponent={SetRefineList}/>

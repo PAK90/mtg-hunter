@@ -65,6 +65,18 @@ $divheight:500px;
   100% { border-color: 0 3px 3px 0 rgba(0, 0, 0, 0.8); }
 }
 
+/* The card images in grid view. */
+.gridImg {
+  border-radius: 12px;
+  transition: 0.2s;
+  max-width: 223px;
+  max-height: 310px;
+  /*object-fit: contain;*/
+}
+.gridImg:hover {
+  box-shadow: 3px 3px 12px 0 rgba(0, 0, 0, 0.4);
+}
+
 /* The set symbols in list view. */
 .setIcon {
   padding: 4px;
