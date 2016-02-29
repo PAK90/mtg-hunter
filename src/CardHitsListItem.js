@@ -99,6 +99,44 @@ var CardHitsListItem = React.createClass({
 	    // Generate the mana symbols in both cost and the card text.	    
 	    source.tagCost = this.generateTitleCostSymbols(source.manaCost);
 	    source.taggedText = this.generateTextCostSymbols(source.text);
+	    // Define conditional information here.
+	    var extraInfo, flavour, pt, legalities;
+	    if (this.state.clickedCard) {
+	    	if (this.state.currentFlavor) {
+	    		flavour = ( <div>		
+			        <span className={bemBlocks.item("subtitle")}><b>{'Flavour: '}</b></span><span className={bemBlocks.item("subtitle")}>{nl2br(this.state.currentFlavor)}</span>
+			        <br/>
+		        </div> )
+	    	}
+	    	else { flavour = <div/> }
+	    	if (source.power) {
+	    		pt = ( <div>		
+			        <span className={bemBlocks.item("subtitle")}><b>{'P/T: '}</b></span><span className={bemBlocks.item("subtitle")}>{source.power + '/' + source.toughness}</span>
+			        <br/>
+		        </div> )
+	    	}
+	    	else { pt = <div/> }
+	    	extraInfo = (
+	    		<div>	
+			        <span className={bemBlocks.item("subtitle")}><b>{'Set: '}</b></span><span className={bemBlocks.item("subtitle")}>{this.state.currentSetName}</span>
+			        <br/>
+			        <span className={bemBlocks.item("subtitle")}><b>{'Artist: '}</b></span><span className={bemBlocks.item("subtitle")}>{this.state.currentArtist}</span>
+			        <br/>
+		        </div>
+        	)
+	    	if (source.legalities) {
+		    	legalities = (<div>
+			        <span className={bemBlocks.item("subtitle")}><b>{'Legalities: '}</b></span>
+			        { source.legalities.map(function(legality, i) {
+			        	return <div><span className={legality.legality == "Banned" ? bemBlocks.item("subtitle") + ' banned' : bemBlocks.item("subtitle") + ' legal'}>{legality.format + ': ' + legality.legality}</span><br/></div>
+			        })}
+			        </div>
+		    	)
+		    }
+	    }
+	    else {
+	    	extraInfo = <div/>
+	    }
 	    // In the style for the set icons, 'relative' enables cards like Forest to grow the div around them to fit all the symbols.
 	    // In the future, might want an 'open/close' <p> tag for that, since it's pretty useless seeing all those symbols anyway.
 	    // The <p> tag helps to align the symbols in the centre, and probably other important css-y stuff.
@@ -115,13 +153,8 @@ var CardHitsListItem = React.createClass({
 	        	<div className={bemBlocks.item("details")}>
 	         		<h2 className={bemBlocks.item("title")}>{source.name} {source.tagCost} ({source.cmc ? source.cmc : 0})</h2>
 			        <h3 className={bemBlocks.item("subtitle")}><b>{source.type}</b></h3>
-			        <h3 className={bemBlocks.item("subtitle")}>{source.taggedText}</h3>
-			        <span className={bemBlocks.item("subtitle")}><b>{this.state.clickedCard && this.state.currentFlavor ? 'Flavour: ' : ''}</b></span><span className={bemBlocks.item("subtitle")}>{this.state.clickedCard && this.state.currentFlavor ? nl2br(this.state.currentFlavor) : ''}</span>
-			        <br/>
-			        <span className={bemBlocks.item("subtitle")}><b>{this.state.clickedCard ? 'Set: ' : ''}</b></span><span className={bemBlocks.item("subtitle")}>{this.state.clickedCard ? this.state.currentSetName : ''}</span>
-			        <br/>
-			        <span className={bemBlocks.item("subtitle")}><b>{this.state.clickedCard ? 'Artist: ' : ''}</b></span><span className={bemBlocks.item("subtitle")}>{this.state.clickedCard ? this.state.currentArtist : ''}</span>
-	        	</div>
+			        <h3 className={bemBlocks.item("subtitle")}>{source.taggedText}</h3></div>
+			        <div className='extraDetails'>{flavour}{extraInfo}{pt}{legalities}</div>
 	        	<div style={{width: '150px', position: 'relative', right:'10px'}}>
 	          		<p style={{textAlign:'center'}}>{this.getSetIcons(source)}</p>
 	        	</div>

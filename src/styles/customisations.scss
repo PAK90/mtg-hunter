@@ -48,6 +48,17 @@ $divheight:500px;
   padding: 0 10 0 10;
 }
 
+/* The subtitle text being used everywhere. May change this.*/
+.sk-hits-list-hit__subtitle {
+  &.banned {
+    font-weight: bold;
+    color: red;
+  }
+  &.legal {
+    color: green;
+  }
+}
+
 /* The card images in list view. */
 .listImg {
   transition: 0.3s;
@@ -74,7 +85,7 @@ $divheight:500px;
   /*object-fit: contain;*/
 }
 .gridImg:hover {
-  box-shadow: 3px 3px 12px 0 rgba(0, 0, 0, 0.4);
+  box-shadow: 0px 0px 15px 0 rgba(0, 0, 0, 0.8);
 }
 
 /* The set symbols in list view. */
@@ -101,6 +112,12 @@ $divheight:500px;
 }
 .setIcon:hover {
   background-color: lightgray;
+}
+
+.extraDetails {
+  max-width: 300px;
+  padding-top: 24px;
+  padding-right: 10px;
 }
 
 /* The thing holding complete card details. */

@@ -3,6 +3,12 @@ import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import "searchkit/theming/theme.scss";
 import "./styles/customisations.scss";
+var VelocityTransitionGroup = require('velocity-react/velocity-transition-group.js');
+var VelocityComponent = require('velocity-react/velocity-component.js');
+var VelocityHelpers = require('velocity-react/velocity-helpers.js');
+require('velocity-animate/');
+require('velocity-animate/velocity.js');
+require('velocity-animate/velocity.ui.js');
 var ent = require('ent');
 const nl2br = require('react-nl2br');
 
@@ -33,7 +39,39 @@ import CardHitsListItem from './CardHitsListItem';
 
 String.prototype.replaceAll = function(s,r){return this.split(s).join(r)};
 
-//"Enchant creature↵Enchanted creature gets +1/+1 for each creature you control.↵Cycling {G/W} ({G/W}, Discard this card: Draw a card.)"
+// Register animations here so that 'stagger' property can be used with them.
+var Animations = {
+    In: VelocityHelpers.registerEffect({
+        calls: [
+            [{
+                transformPerspective: [ 800, 800 ],
+                transformOriginX: [ '50%', '50%' ],
+                transformOriginY: [ '100%', '100%' ],
+                marginBottom: 1,
+                opacity: 1,
+                rotateX: [0, 130],
+            }, 1, {
+                easing: 'ease-out',
+                display: 'block',
+            }]
+        ],
+    }),
+    Out: VelocityHelpers.registerEffect({
+        calls: [
+            [{
+                transformPerspective: [ 800, 800 ],
+                transformOriginX: [ '50%', '50%' ],
+                transformOriginY: [ '0%', '0%' ],
+                marginBottom: -30,
+                opacity: 0,
+                rotateX: [-70],
+            }, 1, {
+                easing: 'ease-out',
+                display: 'block',
+            }]
+        ],
+    })
+};
 
 function generateTitleCostSymbols(source) {
   // Take the manacost and return a bunch of img divs.
@@ -190,7 +228,18 @@ export class App extends React.Component<any, any> {
     }
   }
 
-  render(){
+  render() {
+    var animationEnter = {
+      duration: 100,
+      animation: Animations.In,
+      stagger: 50
+    };
+    var animationLeave = {
+      duration: 100,
+      animation: Animations.Out,
+      stagger: 50,
+      backwards: true
+    };
     return (
       <div>
       <SearchkitProvider searchkit={this.searchkit}>
