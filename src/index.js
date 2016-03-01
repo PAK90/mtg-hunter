@@ -11,6 +11,8 @@ require('velocity-animate/velocity.js');
 require('velocity-animate/velocity.ui.js');
 var ent = require('ent');
 const nl2br = require('react-nl2br');
+const omit = require("lodash/omit");
+const map = require("lodash/map");
 
 import {
   SearchBox,
@@ -47,7 +49,7 @@ var Animations = {
                 transformPerspective: [ 800, 800 ],
                 transformOriginX: [ '50%', '50%' ],
                 transformOriginY: [ '100%', '100%' ],
-                marginBottom: 1,
+                marginBottom: 10,
                 opacity: 1,
                 rotateX: [0, 130],
             }, 1, {
@@ -72,6 +74,49 @@ var Animations = {
         ],
     })
 };
+
+export class AnimatedHits extends Hits<HitsProps, any> {
+  render() {
+    var animationEnter = {
+      duration: 100,
+      animation: Animations.In,
+      stagger: 50
+    };
+    var animationLeave = {
+      duration: 100,
+      animation: Animations.Out,
+      stagger: 50,
+      backwards: true
+    };
+
+    let hits:Array<Object> = this.getHits()
+    let hasHits = hits.length > 0
+
+    if (!this.isInitialLoading() && hasHits) {
+      return (
+        <div data-qa="hits" className={this.bemBlocks.container()}>
+        <VelocityTransitionGroup enter={animationEnter} leave={animationLeave}>
+          {map(hits, this.renderResult.bind(this))}
+        </VelocityTransitionGroup>
+        </div>
+      );
+    }
+    return null
+  }
+}
+
+export class ViewSwitcherHitsExt extends ViewSwitcherHits<ViewSwitcherHitsProps, any> {
+  render(){
+    let hitComponents = this.props.hitComponents
+    let props = omit(this.props, "hitComponents")
+    let selectedOption = this.accessor.getSelectedOption()
+    props.itemComponent = selectedOption.itemComponent
+    props.mod = 'sk-hits-'+selectedOption.key
+    return (
+      <AnimatedHits {...props} />
+    )
+  }
+}
 
 function generateTitleCostSymbols(source) {
   // Take the manacost and return a bunch of img divs.
@@ -229,17 +274,6 @@ export class App extends React.Component<any, any> {
   }
 
   render() {
-    var animationEnter = {
-      duration: 100,
-      animation: Animations.In,
-      stagger: 50
-    };
-    var animationLeave = {
-      duration: 100,
-      animation: Animations.Out,
-      stagger: 50,
-      backwards: true
-    };
     return (
       <div>
       <SearchkitProvider searchkit={this.searchkit}>
@@ -304,7 +338,7 @@ export class App extends React.Component<any, any> {
 
               </div>
                 <ViewSwitcherHits
-                    hitsPerPage={18}
+                    hitsPerPage={20}
                     hitComponents = {[
                       {key:"grid", title:"Grid", itemComponent:this.CardHitsGridItem},
                       {key:"list", title:"List", itemComponent:CardHitsListItem, defaultOption:true}

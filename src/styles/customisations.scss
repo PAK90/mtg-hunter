@@ -48,6 +48,15 @@ $divheight:500px;
   padding: 0 10 0 10;
 }
 
+/* The card title.*/
+.sk-hits-list-hit__title {
+  transition: 0.8s;
+  color: #666;
+}
+.sk-hits-list-hit__title:hover {
+  text-decoration: underline;
+}
+
 /* The subtitle text being used everywhere. May change this.*/
 .sk-hits-list-hit__subtitle {
   &.banned {
@@ -81,7 +90,7 @@ $divheight:500px;
   border-radius: 12px;
   transition: 0.2s;
   max-width: 223px;
-  max-height: 310px;
+  max-height: 311px;
   /*object-fit: contain;*/
 }
 .gridImg:hover {

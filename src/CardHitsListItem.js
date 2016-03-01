@@ -118,7 +118,7 @@ var CardHitsListItem = React.createClass({
 	    	else { pt = <div/> }
 	    	extraInfo = (
 	    		<div>	
-			        <span className={bemBlocks.item("subtitle")}><b>{'Set: '}</b></span><span className={bemBlocks.item("subtitle")}>{this.state.currentSetName}</span>
+			        <span className={bemBlocks.item("subtitle")}><b>{'Set: '}</b></span><span className={bemBlocks.item("subtitle")}>{this.state.currentSetName + ' (#' + source.number + ')'}</span>
 			        <br/>
 			        <span className={bemBlocks.item("subtitle")}><b>{'Artist: '}</b></span><span className={bemBlocks.item("subtitle")}>{this.state.currentArtist}</span>
 			        <br/>
@@ -151,7 +151,9 @@ var CardHitsListItem = React.createClass({
 	            		onClick={this.handleClick.bind(this, source)} />
 	        	</div>
 	        	<div className={bemBlocks.item("details")}>
+	        	<a href={'http://shop.tcgplayer.com/magic/' + this.state.currentSetName.replace(/[^\w\s]/gi, '') + '/' + source.name} target="_blank">
 	         		<h2 className={bemBlocks.item("title")}>{source.name} {source.tagCost} ({source.cmc ? source.cmc : 0})</h2>
+	         		</a>
 			        <h3 className={bemBlocks.item("subtitle")}><b>{source.type}</b></h3>
 			        <h3 className={bemBlocks.item("subtitle")}>{source.taggedText}</h3></div>
 			        <div className='extraDetails'>{flavour}{extraInfo}{pt}{legalities}</div>
