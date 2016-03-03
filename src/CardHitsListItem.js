@@ -5,6 +5,7 @@ import "searchkit/theming/theme.scss";
 import "./styles/customisations.scss";
 var ent = require('ent');
 const nl2br = require('react-nl2br');
+var Slider = require('react-slick');
 
 var CardHitsListItem = React.createClass({
 	getInitialState: function() {  	
@@ -90,6 +91,15 @@ var CardHitsListItem = React.createClass({
 	},
 
 	render: function() {
+		// Temporary slider test stuff.
+		var settings = {
+	      	dots: true,
+	      	infinite: true,
+	      	speed: 200,
+	      	slidesToShow: 1,
+	      	slidesToScroll: 1
+	    };
+
 	    var {bemBlocks, result} = this.props;
 	    var source = result._source;
 	    // Set the multiverseId state to the latest card.
@@ -101,6 +111,13 @@ var CardHitsListItem = React.createClass({
 	    source.taggedText = this.generateTextCostSymbols(source.text);
 	    // Define conditional information here.
 	    var extraInfo, flavour, pt, legalities;
+    	if (source.power) {
+    		pt = ( <div>		
+		        <span className={bemBlocks.item("subtitle")}><b>{'P/T: '}</b></span><span className={bemBlocks.item("subtitle")}>{source.power + '/' + source.toughness}</span>
+		        <br/>
+	        </div> )
+    	}
+    	else { pt = <div/> }
 	    if (this.state.clickedCard) {
 	    	if (this.state.currentFlavor) {
 	    		flavour = ( <div>		
@@ -109,13 +126,6 @@ var CardHitsListItem = React.createClass({
 		        </div> )
 	    	}
 	    	else { flavour = <div/> }
-	    	if (source.power) {
-	    		pt = ( <div>		
-			        <span className={bemBlocks.item("subtitle")}><b>{'P/T: '}</b></span><span className={bemBlocks.item("subtitle")}>{source.power + '/' + source.toughness}</span>
-			        <br/>
-		        </div> )
-	    	}
-	    	else { pt = <div/> }
 	    	extraInfo = (
 	    		<div>	
 			        <span className={bemBlocks.item("subtitle")}><b>{'Set: '}</b></span><span className={bemBlocks.item("subtitle")}>{this.state.currentSetName + ' (#' + source.number + ')'}</span>
@@ -142,22 +152,22 @@ var CardHitsListItem = React.createClass({
 	    // The <p> tag helps to align the symbols in the centre, and probably other important css-y stuff.
 	    // this.state.clickedCard is '' when unclicked, which is apparently false-y enough to use for a bool.
 	    return (
-	    	<div className={bemBlocks.item().mix(bemBlocks.container("item"))} data-qa="hit">
-	        	<div className='listImg'>
+	    	<div className={bemBlocks.item().mix(bemBlocks.container("item"))}>
+	        	<div className='listImg' style={{display:'inline-block'}}>
 	          		<img className={(this.state.clickedCard ? "clicked " : "") + "listImg"}
 	            		src={imgUrl} 
 	            		style={{borderRadius: this.state.clickedCard ? "10" : "3"}} 
 	            		width="100"
 	            		onClick={this.handleClick.bind(this, source)} />
 	        	</div>
-	        	<div className={bemBlocks.item("details")}>
+	        	<div className={bemBlocks.item("details")} style={{display:'inline-block'}}>
 	        	<a href={'http://shop.tcgplayer.com/magic/' + this.state.currentSetName.replace(/[^\w\s]/gi, '') + '/' + source.name} target="_blank">
 	         		<h2 className={bemBlocks.item("title")}>{source.name} {source.tagCost} ({source.cmc ? source.cmc : 0})</h2>
 	         		</a>
 			        <h3 className={bemBlocks.item("subtitle")}><b>{source.type}</b></h3>
-			        <h3 className={bemBlocks.item("subtitle")}>{source.taggedText}</h3></div>
-			        <div className='extraDetails'>{flavour}{extraInfo}{pt}{legalities}</div>
-	        	<div style={{width: '150px', position: 'relative', right:'10px'}}>
+			        <h3 className={bemBlocks.item("subtitle")}>{source.taggedText}{pt}</h3></div>
+			        <div className='extraDetails'>{flavour}{extraInfo}{legalities}</div>
+	        	<div style={{width: '150px', position: 'relative', right: '10px', display:'inline-block'}}>
 	          		<p style={{textAlign:'center'}}>{this.getSetIcons(source)}</p>
 	        	</div>
 	      	</div>

@@ -75,6 +75,32 @@ var Animations = {
     })
 };
 
+export class RefinementListFilterExt extends RefinementListFilter<RefinementListFilterDisplayProps, any> {
+  render() {
+
+    const { id, title, bemBlocks, buckets } = this.props
+
+    let block = bemBlocks.container
+    let className = block()
+      .mix(`filter--${id}`)
+      .state({
+        disabled: !this.hasOptions()
+      })
+
+    return (
+      <div data-qa={`filter--${this.props.id}`} className={className}>
+        <div data-qa="header" className={block("header")}>{title}</div>
+        <div>HI</div>
+        <div data-qa="options" className={block("options")}>
+          {map(buckets, this.renderOption.bind(this))}
+        </div>
+        {this.renderShowMore()}
+      </div>
+    );
+  }
+}
+
+// Subclass Hits and ViewSwitcherHits to support animations.
 export class AnimatedHits extends Hits<HitsProps, any> {
   render() {
     var animationEnter = {
