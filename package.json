@@ -45,6 +45,7 @@
     "moment": "^2.11.2",
     "mtg-json": "^1.0.1",
     "normalize.css": "^3.0.3",
+    "nuka-carousel": "^1.0.2",
     "query-string": "^3.0.0",
     "react": "^0.14.7",
     "react-addons-css-transition-group": "^0.14.3",

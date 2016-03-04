@@ -29,6 +29,13 @@ html {
 .layout__body {
   max-width: none;
 }
+.container {
+  margin: 0 auto;
+  padding: 40px;
+  max-width: 800px;
+  color: #333;
+  background: #419be0;
+}
 
 /* Lets the set symbols 'align right' (key part being position: relative).*/
 .sk-hits-list-hit {
