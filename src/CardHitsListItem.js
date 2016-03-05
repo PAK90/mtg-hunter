@@ -7,6 +7,11 @@ var ent = require('ent');
 const nl2br = require('react-nl2br');
 var Carousel = require('nuka-carousel');
 var Slider = require('react-slick');
+var ReactTabs = require('react-tabs');
+var Tab = ReactTabs.Tab;
+var Tabs = ReactTabs.Tabs;
+var TabList = ReactTabs.TabList;
+var TabPanel = ReactTabs.TabPanel;
 
 var CardHitsListItem = React.createClass({
 	getInitialState: function() {  	
@@ -20,7 +25,8 @@ var CardHitsListItem = React.createClass({
             currentArtist: source.multiverseids[result._source.multiverseids.length - 1].artist,
             currentFlavor: source.multiverseids[result._source.multiverseids.length - 1].flavor,
             currentOriginalText: source.multiverseids[result._source.multiverseids.length - 1].originalText,
-            currentSetName: source.multiverseids[result._source.multiverseids.length - 1].setName
+            currentSetName: source.multiverseids[result._source.multiverseids.length - 1].setName,
+            currentSelectedTab: 0
         };
     },
 
@@ -36,6 +42,10 @@ var CardHitsListItem = React.createClass({
 	    }
 	    //document.addEventListener("click", this.hide.bind(this));
 	},
+	
+	handleTabSelect(index, last) {
+		this.setState({currentSelectedTab: index});
+	},
 
 	handleSetIconClick(multi) {
 		// Set the new multiId. Eventually this will work for flavour and original text too.
@@ -44,6 +54,11 @@ var CardHitsListItem = React.createClass({
 			currentFlavor: multi.flavor,
 			currentOriginalText: multi.originalText,
 			currentSetName: multi.setName});
+	},
+
+	onLanguageHover(language) {
+		console.log('new multiId is ' + language.multiverseid );
+		this.setState({currentMultiId: language.multiverseid});
 	},
 
     getSetIcons: function(source) {
@@ -103,14 +118,13 @@ var CardHitsListItem = React.createClass({
 
 	    var {bemBlocks, result} = this.props;
 	    var source = result._source;
-	    // Set the multiverseId state to the latest card.
-	    // Add onHover for the image to enlarge with Velocity.
 	    let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + this.state.currentMultiId;
 	    let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/' + this.state.currentMultiId + '.jpg';
 	    // Generate the mana symbols in both cost and the card text.	    
 	    source.tagCost = this.generateTitleCostSymbols(source.manaCost);
 	    source.taggedText = this.generateTextCostSymbols(source.text);
-	    // Define conditional information here.
+
+	    // Define 'details' tab information here.
 	    var extraInfo, flavour, pt, legalities;
     	if (source.power) {
     		pt = ( <div>		
@@ -118,35 +132,96 @@ var CardHitsListItem = React.createClass({
 		        <br/>
 	        </div> )
     	}
-    	else { pt = <div/> }
-	    if (this.state.clickedCard) {
-	    	if (this.state.currentFlavor) {
-	    		flavour = ( <div>		
-			        <span className={bemBlocks.item("subtitle")}><b>{'Flavour: '}</b></span><span className={bemBlocks.item("subtitle")}>{nl2br(this.state.currentFlavor)}</span>
-			        <br/>
-		        </div> )
-	    	}
-	    	else { flavour = <div/> }
-	    	extraInfo = (
-	    		<div>	
-			        <span className={bemBlocks.item("subtitle")}><b>{'Set: '}</b></span><span className={bemBlocks.item("subtitle")}>{this.state.currentSetName + ' (#' + source.number + ')'}</span>
-			        <br/>
-			        <span className={bemBlocks.item("subtitle")}><b>{'Artist: '}</b></span><span className={bemBlocks.item("subtitle")}>{this.state.currentArtist}</span>
-			        <br/>
+    	if (this.state.currentFlavor) {
+    		flavour = ( <div>		
+		        <span className={bemBlocks.item("subtitle")}><b>{'Flavour: '}</b></span><span className={bemBlocks.item("subtitle")}>{nl2br(this.state.currentFlavor)}</span>
+		        <br/>
+	        </div> )
+    	}
+    	else { flavour = <div/> }
+    	extraInfo = (
+    		<div>	
+		        <span className={bemBlocks.item("subtitle")}><b>{'Set: '}</b></span><span className={bemBlocks.item("subtitle")}>{this.state.currentSetName + ' (#' + source.number + ')'}</span>
+		        <br/>
+		        <span className={bemBlocks.item("subtitle")}><b>{'Artist: '}</b></span><span className={bemBlocks.item("subtitle")}>{this.state.currentArtist}</span>
+		        <br/>
+	        </div>
+    	)
+    	if (source.legalities) {
+	    	legalities = (<div>
+		        <span className={bemBlocks.item("subtitle")}><b>{'Legalities: '}</b></span>
+		        { source.legalities.map(function(legality, i) {
+		        	return <div><span className={legality.legality == "Banned" ? bemBlocks.item("subtitle") + ' banned' : bemBlocks.item("subtitle") + ' legal'}>{legality.format + ': ' + legality.legality}</span><br/></div>
+		        })}
 		        </div>
-        	)
-	    	if (source.legalities) {
-		    	legalities = (<div>
-			        <span className={bemBlocks.item("subtitle")}><b>{'Legalities: '}</b></span>
-			        { source.legalities.map(function(legality, i) {
-			        	return <div><span className={legality.legality == "Banned" ? bemBlocks.item("subtitle") + ' banned' : bemBlocks.item("subtitle") + ' legal'}>{legality.format + ': ' + legality.legality}</span><br/></div>
-			        })}
-			        </div>
-		    	)
-		    }
+	    	)
+	    }
+    	else { pt = <div/> }
+
+    	// Define rulings here.
+    	var rulings;
+    	if (source.rulings) {
+    		rulings = (<div>
+    			{ source.rulings.map(function(ruling, i) {
+    				return <div><span className={bemBlocks.item("subtitle")}><b>{ruling.date + ": "}</b></span>
+    							<span className={bemBlocks.item("subtitle")}>{this.generateTextCostSymbols(ruling.text)}</span></div>
+    			}.bind(this))}
+    			</div>
+    		)
+    	}
+    	else {
+    		rulings = <div><span className={bemBlocks.item("subtitle")}>No rulings!</span></div>;
+    	}
+
+    	// Define languages here.
+    	var languages;
+    	if (source.foreignNames) {
+    		languages = (<div>
+    			{ source.foreignNames.map(function(language, i) {
+    				return <div ><span onMouseOver={this.onLanguageHover.bind(this, language)} className={bemBlocks.item("subtitle")}><b>{language.language + ": "}</b></span>
+    							<span onMouseOver={this.onLanguageHover.bind(this, language)} className={bemBlocks.item("subtitle")}>{language.name}</span></div>
+    			}.bind(this))}
+    			</div>
+    		)
+    	}
+    	else {
+    		languages = <div><span className={bemBlocks.item("subtitle")}>No other languages!</span></div>;
+    	}
+
+    	// Define comments!
+
+    	// Define prices!
+
+    	// Define the tab stuff here.
+    	var selectedInfo;
+	    if (this.state.clickedCard) {
+        	selectedInfo = (<Tabs selectedIndex={this.state.currentSelectedTab} onSelect={this.handleTabSelect}>
+        		<TabList>
+	        		<Tab>Details</Tab>
+	            	<Tab>Rulings</Tab>
+	            	<Tab>Languages</Tab>
+	            	<Tab>Comments</Tab>
+	            	<Tab>Prices</Tab>
+	        	</TabList>
+            	<TabPanel>
+					<div className='extraDetails'>{flavour}{extraInfo}{legalities}</div> 
+		        </TabPanel>
+		        <TabPanel>
+		          <div className='extraDetails'>{rulings}</div> 
+		        </TabPanel>
+		        <TabPanel>
+		          <div className='extraDetails'>{languages}</div> 
+		        </TabPanel>
+		        <TabPanel>
+		          <h2>Hello from afgaesfgaesg</h2>
+		        </TabPanel>
+		        <TabPanel>
+		          <h2>Hello from expensive card!</h2>
+		        </TabPanel>
+        	</Tabs>)
 	    }
 	    else {
-	    	extraInfo = <div/>
+	    	selectedInfo = <div/>
 	    }
 	    // In the style for the set icons, 'relative' enables cards like Forest to grow the div around them to fit all the symbols.
 	    // In the future, might want an 'open/close' <p> tag for that, since it's pretty useless seeing all those symbols anyway.
@@ -182,16 +257,20 @@ var CardHitsListItem = React.createClass({
 		            		width="100"
 		            		onClick={this.handleClick.bind(this, source)} />
 		        	</div>
-		        	<div className={bemBlocks.item("details")} style={{display:'inline-block'}}>
-		        	<a href={'http://shop.tcgplayer.com/magic/' + this.state.currentSetName.replace(/[^\w\s]/gi, '') + '/' + source.name} target="_blank">
-		         		<h2 className={bemBlocks.item("title")}>{source.name} {source.tagCost} ({source.cmc ? source.cmc : 0})</h2>
-		         		</a>
-				        <h3 className={bemBlocks.item("subtitle")}><b>{source.type}</b></h3>
-				        <h3 className={bemBlocks.item("subtitle")}>{source.taggedText}{pt}</h3></div>
-						<div className='extraDetails'>{flavour}{extraInfo}{legalities}</div> 
-		        	<div style={{width: '150px', position: 'relative', right: '10px', display:'inline-block'}}>
-		          		<p style={{textAlign:'center'}}>{this.getSetIcons(source)}</p>
-		        	</div>
+		        	<div style={{width:'100%'}}>
+		        		<div  style={{display:'flex'}}>
+				        	<div className={bemBlocks.item("details")} style={{display:'inline-block'}}>
+				        		<a href={'http://shop.tcgplayer.com/magic/' + this.state.currentSetName.replace(/[^\w\s]/gi, '') + '/' + source.name} target="_blank">
+				         			<h2 className={bemBlocks.item("title")}>{source.name} {source.tagCost} ({source.cmc ? source.cmc : 0})</h2>
+				         		</a>
+						        <h3 className={bemBlocks.item("subtitle")}><b>{source.type}</b></h3>
+						        <h3 className={bemBlocks.item("subtitle")}>{source.taggedText}{pt}</h3></div>
+				        	<div style={{width: '150px', position: 'relative', right: '10px', display:'inline-block'}}>
+				          		<p style={{textAlign:'center'}}>{this.getSetIcons(source)}</p>
+				        	</div>	
+				        </div>
+	        			<div className={bemBlocks.item("details")}>{selectedInfo}</div>
+		        	</div>			        
 	        	</div>
 	      	</div>
 	    )

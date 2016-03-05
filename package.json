@@ -55,6 +55,7 @@
     "react-highcharts": "^6.0.0",
     "react-nl2br": "0.0.3",
     "react-slick": "^0.11.1",
+    "react-tabs": "^0.5.3",
     "react-toolbox": "^0.14.0",
     "request": "^2.65.0",
     "searchkit": "^0.7.0",
