@@ -5,13 +5,12 @@ import "searchkit/theming/theme.scss";
 import "./styles/customisations.scss";
 var ent = require('ent');
 const nl2br = require('react-nl2br');
-var Carousel = require('nuka-carousel');
-var Slider = require('react-slick');
 var ReactTabs = require('react-tabs');
 var Tab = ReactTabs.Tab;
 var Tabs = ReactTabs.Tabs;
 var TabList = ReactTabs.TabList;
 var TabPanel = ReactTabs.TabPanel;
+var ReactDisqusThread = require('react-disqus-thread');
 
 var CardHitsListItem = React.createClass({
 	getInitialState: function() {  	
@@ -22,6 +21,7 @@ var CardHitsListItem = React.createClass({
         return {
             clickedCard: '',
             currentMultiId: source.multiverseids[result._source.multiverseids.length - 1].multiverseid,
+            currentImageMultiId: source.multiverseids[result._source.multiverseids.length - 1].multiverseid,
             currentArtist: source.multiverseids[result._source.multiverseids.length - 1].artist,
             currentFlavor: source.multiverseids[result._source.multiverseids.length - 1].flavor,
             currentOriginalText: source.multiverseids[result._source.multiverseids.length - 1].originalText,
@@ -57,8 +57,7 @@ var CardHitsListItem = React.createClass({
 	},
 
 	onLanguageHover(language) {
-		console.log('new multiId is ' + language.multiverseid );
-		this.setState({currentMultiId: language.multiverseid});
+		this.setState({currentImageMultiId: language.multiverseid});
 	},
 
     getSetIcons: function(source) {
@@ -119,7 +118,7 @@ var CardHitsListItem = React.createClass({
 	    var {bemBlocks, result} = this.props;
 	    var source = result._source;
 	    let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + this.state.currentMultiId;
-	    let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/' + this.state.currentMultiId + '.jpg';
+	    let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/' + this.state.currentImageMultiId + '.jpg';
 	    // Generate the mana symbols in both cost and the card text.	    
 	    source.tagCost = this.generateTitleCostSymbols(source.manaCost);
 	    source.taggedText = this.generateTextCostSymbols(source.text);
@@ -174,10 +173,17 @@ var CardHitsListItem = React.createClass({
     	}
 
     	// Define languages here.
+    	var whichMultiIndex = source.multiverseids.length - 1;
+    	for (var i = 0; i <= whichMultiIndex; i++) {
+    		if (_.includes(source.multiverseids[i], this.state.currentMultiId)) {
+    			whichMultiIndex = i;
+    			break;
+    		}
+    	}
     	var languages;
-    	if (source.foreignNames) {
+    	if (source.multiverseids[whichMultiIndex].foreignNames) {
     		languages = (<div>
-    			{ source.foreignNames.map(function(language, i) {
+    			{ source.multiverseids[whichMultiIndex].foreignNames.map(function(language, i) {
     				return <div ><span onMouseOver={this.onLanguageHover.bind(this, language)} className={bemBlocks.item("subtitle")}><b>{language.language + ": "}</b></span>
     							<span onMouseOver={this.onLanguageHover.bind(this, language)} className={bemBlocks.item("subtitle")}>{language.name}</span></div>
     			}.bind(this))}
@@ -213,7 +219,12 @@ var CardHitsListItem = React.createClass({
 		          <div className='extraDetails'>{languages}</div> 
 		        </TabPanel>
 		        <TabPanel>
-		          <h2>Hello from afgaesfgaesg</h2>
+			        <ReactDisqusThread
+		                shortname="mtg-hunter"
+		                identifier={this.state.currentSetName + ': ' + source.name}
+		                title={this.state.currentSetName + ': ' + source.name}
+		                url="http://localhost:3333/"
+		                category_id="4523863"/>
 		        </TabPanel>
 		        <TabPanel>
 		          <h2>Hello from expensive card!</h2>
@@ -250,6 +261,7 @@ var CardHitsListItem = React.createClass({
 	    return (
 	    	<div className={bemBlocks.item().mix(bemBlocks.container("item"))} style={{display: 'block'}}>
 	    		<div style={{display: 'flex'}}>
+	    			{/* Block 1; the card image. */}
 		    		<div className='listImg' style={{display:'inline-block'}}>
 		          		<img className={(this.state.clickedCard ? "clicked " : "") + "listImg"}
 		            		src={imgUrl} 
@@ -257,7 +269,9 @@ var CardHitsListItem = React.createClass({
 		            		width="100"
 		            		onClick={this.handleClick.bind(this, source)} />
 		        	</div>
+	    			{/* Block 2; the title + text, details tabs, and set icons. */}
 		        	<div style={{width:'100%'}}>
+	    				{/* Block 3; the title + text and set icons. */}
 		        		<div  style={{display:'flex'}}>
 				        	<div className={bemBlocks.item("details")} style={{display:'inline-block'}}>
 				        		<a href={'http://shop.tcgplayer.com/magic/' + this.state.currentSetName.replace(/[^\w\s]/gi, '') + '/' + source.name} target="_blank">
@@ -269,6 +283,7 @@ var CardHitsListItem = React.createClass({
 				          		<p style={{textAlign:'center'}}>{this.getSetIcons(source)}</p>
 				        	</div>	
 				        </div>
+	    				{/* The tab panel is by itself under block 3. */}
 	        			<div className={bemBlocks.item("details")}>{selectedInfo}</div>
 		        	</div>			        
 	        	</div>
