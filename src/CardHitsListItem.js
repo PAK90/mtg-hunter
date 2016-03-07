@@ -26,6 +26,7 @@ var CardHitsListItem = React.createClass({
             currentFlavor: source.multiverseids[result._source.multiverseids.length - 1].flavor,
             currentOriginalText: source.multiverseids[result._source.multiverseids.length - 1].originalText,
             currentSetName: source.multiverseids[result._source.multiverseids.length - 1].setName,
+            currentNumber: source.multiverseids[result._source.multiverseids.length - 1].number,
             currentSelectedTab: 0
         };
     },
@@ -50,14 +51,20 @@ var CardHitsListItem = React.createClass({
 	handleSetIconClick(multi) {
 		// Set the new multiId. Eventually this will work for flavour and original text too.
 		this.setState({currentMultiId: multi.multiverseid,
+			currentImageMultiId: multi.multiverseid,
 			currentArtist: multi.artist,
 			currentFlavor: multi.flavor,
 			currentOriginalText: multi.originalText,
-			currentSetName: multi.setName});
+			currentSetName: multi.setName,
+			currentNumber: multi.number});
 	},
 
 	onLanguageHover(language) {
 		this.setState({currentImageMultiId: language.multiverseid});
+	},
+
+	onLanguageHoverOut(language) {
+		this.setState({currentImageMultiId: this.state.currentMultiId});
 	},
 
     getSetIcons: function(source) {
@@ -140,7 +147,8 @@ var CardHitsListItem = React.createClass({
     	else { flavour = <div/> }
     	extraInfo = (
     		<div>	
-		        <span className={bemBlocks.item("subtitle")}><b>{'Set: '}</b></span><span className={bemBlocks.item("subtitle")}>{this.state.currentSetName + ' (#' + source.number + ')'}</span>
+		        <span className={bemBlocks.item("subtitle")}><b>{'Set: '}</b></span>
+		        <span className={bemBlocks.item("subtitle")}>{this.state.currentSetName + (this.state.currentNumber ? ' (#' + this.state.currentNumber + ')' : '')}</span>
 		        <br/>
 		        <span className={bemBlocks.item("subtitle")}><b>{'Artist: '}</b></span><span className={bemBlocks.item("subtitle")}>{this.state.currentArtist}</span>
 		        <br/>
@@ -185,7 +193,9 @@ var CardHitsListItem = React.createClass({
     		languages = (<div>
     			{ source.multiverseids[whichMultiIndex].foreignNames.map(function(language, i) {
     				return <div ><span onMouseOver={this.onLanguageHover.bind(this, language)} className={bemBlocks.item("subtitle")}><b>{language.language + ": "}</b></span>
-    							<span onMouseOver={this.onLanguageHover.bind(this, language)} className={bemBlocks.item("subtitle")}>{language.name}</span></div>
+    							<span onMouseOver={this.onLanguageHover.bind(this, language)} 
+    							onMouseOut={this.onLanguageHoverOut.bind(this, language)} 
+    							className={bemBlocks.item("subtitle")}>{language.name}</span></div>
     			}.bind(this))}
     			</div>
     		)
