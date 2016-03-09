@@ -185,7 +185,7 @@ const SymbolRefineList = (props:FilterItemComponentProps, showCheckbox)=> {
     <FastClick handler={toggleFilter}>
       <div className={className} data-qa="option">
         {showCheckbox ? <input type="checkbox" data-qa="checkbox" checked={selected} readOnly className={block("checkbox").state({ selected }) } ></input> : undefined}
-        <img src = {'./src/img/' + props.label.toLowerCase() + '.png'}  height="15px"/>
+        <img src = {'./src/img/' + props.label.toLowerCase() + '.png'}  height="15px" style={{marginTop: '3px'}}/>
         <div data-qa="count" className={block("count")} style={{flex:'1'}}>{count}</div>
       </div>
     </FastClick>

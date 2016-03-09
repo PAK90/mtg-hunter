@@ -77,12 +77,38 @@ html {
 /* The card images in list view. */
 .listImg {
   transition: 0.3s;
+  position: relative; /* Purely here to make z-index work. */
   &.clicked {
     width: 223px;
+
+    &.split {
+      transform: rotate(90deg);
+      z-index: 100;
+    }
+    &.flip {
+      transform: rotate(180deg);
+    }
+    &.double-faced {
+      transform: rotateY(360deg);
+    }
+  }
+  &.split {
+    transform: rotate(90deg);
+    z-index: 100;
+  }
+  &.flip {
+    transform: rotate(180deg);
+  }
+  &.double-faced {
+    transform: rotateY(360deg);
   }
 }
 .listImg:hover {
   animation: border-pulsate 2s infinite;
+}
+
+.listImgDiv {
+  transition: 0.3s;
 }
 
 @keyframes border-pulsate {

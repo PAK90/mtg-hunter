@@ -11,6 +11,7 @@ var Tabs = ReactTabs.Tabs;
 var TabList = ReactTabs.TabList;
 var TabPanel = ReactTabs.TabPanel;
 var ReactDisqusThread = require('react-disqus-thread');
+var cards = require('./allCardsMod.json');
 
 var CardHitsListItem = React.createClass({
 	getInitialState: function() {  	
@@ -27,7 +28,8 @@ var CardHitsListItem = React.createClass({
             currentOriginalText: source.multiverseids[result._source.multiverseids.length - 1].originalText,
             currentSetName: source.multiverseids[result._source.multiverseids.length - 1].setName,
             currentNumber: source.multiverseids[result._source.multiverseids.length - 1].number,
-            currentSelectedTab: 0
+            currentSelectedTab: 0,
+            currentImageLayout: '',
         };
     },
 
@@ -38,10 +40,10 @@ var CardHitsListItem = React.createClass({
 	      this.setState({clickedCard: source.name});
 	    }
 	    // Else, we clicked on the same card, so shrink.
+	    // The enlarging/shrinking happens via a css style which turns on/off based on whether clickedCard matches current card name.
 	    else {
 	      this.setState({clickedCard: ''});
 	    }
-	    //document.addEventListener("click", this.hide.bind(this));
 	},
 	
 	handleTabSelect(index, last) {
@@ -65,6 +67,18 @@ var CardHitsListItem = React.createClass({
 
 	onLanguageHoverOut(language) {
 		this.setState({currentImageMultiId: this.state.currentMultiId});
+	},
+
+	onLayoutHover(source) {
+		this.setState({currentImageLayout: source.layout});
+		if (source.layout == 'double-faced') {
+			var targetName = source.name == source.names[0] ? source.names[1] : source.names[0];
+			this.setState({currentImageMultiId: cards[targetName].multiverseids[0].multiverseid});
+		}
+	},
+
+	onLayoutHoverOut() {
+		this.setState({currentImageLayout: '', currentImageMultiId: this.state.currentMultiId});
 	},
 
     getSetIcons: function(source) {
@@ -113,15 +127,6 @@ var CardHitsListItem = React.createClass({
 	},
 
 	render: function() {
-		// Temporary slider test stuff.
-		var settings = {
-	      dots: true,
-	      infinite: false,
-	      speed: 500,
-	      slidesToShow: 1,
-	      slidesToScroll: 1
-	    };
-
 	    var {bemBlocks, result} = this.props;
 	    var source = result._source;
 	    let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + this.state.currentMultiId;
@@ -131,7 +136,7 @@ var CardHitsListItem = React.createClass({
 	    source.taggedText = this.generateTextCostSymbols(source.text);
 
 	    // Define 'details' tab information here.
-	    var extraInfo, flavour, pt, legalities;
+	    var extraInfo, flavour, pt, legalities, otherSide;
     	if (source.power) {
     		pt = ( <div>		
 		        <span className={bemBlocks.item("subtitle")}><b>{'P/T: '}</b></span><span className={bemBlocks.item("subtitle")}>{source.power + '/' + source.toughness}</span>
@@ -164,6 +169,16 @@ var CardHitsListItem = React.createClass({
 	    	)
 	    }
     	else { pt = <div/> }
+    	if (source.layout != "normal" && source.layout != "vanguard" && source.layout != "schema") {
+    		otherSide = (
+    			<span onMouseOver={this.onLayoutHover.bind(this, source)}
+    				onMouseOut={this.onLayoutHoverOut}
+    				className={bemBlocks.item("subtitle")}><b>{source.name == source.names[0] ? source.names[1] : source.names[0]}</b></span>
+    		)
+    	}
+    	else {
+    		otherSide = <div/>
+    	}
 
     	// Define rulings here.
     	var rulings;
@@ -247,45 +262,25 @@ var CardHitsListItem = React.createClass({
 	    // In the style for the set icons, 'relative' enables cards like Forest to grow the div around them to fit all the symbols.
 	    // In the future, might want an 'open/close' <p> tag for that, since it's pretty useless seeing all those symbols anyway.
 	    // The <p> tag helps to align the symbols in the centre, and probably other important css-y stuff.
-	    /*<Carousel slidesToShow={2} cellAlign="center" cellSpacing={20}  slideWidth="500px">
-        <img src="http://placehold.it/1000x400/ffffff/c0392b/&text=slide1"/>
-        <img src="http://placehold.it/1000x400/ffffff/c0392b/&text=slide2"/>
-        <img src="http://placehold.it/1000x400/ffffff/c0392b/&text=slide3"/>
-        <img src="http://placehold.it/1000x400/ffffff/c0392b/&text=slide4"/>
-        <img src="http://placehold.it/1000x400/ffffff/c0392b/&text=slide5"/>
-        <img src="http://placehold.it/1000x400/ffffff/c0392b/&text=slide6"/>
-      </Carousel>
-
-    			<div className='container'>
-      			</div>
-      <Slider {...settings}>
-        
-						<div className='extraDetails'>{flavour}{extraInfo}{legalities}</div> 
-        <div><h3>2</h3></div>
-        <div><h3>3</h3></div>
-        <div><h3>4</h3></div>
-        <div><h3>5</h3></div>
-        <div><h3>6</h3></div>
-      </Slider>*/
 	    // this.state.clickedCard is '' when unclicked, which is apparently false-y enough to use for a bool.
 	    return (
 	    	<div className={bemBlocks.item().mix(bemBlocks.container("item"))} style={{display: 'block'}}>
 	    		<div style={{display: 'flex'}}>
 	    			{/* Block 1; the card image. */}
-		    		<div className='listImg' style={{display:'inline-block'}}>
-		          		<img className={(this.state.clickedCard ? "clicked " : "") + "listImg"}
+		    		<div className={"listImgDiv "} style={{display:'inline-block'}}>
+		          		<img className={(this.state.clickedCard ? "clicked " : "") + "listImg "+ this.state.currentImageLayout }
 		            		src={imgUrl} 
 		            		style={{borderRadius: this.state.clickedCard ? "10" : "3"}} 
 		            		width="100"
 		            		onClick={this.handleClick.bind(this, source)} />
 		        	</div>
-	    			{/* Block 2; the title + text, details tabs, and set icons. */}
+	    			{/* Block 2; the title + text, details tabs, and set icons. Width = 100% to stretch it out and 'align right' the set icons. */}
 		        	<div style={{width:'100%'}}>
 	    				{/* Block 3; the title + text and set icons. */}
 		        		<div  style={{display:'flex'}}>
 				        	<div className={bemBlocks.item("details")} style={{display:'inline-block'}}>
 				        		<a href={'http://shop.tcgplayer.com/magic/' + this.state.currentSetName.replace(/[^\w\s]/gi, '') + '/' + source.name} target="_blank">
-				         			<h2 className={bemBlocks.item("title")}>{source.name} {source.tagCost} ({source.cmc ? source.cmc : 0})</h2>
+				         			<h2 className={bemBlocks.item("title")}>{source.name} {source.tagCost} ({source.cmc ? source.cmc : 0}) {otherSide}</h2>
 				         		</a>
 						        <h3 className={bemBlocks.item("subtitle")}><b>{source.type}</b></h3>
 						        <h3 className={bemBlocks.item("subtitle")}>{source.taggedText}{pt}</h3></div>
