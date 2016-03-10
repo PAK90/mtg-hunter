@@ -1,7 +1,9 @@
 @import url(https://fonts.googleapis.com/css?family=Open+Sans:400,700,600);
+@import url(//fonts.googleapis.com/css?family=Dosis:400,600);
 
 html {
-  font-family:"Open Sans";
+  /*font-family:"Open Sans";*/
+  font-family: 'Dosis';
 }
 
 .my-logo {
@@ -10,6 +12,10 @@ html {
   padding: 13px 20px;
   margin-right: 15px;
   line-height: 16px;
+}
+.my-logo-small {
+  color: #8189A0;
+  font-size: 9px;
 }
 
 .view-src-link {
@@ -53,6 +59,23 @@ html {
   position: relative;
   padding: 0 10 0 10;
 }
+
+/*.sk-refinement-list-option__checkbox {
+  display: none;
+}
+
+.sk-refinement-list-option__checkbox {
+  content: '';
+  background: #fff;
+  border: 2px solid #ddd;
+  display: inline-block;
+  vertical-align: middle;
+  width: 15px;
+  height: 15px;
+  padding: 2px;
+  margin-right: 10px;
+  text-align: center;
+}*/
 
 /* The card title.*/
 .sk-hits-list-hit__title {

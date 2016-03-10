@@ -11,7 +11,7 @@ var Tabs = ReactTabs.Tabs;
 var TabList = ReactTabs.TabList;
 var TabPanel = ReactTabs.TabPanel;
 var ReactDisqusThread = require('react-disqus-thread');
-var cards = require('./allCardsMod.json');
+var cards = require('./multiIdName.json');
 
 var CardHitsListItem = React.createClass({
 	getInitialState: function() {  	
@@ -169,7 +169,7 @@ var CardHitsListItem = React.createClass({
 	    	)
 	    }
     	else { pt = <div/> }
-    	if (source.layout != "normal" && source.layout != "vanguard" && source.layout != "schema") {
+    	if (source.layout == "flip" || source.layout == "double-faced" || source.layout == "split") {
     		otherSide = (
     			<span onMouseOver={this.onLayoutHover.bind(this, source)}
     				onMouseOut={this.onLayoutHoverOut}

@@ -221,7 +221,8 @@ export class App extends React.Component<any, any> {
     this.state = {hoveredId: '',
       clickedCard: '',
       matchPercent: '100%',
-      operator: "AND"};
+      operator: "AND",
+      all: 'collapse'};
   }
 
   hide() {
@@ -257,6 +258,14 @@ export class App extends React.Component<any, any> {
 
   handleOperatorChange(e){
     this.setState({operator: e.target.value})
+  }
+
+  handleCollapseClick() {
+    this.setState({all: 'collapse'});
+  }
+
+  handleExpandClick() {
+    this.setState({all: 'expand'});
   }
 
   getSetIcons(source) {
@@ -308,7 +317,9 @@ export class App extends React.Component<any, any> {
 
           <div className="sk-layout__top-bar sk-top-bar">
             <div className="sk-top-bar__content">
-              <div className="my-logo">MtG:Hunter</div>
+              <div className="my-logo"><span>MtG:Hunter</span><br/>
+              <a href="http://searchkit.co/" style={{textDecoration:"none"}}>
+              <span className="my-logo-small">Made with Searchkit</span></a></div>
               <SearchBox
                 translations={{"searchbox.placeholder": "search card names"}}
                 queryOptions={{"minimum_should_match": this.state.matchPercent}}
@@ -348,6 +359,8 @@ export class App extends React.Component<any, any> {
               <div className="sk-results-list__action-bar sk-action-bar">
                 <div className="sk-action-bar__info">
                   <HitsStats />
+                  <input type="button" onClick={this.handleExpandClick} value="Expand all" />
+                  <input type="button" onClick={this.handleCollapseClick} value="Collapse all" />
                   <ViewSwitcherToggle/>
                   <SortingSelector options={[
                     {label:"Name", field: "name.raw", order: "asc", defaultOption:true},
