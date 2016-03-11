@@ -60,14 +60,16 @@ html {
   padding: 0 10 0 10;
 }
 
-/*.sk-refinement-list-option__checkbox {
-  display: none;
+/* The checkboxes. */
+.sk-refinement-list-option__checkbox {
+  display:none;
 }
 
-.sk-refinement-list-option__checkbox {
+.sk-refinement-list-option__checkbox + .sk-refinement-list-option__text:before {
   content: '';
   background: #fff;
-  border: 2px solid #ddd;
+  border: 1px solid #616161;
+  border-radius: 4px;
   display: inline-block;
   vertical-align: middle;
   width: 15px;
@@ -75,7 +77,25 @@ html {
   padding: 2px;
   margin-right: 10px;
   text-align: center;
-}*/
+}
+
+.sk-refinement-list-option__checkbox + .sk-refinement-list-option__count:before {
+  content: '';
+  background: #fff;
+  border: 1px solid #616161;
+  border-radius: 4px;
+  display: inline-block;
+  vertical-align: middle;
+  width: 15px;
+  height: 15px;
+  padding: 2px;
+  margin-right: 10px;
+  text-align: center;
+}
+
+.sk-refinement-list-option__checkbox:checked + .sk-refinement-list-option__text:before {
+  background:#000;
+}
 
 /* The card title.*/
 .sk-hits-list-hit__title {

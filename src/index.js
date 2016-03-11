@@ -175,6 +175,7 @@ function generateTextCostSymbols(source) {
   return tagged;
 }
 
+// The mana symbol refinement list.
 const SymbolRefineList = (props:FilterItemComponentProps, showCheckbox)=> {
   const {bemBlocks, toggleFilter, translate, selected, label, count} = props;
   const block = bemBlocks.option;
@@ -185,7 +186,7 @@ const SymbolRefineList = (props:FilterItemComponentProps, showCheckbox)=> {
     <FastClick handler={toggleFilter}>
       <div className={className} data-qa="option">
         {showCheckbox ? <input type="checkbox" data-qa="checkbox" checked={selected} readOnly className={block("checkbox").state({ selected }) } ></input> : undefined}
-        <img src = {'./src/img/' + props.label.toLowerCase() + '.png'}  height="15px" style={{marginTop: '3px'}}/>
+        <img src = {'./src/img/' + props.label.toLowerCase() + '.png'} className="refineListImage" height="15px" style={{marginTop: '3px'}}/>
         <div data-qa="count" className={block("count")} style={{flex:'1'}}>{count}</div>
       </div>
     </FastClick>
@@ -344,6 +345,8 @@ export class App extends React.Component<any, any> {
                 <option value="AND">AND</option>
                 <option value="OR">OR</option>
               </select>
+              <RefinementListFilter id="power" title="Power" field="power.raw" size={5} operator={this.state.operator}/>
+              <RefinementListFilter id="toughness" title="Toughness" field="toughness.raw" size={5} operator={this.state.operator}/>
               <RefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator={this.state.operator}/>
               <RefinementListFilter id="symbols" title="Symbols" field="symbols" size={5} operator={this.state.operator} itemComponent={SymbolRefineList}/>
               <RefinementListFilter id="colourCount" title="Colour Count" field="colourCount" size={6} operator={this.state.operator} orderKey="_term"/>

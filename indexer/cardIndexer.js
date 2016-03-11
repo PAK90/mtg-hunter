@@ -2,6 +2,16 @@
 let cards = require("./data/allCardsWithSetsExt.js");
 let indexer = require("./indexer");
 let _ = require("lodash");
+var cardMultis = require('../src/multiIdName.json');
+
+var cardArray = Object.keys(cardMultis).map(function(cardName) {
+  return (cardMultis[cardName].cardName = cardName) && cardMultis[cardName];
+});
+
+// Remove basic lands.
+var cardArray = cardArray.filter(function(card) {
+  return (card.name != "Swamp" && card.name != "Forest" && card.name != "Plains" && card.name != "Island"  && card.name != "Mountain" && card.name != "Where" && card.name != "When" );
+})
 
 function symbolize(manaCost) {
   var symbolArray = [];
@@ -35,20 +45,40 @@ function anonymizeRulesText(name, text) {
   // Now with a first name. Since 'flying' occurs in names and is a keyword, don't do that. Duplicate for other keywords.
   let firstName = name.split(' ')[0];
   if (!_.includes(forbiddenWords, firstName) && name != "Erase (Not the Urza's Legacy One)") {
-    console.log('Finding and replacing '+firstName);
+    //console.log('Finding and replacing '+firstName);
     text = text.replace(new RegExp(firstName, 'g'), '~');
   }
   let beforeComma = name.split(' ,')[0];
   if (!_.includes(forbiddenWords, beforeComma) && name != "Erase (Not the Urza's Legacy One)") {
-    console.log('Finding and replacing '+beforeComma);
+    //console.log('Finding and replacing '+beforeComma);
     text = text.replace(new RegExp(beforeComma, 'g'), '~');
   }
   let beforeThe = name.split(' the')[0];
   if (!_.includes(forbiddenWords, beforeThe) && name != "Erase (Not the Urza's Legacy One)") {
-    console.log('Finding and replacing '+beforeThe);
+    //console.log('Finding and replacing '+beforeThe);
     text = text.replace(new RegExp(beforeThe, 'g'), '~');
   }
   return text;
+}
+
+function bracketRulings(ruling, currentCard) {
+  let oldRuling = ruling.text;
+  // Loop through all card names.
+  for (var i = 0; i < cardArray.length; i++) {
+    // Only go in if current card isn't named.
+    if (cardArray[i].name != currentCard.name && cardArray[i]) {
+      // If you find the name in the text, get in there and replace it.
+      //var reg = new RegExp ("/(?:^|\b)(" + cardArray[i].name + ")(?=\b|$)/",'g');
+      if (ruling.text.search(cardArray[i].name) != -1) {
+        let bracketedName = '[' + cardArray[i].name + ']';
+        //console.log('found ' + cardArray[i].name + ' in ' + ruling.text + '\n');
+        ruling.text = ruling.text.replace(cardArray[i].name, bracketedName );
+      }
+    }
+  }
+  if (oldRuling != ruling.text) {console.log(ruling.text + '!!!!!!\n');}
+
+  return ruling;
 }
 
 let stringWithRaw = {
@@ -108,6 +138,7 @@ function bulkLoop() {
       // Tuktuk is a special case, because of 'Tuktuk the Reborn' appearing in the text.
       card.namelessText = card.name == "Tuktuk the Explorer" ? card.text.replace(card.name, '~') : anonymizeRulesText(card.name, card.text);
       //card.colourCount = countColours(card.symbols); // Count unique colours. ['w','ug'] = 3, ['r','u','w'] = 3, ['c'] = 0 since colourless isn't a colour. Replaced by line 30.
+      card.rulings = card.rulings ? card.rulings.map(function(ruling) { return bracketRulings(ruling, card); }.bind(this)) : null;
       return card;
     });
     i += 1000;
