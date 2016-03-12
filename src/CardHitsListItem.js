@@ -116,11 +116,24 @@ var CardHitsListItem = React.createClass({
 		var tagged;
 		if (source !== undefined) {
 		    // Get rid of / in any costs first, but only if inside {} brackets (so as not to affect +1/+1).
+		    //source = this.generateCardHoverSpan(source);
 		    source = source.replace(/(\/)(?=\w\})/g,'');
 		    // Then generate the tags through setting the innerHtml. This is the only way to preserve the text around the img tags.
 		    // Encode the source in html, to prevent XSS nastiness. Then replace the newlines with <br/>. Then insert the <img> tags.
 		    tagged = <div dangerouslySetInnerHTML={{__html: ent.encode(source).replace(/&#10;/g, '<br/>').replace(/\{([0-z,½,∞]+)\}/g, (fullMatch, firstMatch) =>
 		        `<img src=./src/img/${firstMatch.toLowerCase()}.png height=12px/>`
+		    )}}></div>
+		}
+		return tagged;
+	},
+
+	generateCardHoverSpan: function(source) {
+		var tagged;
+		if (source !== undefined) {
+		    // Then generate the tags through setting the innerHtml. This is the only way to preserve the text around the img tags.
+		    // Encode the source in html, to prevent XSS nastiness. Then replace the newlines with <br/>. Then insert the <img> tags.
+		    tagged = <div dangerouslySetInnerHTML={{__html: ent.encode(source).replace(/&#10;/g, '<br/>').replace(/\[(.*?)\]/g, (fullMatch, firstMatch) =>
+		        `<span><b>${firstMatch}</b></span>`
 		    )}}></div>
 		}
 		return tagged;

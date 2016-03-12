@@ -65,14 +65,15 @@ function bracketRulings(ruling, currentCard) {
   let oldRuling = ruling.text;
   // Loop through all card names.
   for (var i = 0; i < cardArray.length; i++) {
-    // Only go in if current card isn't named.
-    if (cardArray[i].name != currentCard.name && cardArray[i]) {
+    // Only go in if current card isn't named. Also not if the current name (e.g. Goblin) is included in the main name (Goblin Grenadier). Not working at the moment for some reason...
+    if (cardArray[i].name != currentCard.name && cardArray[i] && !_.includes(currentCard.name, cardArray[i].name)) {
       // If you find the name in the text, get in there and replace it.
-      //var reg = new RegExp ("/(?:^|\b)(" + cardArray[i].name + ")(?=\b|$)/",'g');
-      if (ruling.text.search(cardArray[i].name) != -1) {
+      // TURNS OUT YOU NEED TO ESCAPE THE STUFF IN THE "" PAIRS TOO, like \b. Annoying.
+      var reg = new RegExp("(?:^|\\b)("+cardArray[i].name+")(?=\\b|$)", 'g');
+      if (ruling.text.search(reg) != -1) {
         let bracketedName = '[' + cardArray[i].name + ']';
         //console.log('found ' + cardArray[i].name + ' in ' + ruling.text + '\n');
-        ruling.text = ruling.text.replace(cardArray[i].name, bracketedName );
+        ruling.text = ruling.text.replace(reg, bracketedName );
       }
     }
   }
