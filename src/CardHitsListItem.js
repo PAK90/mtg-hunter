@@ -13,8 +13,8 @@ var TabPanel = ReactTabs.TabPanel;
 var ReactDisqusThread = require('react-disqus-thread');
 var cards = require('./multiIdName.json');
 
-var CardHitsListItem = React.createClass({
-	getInitialState: function() {  	
+var CardHitsListItem = React.createFactory(React.createClass({
+	getInitialState: function() {
 	    var {bemBlocks, result} = this.props;
 	    var source = result._source;
 	    // At some point, have all multiverse-specific stuff (id, flavour text, original text) as states.
@@ -45,7 +45,7 @@ var CardHitsListItem = React.createClass({
 	      this.setState({clickedCard: ''});
 	    }
 	},
-	
+
 	handleTabSelect(index, last) {
 		this.setState({currentSelectedTab: index});
 	},
@@ -92,7 +92,7 @@ var CardHitsListItem = React.createClass({
       		let rarity = multis.rarity.charAt(0) == "B" ? "C" : multis.rarity.charAt(0); // Replace 'basic' rarity with common.
       		let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + multis.multiverseid;
       		return (
-            	<img className={(this.state.currentMultiId == multis.multiverseid ? "clicked " : "") + "setIcon " + rarity } src={'./src/img/sets/' + multis.setName.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-' + rarity + '.jpg'} 
+            	<img className={(this.state.currentMultiId == multis.multiverseid ? "clicked " : "") + "setIcon " + rarity } src={'./src/img/sets/' + multis.setName.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-' + rarity + '.jpg'}
 	                title={multis.setName}
 	                onClick={this.handleSetIconClick.bind(this, multis)}/>
 	            )
@@ -149,27 +149,27 @@ var CardHitsListItem = React.createClass({
 	    var source = result._source;
 	    let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + this.state.currentMultiId;
 	    let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/' + this.state.currentImageMultiId + '.jpg';
-	    // Generate the mana symbols in both cost and the card text.	    
+	    // Generate the mana symbols in both cost and the card text.
 	    source.tagCost = this.generateTitleCostSymbols(source.manaCost);
 	    source.taggedText = this.generateTextCostSymbols(source.text);
 
 	    // Define 'details' tab information here.
 	    var extraInfo, flavour, pt, legalities, otherSide;
     	if (source.power) {
-    		pt = ( <div>		
+    		pt = ( <div>
 		        <span className={bemBlocks.item("subtitle")}><b>{'P/T: '}</b></span><span className={bemBlocks.item("subtitle")}>{source.power + '/' + source.toughness}</span>
 		        <br/>
 	        </div> )
     	}
     	if (this.state.currentFlavor) {
-    		flavour = ( <div>		
+    		flavour = ( <div>
 		        <span className={bemBlocks.item("subtitle")}><b>{'Flavour: '}</b></span><span className={bemBlocks.item("subtitle")}>{nl2br(this.state.currentFlavor)}</span>
 		        <br/>
 	        </div> )
     	}
     	else { flavour = <div/> }
     	extraInfo = (
-    		<div>	
+    		<div>
 		        <span className={bemBlocks.item("subtitle")}><b>{'Set: '}</b></span>
 		        <span className={bemBlocks.item("subtitle")}>{this.state.currentSetName + (this.state.currentNumber ? ' (#' + this.state.currentNumber + ')' : '')}</span>
 		        <br/>
@@ -226,8 +226,8 @@ var CardHitsListItem = React.createClass({
     		languages = (<div>
     			{ source.multiverseids[whichMultiIndex].foreignNames.map(function(language, i) {
     				return <div ><span onMouseOver={this.onLanguageHover.bind(this, language)} className={bemBlocks.item("subtitle")}><b>{language.language + ": "}</b></span>
-    							<span onMouseOver={this.onLanguageHover.bind(this, language)} 
-    							onMouseOut={this.onLanguageHoverOut.bind(this, language)} 
+    							<span onMouseOver={this.onLanguageHover.bind(this, language)}
+    							onMouseOut={this.onLanguageHoverOut.bind(this, language)}
     							className={bemBlocks.item("subtitle")}>{language.name}</span></div>
     			}.bind(this))}
     			</div>
@@ -253,13 +253,13 @@ var CardHitsListItem = React.createClass({
 	            	<Tab>Prices</Tab>
 	        	</TabList>
             	<TabPanel>
-					<div className='extraDetails'>{flavour}{extraInfo}{legalities}</div> 
+					<div className='extraDetails'>{flavour}{extraInfo}{legalities}</div>
 		        </TabPanel>
 		        <TabPanel>
-		          <div className='extraDetails'>{rulings}</div> 
+		          <div className='extraDetails'>{rulings}</div>
 		        </TabPanel>
 		        <TabPanel>
-		          <div className='extraDetails'>{languages}</div> 
+		          <div className='extraDetails'>{languages}</div>
 		        </TabPanel>
 		        <TabPanel>
 			        <ReactDisqusThread
@@ -287,8 +287,8 @@ var CardHitsListItem = React.createClass({
 	    			{/* Block 1; the card image. */}
 		    		<div className={"listImgDiv "} style={{display:'inline-block'}}>
 		          		<img className={(this.state.clickedCard ? "clicked " : "") + "listImg "+ this.state.currentImageLayout }
-		            		src={imgUrl} 
-		            		style={{borderRadius: this.state.clickedCard ? "10" : "3"}} 
+		            		src={imgUrl}
+		            		style={{borderRadius: this.state.clickedCard ? "10" : "3"}}
 		            		width="100"
 		            		onClick={this.handleClick.bind(this, source)} />
 		        	</div>
@@ -304,15 +304,15 @@ var CardHitsListItem = React.createClass({
 						        <h3 className={bemBlocks.item("subtitle")}>{source.taggedText}{pt}</h3></div>
 				        	<div style={{width: '150px', position: 'relative', right: '10px', display:'inline-block'}}>
 				          		<p style={{textAlign:'center'}}>{this.getSetIcons(source)}</p>
-				        	</div>	
+				        	</div>
 				        </div>
 	    				{/* The tab panel is by itself under block 3. */}
 	        			<div className={bemBlocks.item("details")}>{selectedInfo}</div>
-		        	</div>			        
+		        	</div>
 	        	</div>
 	      	</div>
 	    )
 	}
-});
+}));
 
 export default CardHitsListItem;

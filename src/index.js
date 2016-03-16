@@ -275,7 +275,7 @@ export class App extends React.Component<any, any> {
       let rarity = multis.rarity.charAt(0) == "B" ? "C" : multis.rarity.charAt(0); // Replace 'basic' rarity with common.
       let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + multis.multiverseid;
       return (
-              <img className='setIcon' src={'./src/img/sets/' + multis.setName.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-' + rarity + '.jpg'} 
+              <img className='setIcon' src={'./src/img/sets/' + multis.setName.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-' + rarity + '.jpg'}
                 title={multis.setName}
                 style={{padding: '2px'}}
                 onClick={this.handleClick.bind(this, source)}/>
@@ -291,8 +291,8 @@ export class App extends React.Component<any, any> {
     let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/' + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid + '.jpg';
     return (
       <div className={bemBlocks.item().mix(bemBlocks.container("item"))}>
-          <img className='gridImg'  
-            src={imgUrl} 
+          <img className='gridImg'
+            src={imgUrl}
             onClick={this.handleClick.bind(this, source)}
             onMouseOver={this.handleHoverIn.bind(this, source)}
             onMouseOut={this.handleHoverOut.bind(this, source)}/>
@@ -382,7 +382,7 @@ export class App extends React.Component<any, any> {
                 <ViewSwitcherHits
                     hitsPerPage={20}
                     hitComponents = {[
-                      {key:"grid", title:"Grid", itemComponent:this.CardHitsGridItem},
+                      {key:"grid", title:"Grid", itemComponent:this.CardHitsGridItem.bind(this)},
                       {key:"list", title:"List", itemComponent:CardHitsListItem, defaultOption:true}
                     ]}
                     scrollTo={false}
