@@ -75,7 +75,7 @@ var Animations = {
     })
 };
 
-export class RefinementListFilterExt extends RefinementListFilter<RefinementListFilterDisplayProps, any> {
+/*export class RefinementListFilterExt extends RefinementListFilter<RefinementListFilterDisplayProps, any> {
   render() {
 
     const { id, title, bemBlocks, buckets } = this.props
@@ -142,7 +142,7 @@ export class ViewSwitcherHitsExt extends ViewSwitcherHits<ViewSwitcherHitsProps,
       <AnimatedHits {...props} />
     )
   }
-}
+}*/
 
 function generateTitleCostSymbols(source) {
   // Take the manacost and return a bunch of img divs.

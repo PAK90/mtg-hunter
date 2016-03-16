@@ -61,6 +61,11 @@ var CardHitsListItem = React.createClass({
 			currentNumber: multi.number});
 	},
 
+	onCardNameHover(card) {
+		console.log("hovered card is " + card);
+		//this.setState({currentImageMultiId: language.multiverseid});
+	},
+
 	onLanguageHover(language) {
 		this.setState({currentImageMultiId: language.multiverseid});
 	},
@@ -133,7 +138,7 @@ var CardHitsListItem = React.createClass({
 		    // Then generate the tags through setting the innerHtml. This is the only way to preserve the text around the img tags.
 		    // Encode the source in html, to prevent XSS nastiness. Then replace the newlines with <br/>. Then insert the <img> tags.
 		    tagged = <div dangerouslySetInnerHTML={{__html: ent.encode(source).replace(/&#10;/g, '<br/>').replace(/\[(.*?)\]/g, (fullMatch, firstMatch) =>
-		        `<span><b>${firstMatch}</b></span>`
+		        `<span onMouseOver={this.onCardNameHover(${firstMatch})}><b>${firstMatch}</b></span>`
 		    )}}></div>
 		}
 		return tagged;
@@ -199,7 +204,7 @@ var CardHitsListItem = React.createClass({
     		rulings = (<div>
     			{ source.rulings.map(function(ruling, i) {
     				return <div><span className={bemBlocks.item("subtitle")}><b>{ruling.date + ": "}</b></span>
-    							<span className={bemBlocks.item("subtitle")}>{this.generateTextCostSymbols(ruling.text)}</span></div>
+    							<span className={bemBlocks.item("subtitle")}>{this.generateCardHoverSpan(ruling.text)}</span></div>
     			}.bind(this))}
     			</div>
     		)
