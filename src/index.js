@@ -22,6 +22,7 @@ import {
   ResetFilters,
   MenuFilter,
   SelectedFilters,
+  GroupedSelectedFilters,
   HierarchicalMenuFilter,
   NumericRefinementListFilter,
   SortingSelector,
@@ -29,8 +30,12 @@ import {
   SearchkitProvider,
   SearchkitManager,
   FastClick,
+  Panel,
   NoHits,
+  PageSizeSelector,
+  Select, Toggle,
   RangeFilter,
+  ItemHistogramList,
   InitialLoader,
   ViewSwitcherHits,
   ViewSwitcherToggle
@@ -177,13 +182,13 @@ function generateTextCostSymbols(source) {
 
 // The mana symbol refinement list.
 const SymbolRefineList = (props:FilterItemComponentProps, showCheckbox)=> {
-  const {bemBlocks, toggleFilter, translate, selected, label, count} = props;
+  const {bemBlocks, onClick, translate, selected, label, count} = props;
   const block = bemBlocks.option;
   const className = block()
                     .state({selected})
                     .mix(bemBlocks.container("item"));
   return (
-    <FastClick handler={toggleFilter}>
+    <FastClick handler={onClick}>
       <div className={className} data-qa="option">
         {showCheckbox ? <input type="checkbox" data-qa="checkbox" checked={selected} readOnly className={block("checkbox").state({ selected }) } ></input> : undefined}
         <img src = {'./src/img/' + props.label.toLowerCase() + '.png'} className="refineListImage" height="15px" style={{marginTop: '3px'}}/>
@@ -194,14 +199,14 @@ const SymbolRefineList = (props:FilterItemComponentProps, showCheckbox)=> {
 }
 
 const SetRefineList = (props:FilterItemComponentProps, showCheckbox)=> {
-  const {bemBlocks, toggleFilter, translate, selected, label, count} = props;
+  const {bemBlocks, onClick, translate, selected, label, count} = props;
   const block = bemBlocks.option;
   const className = block()
                     .state({selected})
                     .mix(bemBlocks.container("item"));
   // objectFit: contain is to preserve the shape of the set icons; otherwise they got distorted.
   return (
-    <FastClick handler={toggleFilter}>
+    <FastClick handler={onClick}>
       <div className={className} data-qa="option">
         {showCheckbox ? <input type="checkbox" data-qa="checkbox" checked={selected} readOnly className={block("checkbox").state({ selected }) } ></input> : undefined}
         <img src = {'./src/img/sets/' + props.label.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-R.jpg'}
@@ -326,6 +331,7 @@ export class App extends React.Component<any, any> {
                 queryOptions={{"minimum_should_match": this.state.matchPercent}}
                 autofocus={true}
                 searchOnChange={true}
+                searchThrottleTime={500}
                 queryFields={["name"]}/>
                 <select name="searchField" onChange={this.handleSearchChange.bind(this)}>
                   <option value="name">Name</option>
@@ -345,17 +351,17 @@ export class App extends React.Component<any, any> {
                 <option value="AND">AND</option>
                 <option value="OR">OR</option>
               </select>
-              <RefinementListFilter id="power" title="Power" field="power.raw" size={5} operator={this.state.operator}/>
-              <RefinementListFilter id="toughness" title="Toughness" field="toughness.raw" size={5} operator={this.state.operator}/>
-              <RefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator={this.state.operator}/>
-              <RefinementListFilter id="symbols" title="Symbols" field="symbols" size={5} operator={this.state.operator} itemComponent={SymbolRefineList}/>
-              <RefinementListFilter id="colourCount" title="Colour Count" field="colourCount" size={6} operator={this.state.operator} orderKey="_term"/>
-              <RefinementListFilter id="rarity" title="Rarity" field="rarities.raw" size={5} operator={this.state.operator}/>
-              <RefinementListFilter id="supertype" title="Supertype" field="supertypes.raw" size={5} operator={this.state.operator}/>
-              <RefinementListFilter id="type" title="Type" field="types.raw" size={5} operator={this.state.operator}/>
-              <RefinementListFilter id="subtype" title="Subtype" field="subtypes.raw" size={5} operator={this.state.operator}/>
-              <RefinementListFilter id="setcodes" title="Set" field="codeNames.raw" size={5} operator={this.state.operator} itemComponent={SetRefineList}/>
-              <RefinementListFilter id="formats" title="Formats" field="formats.raw" size={5} operator={this.state.operator}/>
+              <RefinementListFilter id="power" title="Power" field="power.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="toughness" title="Toughness" field="toughness.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="symbols" title="Symbols" field="symbols" size={5} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="colourCount" title="Colour Count" field="colourCount" size={6} operator={this.state.operator} orderKey="_term" containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="rarity" title="Rarity" field="rarities.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="supertype" title="Supertype" field="supertypes.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="type" title="Type" field="types.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="subtype" title="Subtype" field="subtypes.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="setcodes" title="Set" field="codeNames.raw" size={5} operator={this.state.operator} itemComponent={SetRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="formats" title="Formats" field="formats.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
             </div>
 
             <div className="sk-layout__results sk-results-list">
@@ -370,22 +376,23 @@ export class App extends React.Component<any, any> {
                     {label:"Relevance", field:"_score", order:"desc"},
                     {label:"Colour", field:"colors", order:"asc"},
                     {label:"Converted Cost", field:"cmc", order:"asc"}
-                  ]}/>
+                  ]} />
+                  <PageSizeSelector options={[4,12,24]} listComponent={Toggle}/>
                 </div>
 
                 <div className="sk-action-bar__filters">
-                  <SelectedFilters/>
+                  <GroupedSelectedFilters/>
                   <ResetFilters/>
                 </div>
 
               </div>
                 <ViewSwitcherHits
-                    hitsPerPage={20}
+                    hitsPerPage={12}
                     hitComponents = {[
                       {key:"grid", title:"Grid", itemComponent:this.CardHitsGridItem},
                       {key:"list", title:"List", itemComponent:CardHitsListItem, defaultOption:true}
                     ]}
-                    scrollTo={false}
+                    scrollTo="body"
                 />
               <NoHits suggestionsField={"name"}/>
               <InitialLoader/>

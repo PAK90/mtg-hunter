@@ -12,6 +12,18 @@ var TabList = ReactTabs.TabList;
 var TabPanel = ReactTabs.TabPanel;
 var ReactDisqusThread = require('react-disqus-thread');
 var cards = require('./multiIdName.json');
+var modCards = cards;
+// Turn cards object keys into the format returned by the python script.
+// Just go in and create a new key, and replace each object's key with the new key.
+for (var key in modCards) {
+    var keyLower = key.toLowerCase();
+    var keyLowerDash = keyLower.replace("-", "~").replace("æ","ae").replace('û','u').replace('!','').replace('ú','u').replace('â','a').replace('ö','o').replace("-", "~").replace("-", "~").replace("-", "~").replace("á","a").replace("é","e");
+    if (keyLowerDash !== key) {
+        var temp = modCards[key];
+        delete modCards[key];
+        modCards[keyLowerDash] = temp;
+    }
+}
 
 var CardHitsListItem = React.createClass({
 	getInitialState: function() {  	
@@ -225,7 +237,7 @@ var CardHitsListItem = React.createClass({
     	if (source.multiverseids[whichMultiIndex].foreignNames) {
     		languages = (<div>
     			{ source.multiverseids[whichMultiIndex].foreignNames.map(function(language, i) {
-    				return <div ><span onMouseOver={this.onLanguageHover.bind(this, language)} className={bemBlocks.item("subtitle")}><b>{language.language + ": "}</b></span>
+    				return <div><span onMouseOver={this.onLanguageHover.bind(this, language)} className={bemBlocks.item("subtitle")}><b>{language.language + ": "}</b></span>
     							<span onMouseOver={this.onLanguageHover.bind(this, language)} 
     							onMouseOut={this.onLanguageHoverOut.bind(this, language)} 
     							className={bemBlocks.item("subtitle")}>{language.name}</span></div>
@@ -241,6 +253,21 @@ var CardHitsListItem = React.createClass({
 
     	// Define prices!
 
+    	// Define 10 closest cards!
+    	var closest10 = <div><span className={bemBlocks.item("subtitle")}>No closest cards!</span></div>;
+    	/*if (cards[source.name].closestCards != undefined) {
+    		closest10 = (<div>
+    			{cards[source.name].closestCards.map(function(card, i) {
+    				console.log(card);
+    				return <span>Here!</span>;
+    			})}
+    			</div>
+    		)
+    	}
+    	else {
+    		closest10 = <div><span className={bemBlocks.item("subtitle")}>No closest cards!</span></div>;
+    	}*/
+
     	// Define the tab stuff here.
     	var selectedInfo;
 	    if (this.state.clickedCard) {
@@ -251,6 +278,7 @@ var CardHitsListItem = React.createClass({
 	            	<Tab>Languages</Tab>
 	            	<Tab>Comments</Tab>
 	            	<Tab>Prices</Tab>
+	            	<Tab>10 closest cards</Tab>
 	        	</TabList>
             	<TabPanel>
 					<div className='extraDetails'>{flavour}{extraInfo}{legalities}</div> 
@@ -271,6 +299,9 @@ var CardHitsListItem = React.createClass({
 		        </TabPanel>
 		        <TabPanel>
 		          <h2>Hello from expensive card!</h2>
+		        </TabPanel>
+		        <TabPanel>
+		          {closest10}
 		        </TabPanel>
         	</Tabs>)
 	    }
