@@ -172,6 +172,20 @@ html {
   box-shadow: 0px 0px 15px 0 rgba(0, 0, 0, 0.8);
 }
 
+/* The cards in the 10 closest tab. */
+.closestImg {
+  transition: 0.3s;
+  display: block;
+  width: 115px;
+  height: 158px;
+  border-radius: 8px;
+
+}
+.closestImg:hover {
+  width: 223px;
+  height: 310px;
+}
+
 /* The set symbols in list view. */
 .setIcon {
   padding: 4px;

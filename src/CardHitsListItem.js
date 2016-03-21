@@ -15,7 +15,7 @@ var cards = require('./multiIdName.json');
 var modCards = cards;
 // Turn cards object keys into the format returned by the python script.
 // Just go in and create a new key, and replace each object's key with the new key.
-for (var key in modCards) {
+/*for (var key in modCards) {
     var keyLower = key.toLowerCase();
     var keyLowerDash = keyLower.replace("-", "~").replace("æ","ae").replace('û','u').replace('!','').replace('ú','u').replace('â','a').replace('ö','o').replace("-", "~").replace("-", "~").replace("-", "~").replace("á","a").replace("é","e");
     if (keyLowerDash !== key) {
@@ -23,7 +23,7 @@ for (var key in modCards) {
         delete modCards[key];
         modCards[keyLowerDash] = temp;
     }
-}
+}*/
 
 var CardHitsListItem = React.createClass({
 	getInitialState: function() {  	
@@ -254,19 +254,36 @@ var CardHitsListItem = React.createClass({
     	// Define prices!
 
     	// Define 10 closest cards!
-    	var closest10 = <div><span className={bemBlocks.item("subtitle")}>No closest cards!</span></div>;
-    	/*if (cards[source.name].closestCards != undefined) {
+    	var closest10;
+  		var elemInlineBlock = {
+			display: 'inline-block',
+			textAlign: 'left',
+			padding: '3px'
+		};
+		var spanStyle = {
+			position: 'relative',
+			color: '#F8F8F8',
+		    backgroundColor: '#000000',
+		    borderColor: '#000000',
+		    padding: '2px 2px 0px 2px',
+		    borderTopRightRadius: '5px',
+		    borderTopLeftRadius: '5px',
+		    left: '12px'
+		};
+    	if (cards[source.name].closestCards) {
     		closest10 = (<div>
     			{cards[source.name].closestCards.map(function(card, i) {
-    				console.log(card);
-    				return <span>Here!</span>;
+    				return <div style={elemInlineBlock}>
+    					<span style={spanStyle}>{Math.round(card.deviation * 10000)/10000}</span>
+    					<img className="closestImg" src={'https://image.deckbrew.com/mtg/multiverseid/'+card.multiId+'.jpg'}/>
+	                	</div>
     			})}
     			</div>
     		)
     	}
     	else {
     		closest10 = <div><span className={bemBlocks.item("subtitle")}>No closest cards!</span></div>;
-    	}*/
+    	}
 
     	// Define the tab stuff here.
     	var selectedInfo;
