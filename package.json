@@ -1,5 +1,5 @@
 {
-  "name": "gathererv2",
+  "name": "hunter",
   "version": "1.0.0",
   "description": "Replacing MtG Gatherer with something better.",
   "main": "index.js",

@@ -77,7 +77,7 @@ function bracketRulings(ruling, currentCard) {
       }
     }
   }
-  if (oldRuling != ruling.text) {console.log(ruling.text + '!!!!!!\n');}
+  //if (oldRuling != ruling.text) {console.log(ruling.text + '!!!!!!\n');}
 
   return ruling;
 }
