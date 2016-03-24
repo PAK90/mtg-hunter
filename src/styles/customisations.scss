@@ -115,6 +115,14 @@ html {
   &.legal {
     color: green;
   }
+  &.tagFiltered {
+    transition: 0.1s;
+    color: #0092D6;
+    cursor: hand;
+  }/*
+  &.tagFiltered:hover {
+    font-weight: bold
+  }*/
 }
 
 /* The card images in list view. */

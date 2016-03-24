@@ -32,6 +32,8 @@ import {
   FastClick,
   Panel,
   NoHits,
+  TagFilter,
+  InputFilter,
   PageSizeSelector,
   Select, Toggle,
   RangeFilter,
@@ -182,15 +184,15 @@ function generateTextCostSymbols(source) {
 
 // The mana symbol refinement list.
 const SymbolRefineList = (props:FilterItemComponentProps, showCheckbox)=> {
-  const {bemBlocks, onClick, translate, selected, label, count} = props;
+  const {bemBlocks, onClick, translate, active, label, count} = props;
   const block = bemBlocks.option;
   const className = block()
-                    .state({selected})
+                    .state({active})
                     .mix(bemBlocks.container("item"));
   return (
     <FastClick handler={onClick}>
       <div className={className} data-qa="option">
-        {showCheckbox ? <input type="checkbox" data-qa="checkbox" checked={selected} readOnly className={block("checkbox").state({ selected }) } ></input> : undefined}
+        {showCheckbox ? <input type="checkbox" data-qa="checkbox" checked={active} readOnly className={block("checkbox").state({ active }) } ></input> : undefined}
         <img src = {'./src/img/' + props.label.toLowerCase() + '.png'} className="refineListImage" height="15px" style={{marginTop: '3px'}}/>
         <div data-qa="count" className={block("count")} style={{flex:'1'}}>{count}</div>
       </div>
@@ -199,16 +201,16 @@ const SymbolRefineList = (props:FilterItemComponentProps, showCheckbox)=> {
 }
 
 const SetRefineList = (props:FilterItemComponentProps, showCheckbox)=> {
-  const {bemBlocks, onClick, translate, selected, label, count} = props;
+  const {bemBlocks, onClick, translate, active, label, count} = props;
   const block = bemBlocks.option;
   const className = block()
-                    .state({selected})
+                    .state({active})
                     .mix(bemBlocks.container("item"));
   // objectFit: contain is to preserve the shape of the set icons; otherwise they got distorted.
   return (
     <FastClick handler={onClick}>
       <div className={className} data-qa="option">
-        {showCheckbox ? <input type="checkbox" data-qa="checkbox" checked={selected} readOnly className={block("checkbox").state({ selected }) } ></input> : undefined}
+        {showCheckbox ? <input type="checkbox" data-qa="checkbox" checked={active} readOnly className={block("checkbox").state({ active }) } ></input> : undefined}
         <img src = {'./src/img/sets/' + props.label.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-R.jpg'}
           style={{objectFit: 'contain', padding: '2px'}} />
         <div data-qa="label" className={block("text")}>{label}</div>
@@ -256,22 +258,8 @@ export class App extends React.Component<any, any> {
     this.setState({hoveredId: ''});
   }
 
-  handleSearchChange(e) {
-    this.searchkit.getQueryAccessor().options.queryFields = [e.target.value];
-    this.searchkit.getQueryAccessor().options.prefixQueryFields = [e.target.value];
-    this.searchkit.performSearch();
-  }
-
   handleOperatorChange(e){
     this.setState({operator: e.target.value})
-  }
-
-  handleCollapseClick() {
-    this.setState({all: 'collapse'});
-  }
-
-  handleExpandClick() {
-    this.setState({all: 'expand'});
   }
 
   getSetIcons(source) {
@@ -333,13 +321,6 @@ export class App extends React.Component<any, any> {
                 searchOnChange={true}
                 searchThrottleTime={500}
                 queryFields={["name"]}/>
-                <select name="searchField" onChange={this.handleSearchChange.bind(this)}>
-                  <option value="name">Name</option>
-                  <option value="namelessText">Body text</option>
-                  <option value="flavors">Flavour text</option>
-                  <option value="type">Type</option>
-                  <option value="artists">Artist</option>
-                </select>
             </div>
           </div>
 
@@ -351,6 +332,10 @@ export class App extends React.Component<any, any> {
                 <option value="AND">AND</option>
                 <option value="OR">OR</option>
               </select>
+              <InputFilter id="rulesText" title="Rules text" placeholder="Search rules text" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["namelessText"]} />
+              <InputFilter id="flavourText" title="Flavour text" placeholder="Search flavour text" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["flavors"]} />
+              <InputFilter id="typeLine" title="Type text" placeholder="Search type text" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["type"]} />
+              <InputFilter id="artistName" title="Artist name" placeholder="Search artist name" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["artists.raw"]} />
               <RefinementListFilter id="power" title="Power" field="power.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="toughness" title="Toughness" field="toughness.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
@@ -368,8 +353,6 @@ export class App extends React.Component<any, any> {
               <div className="sk-results-list__action-bar sk-action-bar">
                 <div className="sk-action-bar__info">
                   <HitsStats />
-                  <input type="button" onClick={this.handleExpandClick} value="Expand all" />
-                  <input type="button" onClick={this.handleCollapseClick} value="Collapse all" />
                   <ViewSwitcherToggle/>
                   <SortingSelector options={[
                     {label:"Name", field: "name.raw", order: "asc", defaultOption:true},
