@@ -115,14 +115,23 @@ html {
   &.legal {
     color: green;
   }
-  &.tagFiltered {
-    transition: 0.1s;
-    color: #0092D6;
-    cursor: hand;
-  }/*
-  &.tagFiltered:hover {
-    font-weight: bold
-  }*/
+  &.typeLine {
+    /*margin-bottom: -2px;*/
+    font-weight: bold;
+  }
+}
+
+.sk-tag-filter {
+  transition: 0.3s;
+  margin-bottom: -8px; /* To counteract the tagFilter's larger line height. */
+  /*color: #0092D6;*/
+  cursor: hand;
+}
+.sk-tag-filter:hover {
+  color: #f4f4f4;
+  background-color: #0092D6;
+  border-radius: 2px;
+  border-width: 2px;
 }
 
 /* The card images in list view. */

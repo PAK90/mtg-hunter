@@ -191,14 +191,14 @@ var CardHitsListItem = React.createClass({
     	extraInfo = (
     		<div>	
 		        <span className={bemBlocks.item("subtitle")}><b>{'Set: '}</b></span>
-		        <div className={bemBlocks.item("subtitle") + " tagFiltered"} style={{display:"inline-flex"}}>
+		        <div className={bemBlocks.item("subtitle")} style={{display:"inline-flex"}}>
 			        <TagFilterConfig field="codeNames.raw" id="codeNames" title="Set name" operator="AND" searchkit={this.searchkit} />
 			        <TagFilter field="codeNames.raw" value={this.state.currentSetName} />
 		        </div>
 		        <span className={bemBlocks.item("subtitle")}>{(this.state.currentNumber ? ' (#' + this.state.currentNumber + ')' : '')}</span>
 		        <br/>
 		        <span className={bemBlocks.item("subtitle")}><b>{'Artist: '}</b></span>
-		        <div className={bemBlocks.item("subtitle") + " tagFiltered"} style={{display:"inline-flex"}}>
+		        <div className={bemBlocks.item("subtitle")} style={{display:"inline-flex"}}>
 			        <TagFilterConfig field="artists.raw" id="artistNames" title="Artist name" operator="AND" searchkit={this.searchkit} />
 			        <TagFilter field="artists.raw" value={this.state.currentArtist} />
 		        </div>
@@ -210,7 +210,7 @@ var CardHitsListItem = React.createClass({
 		        <span className={bemBlocks.item("subtitle")}><b>{'Legalities: '}</b></span>
 		        { source.legalities.map(function(legality, i) {
 		        	return (<div>
-				        	<div className={bemBlocks.item("subtitle") + " tagFiltered"} style={{display:"inline-flex"}}>
+				        	<div className={bemBlocks.item("subtitle")} style={{display:"inline-flex"}}>
 					        <TagFilterConfig field="formats.raw" id="artistNames" title="Format name" operator="AND" searchkit={this.searchkit} />
 					        <TagFilter field="formats.raw" value={legality.format} />
 				        </div>
@@ -372,14 +372,23 @@ var CardHitsListItem = React.createClass({
 				        		<a href={'http://shop.tcgplayer.com/magic/' + this.state.currentSetName.replace(/[^\w\s]/gi, '') + '/' + source.name} target="_blank">
 				         			<h2 className={bemBlocks.item("title")}>{source.name} {source.tagCost} ({source.cmc ? source.cmc : 0}) {otherSide}</h2>
 				         		</a>
-						        <div style={{display:"inline-flex"}} className={bemBlocks.item("subtitle") + " tagFiltered"}>
+						        <div style={{display:"inline-flex"}} className={bemBlocks.item("subtitle") + " typeLine"}>
 						        	<TagFilterConfig field="supertypes.raw" id="supertypeField" title="Supertype" operator="AND" searchkit={this.searchkit} />
-						        	{_.map(source.supertypes,supertype => <div style={{display:"inline-flex"}}><TagFilter field="supertypes.raw" value={supertype} /><span>&nbsp;</span></div>)}
+						        	{_.map(source.supertypes,supertype => 
+						        		<div style={{display:"inline-flex"}}>
+						        			<TagFilter field="supertypes.raw" value={supertype} /><span>&nbsp;</span>
+						        		</div>)}
 						        	<TagFilterConfig field="types.raw" id="typeField" title="Type" operator="AND" searchkit={this.searchkit} />
-						        	{_.map(source.types,type => <div style={{display:"inline-flex"}}><TagFilter field="types.raw" value={type} /><span>&nbsp;</span></div>)}
-						        	{source.subtypes ? <span>&nbsp;—&nbsp;</span> : <span/>}
+						        	{_.map(source.types,type => 
+						        		<div style={{display:"inline-flex"}}>
+						        			<TagFilter field="types.raw" value={type} /><span>&nbsp;</span>
+						        		</div>)}
+						        	{source.subtypes ? <span>—&nbsp;</span> : <span/>}
 						        	<TagFilterConfig field="subtypes.raw" id="subtypeField" title="Subtype" operator="AND" searchkit={this.searchkit} />
-						        	{_.map(source.subtypes,subtype => <div style={{display:"inline-flex"}}><TagFilter field="subtypes.raw" value={subtype} /><span>&nbsp;</span></div>)}
+						        	{_.map(source.subtypes,subtype => 
+						        		<div style={{display:"inline-flex"}}>
+						        			<TagFilter field="subtypes.raw" value={subtype} /><span>&nbsp;</span>
+						        		</div>)}
 						        </div>
 						        <h3 className={bemBlocks.item("subtitle")}>{source.taggedText}{pt}</h3></div>
 				        	<div style={{width: '150px', position: 'relative', right: '10px', display:'inline-block'}}>
