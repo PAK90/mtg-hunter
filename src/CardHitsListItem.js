@@ -170,7 +170,8 @@ var CardHitsListItem = React.createClass({
 	    var extraInfo, flavour, pt, legalities, otherSide;
     	if (source.power) {
     		pt = ( <div className={bemBlocks.item("subtitle") + " tagFiltered"} style={{display:"inline-flex"}}>		
-		        <span style={{color: "#666"}}><b>{'P/T: '}</b></span>
+		        <span style={{color: "#666"}}><b>{'P/T:'}</b></span>
+		        <span>&nbsp;</span>
 		        <TagFilterConfig field="power.raw" id="powerField" title="Power" operator="AND" searchkit={this.searchkit} />
 		        <TagFilter field="power.raw" value={source.power} />
 		        <span>/</span>
@@ -373,12 +374,12 @@ var CardHitsListItem = React.createClass({
 				         		</a>
 						        <div style={{display:"inline-flex"}} className={bemBlocks.item("subtitle") + " tagFiltered"}>
 						        	<TagFilterConfig field="supertypes.raw" id="supertypeField" title="Supertype" operator="AND" searchkit={this.searchkit} />
-						        	{_.map(source.supertypes,supertype => <TagFilter field="supertypes.raw" value={supertype} />)}
+						        	{_.map(source.supertypes,supertype => <div style={{display:"inline-flex"}}><TagFilter field="supertypes.raw" value={supertype} /><span>&nbsp;</span></div>)}
 						        	<TagFilterConfig field="types.raw" id="typeField" title="Type" operator="AND" searchkit={this.searchkit} />
-						        	{_.map(source.types,type => <TagFilter field="types.raw" value={type} />)}
-						        	<span> — </span>
+						        	{_.map(source.types,type => <div style={{display:"inline-flex"}}><TagFilter field="types.raw" value={type} /><span>&nbsp;</span></div>)}
+						        	{source.subtypes ? <span>&nbsp;—&nbsp;</span> : <span/>}
 						        	<TagFilterConfig field="subtypes.raw" id="subtypeField" title="Subtype" operator="AND" searchkit={this.searchkit} />
-						        	{_.map(source.subtypes,subtype => <TagFilter field="subtypes.raw" value={subtype} />)}
+						        	{_.map(source.subtypes,subtype => <div style={{display:"inline-flex"}}><TagFilter field="subtypes.raw" value={subtype} /><span>&nbsp;</span></div>)}
 						        </div>
 						        <h3 className={bemBlocks.item("subtitle")}>{source.taggedText}{pt}</h3></div>
 				        	<div style={{width: '150px', position: 'relative', right: '10px', display:'inline-block'}}>
