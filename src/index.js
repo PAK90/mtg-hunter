@@ -45,6 +45,7 @@ import {
 import {RefinementListFilter} from './modRefineListFilter.js';
 import CardDetailPanel from './CardDetailPanel';
 import CardHitsListItem from './CardHitsListItem';
+import CardHitsGridItem from './CardHitsGridItem';
 
 String.prototype.replaceAll = function(s,r){return this.split(s).join(r)};
 
@@ -281,7 +282,8 @@ export class App extends React.Component<any, any> {
     const {bemBlocks, result} = props;
     const source = result._source;
     let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid;
-    let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/' + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid + '.jpg';
+    //let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/' + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid + '.jpg';
+    let imgUrl = '../cropped2/crops' + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid + '.jpg';
     return (
       <div className={bemBlocks.item().mix(bemBlocks.container("item"))}>
           <img className='gridImg'  
@@ -291,15 +293,6 @@ export class App extends React.Component<any, any> {
             onMouseOut={this.handleHoverOut.bind(this, source)}/>
       </div>
     )
-  }
-
-  Details = (source)=> {
-    if (this.state.clickedCard != '') {
-      return <div><p>Look! More stuff about {this.state.clickedCard}</p></div>
-    }
-    else {
-      return <div/>
-    }
   }
 
   render() {

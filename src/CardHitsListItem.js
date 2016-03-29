@@ -367,11 +367,12 @@ var CardHitsListItem = React.createClass({
 	    			{/* Block 2; the title + text, details tabs, and set icons. Width = 100% to stretch it out and 'align right' the set icons. */}
 		        	<div style={{width:'100%'}}>
 	    				{/* Block 3; the title + text and set icons. */}
-		        		<div  style={{display:'flex'}}>
+		        		<div style={{display:'flex'}}>
 				        	<div className={bemBlocks.item("details")} style={{display:'inline-block'}}>
 				        		<a href={'http://shop.tcgplayer.com/magic/' + this.state.currentSetName.replace(/[^\w\s]/gi, '') + '/' + source.name} target="_blank">
 				         			<h2 className={bemBlocks.item("title")}>{source.name} {source.tagCost} ({source.cmc ? source.cmc : 0}) {otherSide}</h2>
 				         		</a>
+				         		{/* The type line is special since it's made of TagFilters. */}
 						        <div style={{display:"inline-flex"}} className={bemBlocks.item("subtitle") + " typeLine"}>
 						        	<TagFilterConfig field="supertypes.raw" id="supertypeField" title="Supertype" operator="AND" searchkit={this.searchkit} />
 						        	{_.map(source.supertypes,supertype => 
@@ -390,7 +391,8 @@ var CardHitsListItem = React.createClass({
 						        			<TagFilter field="subtypes.raw" value={subtype} /><span>&nbsp;</span>
 						        		</div>)}
 						        </div>
-						        <h3 className={bemBlocks.item("subtitle")}>{source.taggedText}{pt}</h3></div>
+						        <h3 className={bemBlocks.item("subtitle")}>{source.taggedText}{pt}</h3>
+						    </div>
 				        	<div style={{width: '150px', position: 'relative', right: '10px', display:'inline-block'}}>
 				          		<p style={{textAlign:'center'}}>{this.getSetIcons(source)}</p>
 				        	</div>	
