@@ -307,6 +307,19 @@ var CardHitsListItem = React.createClass({
     		closest10 = <div><span className={bemBlocks.item("subtitle")}>No closest cards!</span></div>;
     	}
 
+
+		        /*<TabPanel>
+			        <ReactDisqusThread
+		                shortname="mtg-hunter"
+		                identifier={this.state.currentSetName + ': ' + source.name}
+		                title={this.state.currentSetName + ': ' + source.name}
+		                url="http://localhost:3333/"
+		                category_id="4523863"/>
+		        </TabPanel>
+		        <TabPanel>
+		          <h2>Hello from expensive card!</h2>
+		        </TabPanel>*/
+
     	// Define the tab stuff here.
     	var selectedInfo;
 	    if (this.state.clickedCard) {
@@ -315,8 +328,6 @@ var CardHitsListItem = React.createClass({
 	        		<Tab>Details</Tab>
 	            	<Tab>Rulings</Tab>
 	            	<Tab>Languages</Tab>
-	            	<Tab>Comments</Tab>
-	            	<Tab>Prices</Tab>
 	            	<Tab>10 closest cards</Tab>
 	        	</TabList>
             	<TabPanel>
@@ -327,17 +338,6 @@ var CardHitsListItem = React.createClass({
 		        </TabPanel>
 		        <TabPanel>
 		          <div className='extraDetails'>{languages}</div> 
-		        </TabPanel>
-		        <TabPanel>
-			        <ReactDisqusThread
-		                shortname="mtg-hunter"
-		                identifier={this.state.currentSetName + ': ' + source.name}
-		                title={this.state.currentSetName + ': ' + source.name}
-		                url="http://localhost:3333/"
-		                category_id="4523863"/>
-		        </TabPanel>
-		        <TabPanel>
-		          <h2>Hello from expensive card!</h2>
 		        </TabPanel>
 		        <TabPanel>
 		          {closest10}
