@@ -282,11 +282,12 @@ export class App extends React.Component<any, any> {
     const {bemBlocks, result} = props;
     const source = result._source;
     let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid;
-    //let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/' + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid + '.jpg';
-    let imgUrl = '../cropped2/crops' + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid + '.jpg';
+    let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/' + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid + '.jpg';
+    //let imgUrl = '../cropped2/crops' + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid + '.jpg';
     return (
       <div className={bemBlocks.item().mix(bemBlocks.container("item"))}>
-          <img className='gridImg'  
+          <img className='gridaImg' 
+            style={{height: 311}} 
             src={imgUrl} 
             onClick={this.handleClick.bind(this, source)}
             onMouseOver={this.handleHoverIn.bind(this, source)}
