@@ -55,6 +55,7 @@
     "react-dom": "^0.14.3",
     "react-highcharts": "^6.0.0",
     "react-nl2br": "0.0.3",
+    "react-select": "^1.0.0-beta8",
     "react-slick": "^0.11.1",
     "react-tabs": "^0.5.3",
     "react-toolbox": "^0.14.0",
