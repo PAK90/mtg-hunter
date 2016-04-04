@@ -14,6 +14,7 @@ const nl2br = require('react-nl2br');
 const omit = require("lodash/omit");
 const map = require("lodash/map");
 
+
 import {
   SearchBox,
   Hits,
@@ -41,12 +42,14 @@ import {
   InitialLoader,
   ViewSwitcherHits,
   ViewSwitcherToggle,
-  DynamicRangeFilter
+  DynamicRangeFilter,
+  FilterGroup, FilterGroupItem
 } from "searchkit";
 import {RefinementListFilter} from './modRefineListFilter.js';
 import CardDetailPanel from './CardDetailPanel';
 import CardHitsListItem from './CardHitsListItem';
 import CardHitsGridItem from './CardHitsGridItem';
+import CostSymbols from './costSymbols';
 import {MultiSelect} from './MultiSelect';
 //console.log("multiselect is " + MultiSelect);
 
@@ -86,74 +89,71 @@ var Animations = {
     })
 };
 
-/*export class RefinementListFilterExt extends RefinementListFilter<RefinementListFilterDisplayProps, any> {
-  render() {
 
-    const { id, title, bemBlocks, buckets } = this.props
 
-    let block = bemBlocks.container
-    let className = block()
-      .mix(`filter--${id}`)
-      .state({
-        disabled: !this.hasOptions()
-      })
-
-    return (
-      <div data-qa={`filter--${this.props.id}`} className={className}>
-        <div data-qa="header" className={block("header")}>{title}</div>
-        <div>HI</div>
-        <div data-qa="options" className={block("options")}>
-          {map(buckets, this.renderOption.bind(this))}
-        </div>
-        {this.renderShowMore()}
-      </div>
-    );
-  }
+function imageFromColor(color){
+  color = color.toLowerCase()
+  if (color == "blue") color = "u";
+  else if (color.length > 2) color = color[0]; // Keep 2-letter keys (hw, gw, etc.)
+  return './src/img/' + color + '.png'
 }
 
-// Subclass Hits and ViewSwitcherHits to support animations.
-export class AnimatedHits extends Hits<HitsProps, any> {
+class FilterGroupItemImg extends FilterGroupItem {
   render() {
-    var animationEnter = {
-      duration: 100,
-      animation: Animations.In,
-      stagger: 50
-    };
-    var animationLeave = {
-      duration: 100,
-      animation: Animations.Out,
-      stagger: 50,
-      backwards: true
-    };
+    const { bemBlocks, label, itemKey } = this.props
 
-    let hits:Array<Object> = this.getHits()
-    let hasHits = hits.length > 0
-
-    if (!this.isInitialLoading() && hasHits) {
-      return (
-        <div data-qa="hits" className={this.bemBlocks.container()}>
-        <VelocityTransitionGroup enter={animationEnter} leave={animationLeave}>
-          {map(hits, this.renderResult.bind(this))}
-        </VelocityTransitionGroup>
-        </div>
-      );
-    }
-    return null
-  }
-}
-
-export class ViewSwitcherHitsExt extends ViewSwitcherHits<ViewSwitcherHitsProps, any> {
-  render(){
-    let hitComponents = this.props.hitComponents
-    let props = omit(this.props, "hitComponents")
-    let selectedOption = this.accessor.getSelectedOption()
-    props.itemComponent = selectedOption.itemComponent
-    props.mod = 'sk-hits-'+selectedOption.key
     return (
-      <AnimatedHits {...props} />
+      <FastClick handler={this.removeFilter}>
+        <div className={bemBlocks.items("value") } data-key={itemKey}>
+          <img src={imageFromColor(label)} alt={label} />
+        </div>
+      </FastClick>
     )
   }
-}*/
+}
+
+class FilterGroupItemCost extends FilterGroupItem {
+  render() {
+    const { bemBlocks, label, itemKey } = this.props
+
+    return (
+      <FastClick handler={this.removeFilter}>
+        <div className={bemBlocks.items("value") } data-key={itemKey}>
+          <CostSymbols cost={label} />
+        </div>
+      </FastClick>
+    )
+  }
+}
+
+class FilterGroupImg extends FilterGroup {
+  
+  renderFilter(filter, bemBlocks) {
+    const { translate, removeFilter, title } = this.props
+    const id = filter.id
+    if ((id == "symbols") || (id == "colours") || (id == "colourIdentity")) {
+      return (
+        <FilterGroupItemImg key={filter.value}
+                    itemKey={filter.value}
+                    bemBlocks={bemBlocks}
+                    filter={filter}
+                    label={translate(filter.value)}
+                    removeFilter={removeFilter} />
+      ) 
+    } else if (id == "manaCost") {
+      return (
+        <FilterGroupItemCost key={filter.value}
+                    itemKey={filter.value}
+                    bemBlocks={bemBlocks}
+                    filter={filter}
+                    label={translate(filter.value)}
+                    removeFilter={removeFilter} />
+      ) 
+    } else {
+      return super.renderFilter(filter, bemBlocks)
+    }
+  }
+}
 
 function generateTitleCostSymbols(source) {
   // Take the manacost and return a bunch of img divs.
@@ -187,7 +187,8 @@ function generateTextCostSymbols(source) {
 }
 
 // The mana symbol refinement list.
-const SymbolRefineList = (props:FilterItemComponentProps, showCheckbox)=> {
+const SymbolRefineList = (props:FilterItemComponentProps)=> {
+  const showCheckbox = false
   const {bemBlocks, onClick, translate, active, label, count} = props;
   const block = bemBlocks.option;
   const className = block()
@@ -197,8 +198,8 @@ const SymbolRefineList = (props:FilterItemComponentProps, showCheckbox)=> {
     <FastClick handler={onClick}>
       <div className={className} data-qa="option">
         {showCheckbox ? <input type="checkbox" data-qa="checkbox" checked={active} readOnly className={block("checkbox").state({ active }) } ></input> : undefined}
-        <img src = {'./src/img/' + props.label.toLowerCase() + '.png'} className="refineListImage" height="15px" style={{marginTop: '3px'}}/>
-        <div data-qa="count" className={block("count")} style={{flex:'1'}}>{count}</div>
+        <img src = {imageFromColor(props.label)} className="refineListImage"/>
+        <div data-qa="count" className={block("count")}>{count}</div>
       </div>
     </FastClick>
   )
@@ -233,6 +234,12 @@ const InitialLoaderComponent = (props) => {
     loading please wait...
   </div>
 }
+
+
+const CostMultiSelect = <MultiSelect 
+  valueRenderer={(option) => <CostSymbols cost={option.value} />}
+  optionRenderer={(option) => <span><CostSymbols cost={option.value} /> ({option.doc_count})</span>}
+   />
 
 export class App extends React.Component<any, any> {
 
@@ -345,10 +352,10 @@ export class App extends React.Component<any, any> {
               <InputFilter id="artistName" searchThrottleTime={500} title="Artist name" placeholder="Search artist name" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["artists.raw"]} />
               <RefinementListFilter id="power" title="Power" field="power.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="toughness" title="Toughness" field="toughness.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="symbols" title="Symbols" field="symbols" size={5} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="manaCost" title="Mana Cost" field="prettyCost.raw" showMore={false} listComponent={MultiSelect} size={0} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="colourIdentity" title="Colour Identity" field="colorIdentity" size={6} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="symbols" title="Symbols" field="symbols" size={6} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="manaCost" title="Mana Cost" field="prettyCost.raw" showMore={false} listComponent={CostMultiSelect} size={0} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="colourIdentity" title="Colour Identity" field="colorIdentity" size={6} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="colourCount" title="Colour Count" field="colourCount" size={6} operator={this.state.operator} orderKey="_term" containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="rarity" title="Rarity" field="rarities.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="supertype" title="Supertype" field="supertypes.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
@@ -373,7 +380,7 @@ export class App extends React.Component<any, any> {
                 </div>
 
                 <div className="sk-action-bar__filters">
-                  <GroupedSelectedFilters/>
+                  <GroupedSelectedFilters groupComponent={FilterGroupImg} />
                   <ResetFilters/>
                 </div>
 

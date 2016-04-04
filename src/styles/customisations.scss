@@ -264,3 +264,52 @@ html {
   padding-left: 10px;
   padding-bottom: 10px;
 }
+
+.filter--symbols, .filter--colours, .filter--colourIdentity {
+  
+  .sk-item-list {
+    display: flex;
+    flex-flow: row wrap;
+  }
+  
+  .sk-item-list-option {
+    text-align: center;
+    flex: 15% 0 0;
+    display: block;
+    border-radius: 3px;
+    padding: 1px;
+    margin: 1px;
+    
+    &__count {
+      text-align: center;
+    }
+    
+    img.refineListImage {
+      height: 30px;
+      display: block;
+      margin: auto;
+      margin-top: 3px;
+    }
+    
+    &.is-active {
+      background-color: #ccc;
+        
+      .sk-item-list-option__count {
+        color: #fff;
+      }
+    }
+  }
+}
+
+.filter-group-symbols, .filter-group-colours, .filter-group-colourIdentity {
+  .sk-filter-group-items__value {
+    &:hover {
+      opacity: 0.3;
+    }
+    
+    img {
+      height: 20px;
+      margin-bottom: -4px;
+    }
+  } 
+}
