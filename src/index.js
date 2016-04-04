@@ -187,7 +187,8 @@ function generateTextCostSymbols(source) {
 }
 
 // The mana symbol refinement list.
-const SymbolRefineList = (props:FilterItemComponentProps, showCheckbox)=> {
+const SymbolRefineList = (props:FilterItemComponentProps)=> {
+  const showCheckbox = false
   const {bemBlocks, onClick, translate, active, label, count} = props;
   const block = bemBlocks.option;
   const className = block()
@@ -197,8 +198,8 @@ const SymbolRefineList = (props:FilterItemComponentProps, showCheckbox)=> {
     <FastClick handler={onClick}>
       <div className={className} data-qa="option">
         {showCheckbox ? <input type="checkbox" data-qa="checkbox" checked={active} readOnly className={block("checkbox").state({ active }) } ></input> : undefined}
-        <img src = {'./src/img/' + props.label.toLowerCase() + '.png'} className="refineListImage" height="15px" style={{marginTop: '3px'}}/>
-        <div data-qa="count" className={block("count")} style={{flex:'1'}}>{count}</div>
+        <img src = {'./src/img/' + props.label.toLowerCase() + '.png'} className="refineListImage"/>
+        <div data-qa="count" className={block("count")}>{count}</div>
       </div>
     </FastClick>
   )
