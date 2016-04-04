@@ -41,7 +41,8 @@ import {
   InitialLoader,
   ViewSwitcherHits,
   ViewSwitcherToggle,
-  DynamicRangeFilter
+  DynamicRangeFilter,
+  FilterGroup, FilterGroupItem
 } from "searchkit";
 import {RefinementListFilter} from './modRefineListFilter.js';
 import CardDetailPanel from './CardDetailPanel';
@@ -86,74 +87,37 @@ var Animations = {
     })
 };
 
-/*export class RefinementListFilterExt extends RefinementListFilter<RefinementListFilterDisplayProps, any> {
+class FilterGroupItemImg extends FilterGroupItem {
   render() {
-
-    const { id, title, bemBlocks, buckets } = this.props
-
-    let block = bemBlocks.container
-    let className = block()
-      .mix(`filter--${id}`)
-      .state({
-        disabled: !this.hasOptions()
-      })
+    const { bemBlocks, label, itemKey } = this.props
 
     return (
-      <div data-qa={`filter--${this.props.id}`} className={className}>
-        <div data-qa="header" className={block("header")}>{title}</div>
-        <div>HI</div>
-        <div data-qa="options" className={block("options")}>
-          {map(buckets, this.renderOption.bind(this))}
+      <FastClick handler={this.removeFilter}>
+        <div className={bemBlocks.items("value") } data-key={itemKey}>
+          <img src = {'./src/img/' + label.toLowerCase() + '.png'} alt={label} />
         </div>
-        {this.renderShowMore()}
-      </div>
-    );
-  }
-}
-
-// Subclass Hits and ViewSwitcherHits to support animations.
-export class AnimatedHits extends Hits<HitsProps, any> {
-  render() {
-    var animationEnter = {
-      duration: 100,
-      animation: Animations.In,
-      stagger: 50
-    };
-    var animationLeave = {
-      duration: 100,
-      animation: Animations.Out,
-      stagger: 50,
-      backwards: true
-    };
-
-    let hits:Array<Object> = this.getHits()
-    let hasHits = hits.length > 0
-
-    if (!this.isInitialLoading() && hasHits) {
-      return (
-        <div data-qa="hits" className={this.bemBlocks.container()}>
-        <VelocityTransitionGroup enter={animationEnter} leave={animationLeave}>
-          {map(hits, this.renderResult.bind(this))}
-        </VelocityTransitionGroup>
-        </div>
-      );
-    }
-    return null
-  }
-}
-
-export class ViewSwitcherHitsExt extends ViewSwitcherHits<ViewSwitcherHitsProps, any> {
-  render(){
-    let hitComponents = this.props.hitComponents
-    let props = omit(this.props, "hitComponents")
-    let selectedOption = this.accessor.getSelectedOption()
-    props.itemComponent = selectedOption.itemComponent
-    props.mod = 'sk-hits-'+selectedOption.key
-    return (
-      <AnimatedHits {...props} />
+      </FastClick>
     )
   }
-}*/
+}
+
+class FilterGroupImg extends FilterGroup {
+  
+  renderFilter(filter, bemBlocks) {
+    const { translate, removeFilter, title } = this.props
+    
+    if (title != "Symbols") return super.renderFilter(filter, bemBlocks)
+
+    return (
+      <FilterGroupItemImg key={filter.value}
+                  itemKey={filter.value}
+                  bemBlocks={bemBlocks}
+                  filter={filter}
+                  label={translate(filter.value)}
+                  removeFilter={removeFilter} />
+    )
+  }
+}
 
 function generateTitleCostSymbols(source) {
   // Take the manacost and return a bunch of img divs.
@@ -374,7 +338,7 @@ export class App extends React.Component<any, any> {
                 </div>
 
                 <div className="sk-action-bar__filters">
-                  <GroupedSelectedFilters/>
+                  <GroupedSelectedFilters groupComponent={FilterGroupImg} />
                   <ResetFilters/>
                 </div>
 

@@ -300,3 +300,16 @@ html {
     }
   }
 }
+
+.filter-group-symbols {
+  .sk-filter-group-items__value {
+    &:hover {
+      opacity: 0.3;
+    }
+    
+    img {
+      height: 20px;
+      margin-bottom: -4px;
+    }
+  } 
+}
