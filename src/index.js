@@ -14,6 +14,7 @@ const nl2br = require('react-nl2br');
 const omit = require("lodash/omit");
 const map = require("lodash/map");
 
+
 import {
   SearchBox,
   Hits,
@@ -48,6 +49,7 @@ import {RefinementListFilter} from './modRefineListFilter.js';
 import CardDetailPanel from './CardDetailPanel';
 import CardHitsListItem from './CardHitsListItem';
 import CardHitsGridItem from './CardHitsGridItem';
+import CostSymbols from './costSymbols';
 import {MultiSelect} from './MultiSelect';
 //console.log("multiselect is " + MultiSelect);
 
@@ -92,7 +94,7 @@ var Animations = {
 function imageFromColor(color){
   color = color.toLowerCase()
   if (color == "blue") color = "u";
-  else if (color.length > 1) color = color[0];
+  else if (color.length > 2) color = color[0]; // Keep 2-letter keys (hw, gw, etc.)
   return './src/img/' + color + '.png'
 }
 
@@ -110,6 +112,20 @@ class FilterGroupItemImg extends FilterGroupItem {
   }
 }
 
+class FilterGroupItemCost extends FilterGroupItem {
+  render() {
+    const { bemBlocks, label, itemKey } = this.props
+
+    return (
+      <FastClick handler={this.removeFilter}>
+        <div className={bemBlocks.items("value") } data-key={itemKey}>
+          <CostSymbols cost={label} />
+        </div>
+      </FastClick>
+    )
+  }
+}
+
 class FilterGroupImg extends FilterGroup {
   
   renderFilter(filter, bemBlocks) {
@@ -118,6 +134,15 @@ class FilterGroupImg extends FilterGroup {
     if ((id == "symbols") || (id == "colours") || (id == "colourIdentity")) {
       return (
         <FilterGroupItemImg key={filter.value}
+                    itemKey={filter.value}
+                    bemBlocks={bemBlocks}
+                    filter={filter}
+                    label={translate(filter.value)}
+                    removeFilter={removeFilter} />
+      ) 
+    } else if (id == "manaCost") {
+      return (
+        <FilterGroupItemCost key={filter.value}
                     itemKey={filter.value}
                     bemBlocks={bemBlocks}
                     filter={filter}
@@ -209,6 +234,12 @@ const InitialLoaderComponent = (props) => {
     loading please wait...
   </div>
 }
+
+
+const CostMultiSelect = <MultiSelect 
+  valueRenderer={(option) => <CostSymbols cost={option.value} />}
+  optionRenderer={(option) => <span><CostSymbols cost={option.value} /> ({option.count})</span>}
+   />
 
 export class App extends React.Component<any, any> {
 
@@ -322,7 +353,7 @@ export class App extends React.Component<any, any> {
               <RefinementListFilter id="power" title="Power" field="power.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="toughness" title="Toughness" field="toughness.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="symbols" title="Symbols" field="symbols" size={6} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="manaCost" title="Mana Cost" field="prettyCost.raw" showMore={false} listComponent={MultiSelect} size={0} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="manaCost" title="Mana Cost" field="prettyCost.raw" showMore={false} listComponent={CostMultiSelect} size={0} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="colourIdentity" title="Colour Identity" field="colorIdentity" size={6} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="colourCount" title="Colour Count" field="colourCount" size={6} operator={this.state.operator} orderKey="_term" containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>

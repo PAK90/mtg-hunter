@@ -18,12 +18,13 @@ export class MultiSelect extends React.Component{
   }
 
   render() {
-    const { placeholder, clearable = true, items, selectedItems = [], disabled, showCount, setItems } = this.props
+    const { placeholder, clearable, items, selectedItems, 
+      disabled, showCount, setItems, valueRenderer, optionRenderer } = this.props
 
     const options = map(items, (option) => {
       let label = option.title || option.label || option.key
       if (showCount) label += ` (${option.doc_count}) `
-      return { value: option.key, label}
+      return { value: option.key, label, count: option.doc_count}
     })
 
     return (
@@ -31,9 +32,18 @@ export class MultiSelect extends React.Component{
         value={selectedItems}
         placeholder={placeholder}
         options={options}
-        valueRenderer={(v) => v.value}
+        valueRenderer={valueRenderer}
+        optionRenderer={optionRenderer}
         clearable={clearable}
         onChange={this.handleChange} />
     )
   }
+}
+
+MultiSelect.defaultProps = {
+  items: [],
+  selectedItems: [],
+  clearable: true,
+  valueRenderer: (v) => v.value,
+  optionRenderer: (v) => v.label
 }
