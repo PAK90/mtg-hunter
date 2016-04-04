@@ -87,6 +87,15 @@ var Animations = {
     })
 };
 
+
+
+function imageFromColor(color){
+  color = color.toLowerCase()
+  if (color == "blue") color = "u";
+  else if (color.length > 1) color = color[0];
+  return './src/img/' + color + '.png'
+}
+
 class FilterGroupItemImg extends FilterGroupItem {
   render() {
     const { bemBlocks, label, itemKey } = this.props
@@ -94,7 +103,7 @@ class FilterGroupItemImg extends FilterGroupItem {
     return (
       <FastClick handler={this.removeFilter}>
         <div className={bemBlocks.items("value") } data-key={itemKey}>
-          <img src = {'./src/img/' + label.toLowerCase() + '.png'} alt={label} />
+          <img src={imageFromColor(label)} alt={label} />
         </div>
       </FastClick>
     )
@@ -105,17 +114,19 @@ class FilterGroupImg extends FilterGroup {
   
   renderFilter(filter, bemBlocks) {
     const { translate, removeFilter, title } = this.props
-    
-    if (title != "Symbols") return super.renderFilter(filter, bemBlocks)
-
-    return (
-      <FilterGroupItemImg key={filter.value}
-                  itemKey={filter.value}
-                  bemBlocks={bemBlocks}
-                  filter={filter}
-                  label={translate(filter.value)}
-                  removeFilter={removeFilter} />
-    )
+    const id = filter.id
+    if ((id == "symbols") || (id == "colours") || (id == "colourIdentity")) {
+      return (
+        <FilterGroupItemImg key={filter.value}
+                    itemKey={filter.value}
+                    bemBlocks={bemBlocks}
+                    filter={filter}
+                    label={translate(filter.value)}
+                    removeFilter={removeFilter} />
+      ) 
+    } else {
+      return super.renderFilter(filter, bemBlocks)
+    }
   }
 }
 
@@ -162,7 +173,7 @@ const SymbolRefineList = (props:FilterItemComponentProps)=> {
     <FastClick handler={onClick}>
       <div className={className} data-qa="option">
         {showCheckbox ? <input type="checkbox" data-qa="checkbox" checked={active} readOnly className={block("checkbox").state({ active }) } ></input> : undefined}
-        <img src = {'./src/img/' + props.label.toLowerCase() + '.png'} className="refineListImage"/>
+        <img src = {imageFromColor(props.label)} className="refineListImage"/>
         <div data-qa="count" className={block("count")}>{count}</div>
       </div>
     </FastClick>
@@ -310,10 +321,10 @@ export class App extends React.Component<any, any> {
               <InputFilter id="artistName" searchThrottleTime={500} title="Artist name" placeholder="Search artist name" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["artists.raw"]} />
               <RefinementListFilter id="power" title="Power" field="power.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="toughness" title="Toughness" field="toughness.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="symbols" title="Symbols" field="symbols" size={5} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="symbols" title="Symbols" field="symbols" size={6} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="manaCost" title="Mana Cost" field="prettyCost.raw" showMore={false} listComponent={MultiSelect} size={0} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="colourIdentity" title="Colour Identity" field="colorIdentity" size={6} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="colourIdentity" title="Colour Identity" field="colorIdentity" size={6} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="colourCount" title="Colour Count" field="colourCount" size={6} operator={this.state.operator} orderKey="_term" containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="rarity" title="Rarity" field="rarities.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="supertype" title="Supertype" field="supertypes.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
