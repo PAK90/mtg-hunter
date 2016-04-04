@@ -122,7 +122,7 @@ html {
 /* The card title.*/
 .sk-hits-list-hit__title, .sk-hits-grid-hit__title {
   transition: 0.8s;
-  color: #666;
+  color: #000;
   font-size: 18px;
 }
 .sk-hits-list-hit__title:hover, .sk-hits-grid-hit__title:hover {
@@ -132,6 +132,7 @@ html {
 /* The subtitle text being used everywhere. May change this.*/
 .sk-hits-list-hit__subtitle, .sk-hits-grid-hit__subtitle {
   font-size: 14px;
+  color: #000;
   &.banned {
     font-weight: bold;
     color: red;

@@ -39,7 +39,7 @@ function countColours(symbols) {
 
 function anonymizeRulesText(name, text) {
   if (!text) return;
-  var forbiddenWords = ["Flying","Warrior","Soldier","Wizard","The","Defender","Enchanted","Double","First","Flash","Enchanted","Indestructible","Enchanted","Prowess","Reach","Enchanted","Vigilance","Exile","Enchanted","Fight","Regenerate","Sacrifice","Absorb","Enchanted","Battle","Cascade","Champion","Changeling","Clash","Dash","Devour","Dredge","Echo","Epic","Evoke","Exalted","Flanking","Fortify","Frenzy","Enchanted","Graft","Gravestorm","Haunt","Infect","Living","Madness","Manifest","Miracle","Modular","Monstrosity","Offering","Overload","Persist","Poisonous","Populate","Provoke","Prowl","Rampage","Rebound","Recover","Reinforce","Renown","Replicate","Ripple","Scavenge","Shadow","Soulbond","Split","Storm","Sunburst","Suspend","Totem","Transfigure","Transmute","Transform","Undying","Unleash","Unearth","Vanishing","Wither","Battalion","Bloodrush","Channel","Domain","Fateful","Ferocious","Grandeour","Hellbent","Heroic","Join","Kinship","Morbid","Radiance","Raid","Sweep","Threshold","Bury","Fear","Intimidate","Protection","Shroud","Substance"]
+  var forbiddenWords = ["Skulk","Madness","Investigate","Delirium","Flying","Warrior","Soldier","Wizard","The","Defender","Enchanted","Double","First","Flash","Enchanted","Indestructible","Enchanted","Prowess","Reach","Enchanted","Vigilance","Exile","Enchanted","Fight","Regenerate","Sacrifice","Absorb","Enchanted","Battle","Cascade","Champion","Changeling","Clash","Dash","Devour","Dredge","Echo","Epic","Evoke","Exalted","Flanking","Fortify","Frenzy","Enchanted","Graft","Gravestorm","Haunt","Infect","Living","Madness","Manifest","Miracle","Modular","Monstrosity","Offering","Overload","Persist","Poisonous","Populate","Provoke","Prowl","Rampage","Rebound","Recover","Reinforce","Renown","Replicate","Ripple","Scavenge","Shadow","Soulbond","Split","Storm","Sunburst","Suspend","Totem","Transfigure","Transmute","Transform","Undying","Unleash","Unearth","Vanishing","Wither","Battalion","Bloodrush","Channel","Domain","Fateful","Ferocious","Grandeour","Hellbent","Heroic","Join","Kinship","Morbid","Radiance","Raid","Sweep","Threshold","Bury","Fear","Intimidate","Protection","Shroud","Substance"]
   // First do a pass with the name as normal. Use regex so that it repeats beyond the first occurrence.
   text = text.replace(new RegExp(name, 'g'), '~');
   // Now with a first name. Since 'flying' occurs in names and is a keyword, don't do that. Duplicate for other keywords.
@@ -100,6 +100,7 @@ let mapping = {
   imageName:stringWithRaw,
   layout:stringWithRaw,
   manaCost:stringWithRaw,
+  prettyCost:stringWithRaw,
   name:stringWithRaw,  
   power:stringWithRaw,
   rarity:stringWithRaw,
@@ -119,6 +120,13 @@ let cardIndexer = new indexer(
   "cards", "card"
 );
 
+// Strips out cards banned in certain formats.
+function banCards(legalities) {
+  if (legalities.legality == "Legal") {
+    return legalities.format;
+  }
+}
+
 let cardLength = cards.length;
 var i = 0;
 
@@ -127,11 +135,12 @@ function bulkLoop() {
     console.log(i + ' to ' + (i + 999) + ' (' + cards.slice(i,i+1000).length + ')');
     let cardDocs = _.map(cards.slice(i, i+1000), (card)=> {
       card.codes = _.map(card.multiverseids, "setCode");
-      card.formats = _.map(card.legalities, "format");
+      card.formats = _.map(card.legalities, banCards);
       card.codeNames = _.map(card.multiverseids, "setName");
       card.colourCount = card.colors ? card.colors.length : 0; // If it doesn't have colours it won't exist so hopefully it's false-y and will go to 0.
       card.colors = card.colors || "Colourless";
-      card.symbols = _.uniq(symbolize(card.manaCost)); // Extract all symbols from {} that aren't numeric. Remove duplicates with _.uniq.
+      card.prettyCost = card.manaCost ? card.manaCost.replace(/[{}]/g, '') : null;
+      card.symbols = _.uniq(symbolize(card.manaCost)); // Extract all symbols from {} that aren't numeric. Not Remove duplicates with _.uniq, as a devotion test.
       card.artists = _.uniq(_.map(card.multiverseids, "artist"));
       card.flavors = _.uniq(_.map(card.multiverseids, "flavor"));
       card.rarities = _.uniq(_.map(card.multiverseids, "rarity"));

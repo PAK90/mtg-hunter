@@ -40,7 +40,8 @@ import {
   ItemHistogramList,
   InitialLoader,
   ViewSwitcherHits,
-  ViewSwitcherToggle
+  ViewSwitcherToggle,
+  DynamicRangeFilter
 } from "searchkit";
 import {RefinementListFilter} from './modRefineListFilter.js';
 import CardDetailPanel from './CardDetailPanel';
@@ -223,6 +224,16 @@ const SetRefineList = (props:FilterItemComponentProps, showCheckbox)=> {
   )
 }
 
+const InitialLoaderComponent = (props) => {
+  /*const {bemBlocks} = props;
+  const block = bemBlocks.option;
+  const className = block()
+                    .mix(bemBlocks.container("item"));*/
+  return <div >
+    loading please wait...
+  </div>
+}
+
 export class App extends React.Component<any, any> {
 
   constructor() {
@@ -335,20 +346,21 @@ export class App extends React.Component<any, any> {
               <RefinementListFilter id="power" title="Power" field="power.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="toughness" title="Toughness" field="toughness.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="symbols" title="Symbols" field="symbols" size={5} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="manaCost" title="Mana Cost" field="prettyCost.raw" showMore={false} listComponent={MultiSelect} size={0} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="colourIdentity" title="Colour Identity" field="colorIdentity" size={6} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="colourCount" title="Colour Count" field="colourCount" size={6} operator={this.state.operator} orderKey="_term" containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="rarity" title="Rarity" field="rarities.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="supertype" title="Supertype" field="supertypes.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="type" title="Type" field="types.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="subtype" title="Subtype" field="subtypes.raw" listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="setcodes" title="Set" field="codeNames.raw" listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.operator} itemComponent={SetRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="formats" title="Formats" field="formats.raw" listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="subtype" title="Subtype" field="subtypes.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="setcodes" title="Set" field="codeNames.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.operator} itemComponent={SetRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="formats" title="Formats" field="formats.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
             </div>
 
             <div className="sk-layout__results sk-results-list">
               <div className="sk-results-list__action-bar sk-action-bar">
-                <div className="sk-action-bar__info">
+                <div className="sk-action-bar-row">
                   <HitsStats />
                   <ViewSwitcherToggle/>
                   <SortingSelector options={[
@@ -375,7 +387,7 @@ export class App extends React.Component<any, any> {
                     scrollTo="body"
                 />
               <NoHits suggestionsField={"name"}/>
-              <InitialLoader/>
+              <InitialLoader component={InitialLoaderComponent}/>
               <Pagination showNumbers={true}/>
             </div>
           </div>
