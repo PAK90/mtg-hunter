@@ -24,7 +24,7 @@ export class MultiSelect extends React.Component{
     const options = map(items, (option) => {
       let label = option.title || option.label || option.key
       if (showCount) label += ` (${option.doc_count}) `
-      return { value: option.key, label, count: option.doc_count}
+      return { value: option.key, label, doc_count: option.doc_count}
     })
 
     return (

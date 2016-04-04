@@ -238,7 +238,7 @@ const InitialLoaderComponent = (props) => {
 
 const CostMultiSelect = <MultiSelect 
   valueRenderer={(option) => <CostSymbols cost={option.value} />}
-  optionRenderer={(option) => <span><CostSymbols cost={option.value} /> ({option.count})</span>}
+  optionRenderer={(option) => <span><CostSymbols cost={option.value} /> ({option.doc_count})</span>}
    />
 
 export class App extends React.Component<any, any> {
