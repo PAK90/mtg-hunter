@@ -371,10 +371,14 @@ export class App extends React.Component<any, any> {
                   <HitsStats />
                   <ViewSwitcherToggle/>
                   <SortingSelector options={[
-                    {label:"Name", field: "name.raw", order: "asc", defaultOption:true},
-                    {label:"Relevance", field:"_score", order:"desc"},
-                    {label:"Colour", field:"colors", order:"asc"},
-                    {label:"Converted Cost", field:"cmc", order:"asc"}
+                    {label:"Name (ascending)", field: "name.raw", order: "asc", defaultOption:true},
+                    {label:"Name (descending)", field: "name.raw", order: "desc"},
+                    {label:"Relevance (ascending)", field:"_score", order:"asc"},
+                    {label:"Relevance (descending)", field:"_score", order:"desc"},
+                    {label:"Colour (ascending)", field:"colors", order:"asc"},
+                    {label:"Colour (descending)", field:"colors", order:"desc"},
+                    {label:"CMC (ascending)", field:"cmc", order:"asc"},
+                    {label:"CMC (descending)", field:"cmc", order:"desc"}
                   ]} />
                   <PageSizeSelector options={[4,12,24]} listComponent={Toggle}/>
                 </div>
