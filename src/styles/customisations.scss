@@ -6,6 +6,13 @@ html {
   font-family: 'Dosis';
 }
 
+$backgroundColour: #333;
+$listHitTextColour: #ddd;
+
+body {
+  background-color: $backgroundColour;
+}
+
 .my-logo {
   color: white;
   flex :0 0 250px;
@@ -45,33 +52,38 @@ html {
 
 /* Lets the set symbols 'align right' (key part being position: relative).*/
 .sk-hits-list-hit {
-  background: #E6E6E6;
+  background: $backgroundColour;
   border-radius: 3px;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
   width: 100%;
   margin-bottom: 10px;
   position: relative;
+  transition: 0.3s;
+}
+
+.sk-results-list {
+  background-color: #222;
+}
+
+.sk-hits-list-hit:hover {
+  background-color: #444;
 }
 
 /* Ensures minimum width of card text in List mode. */
 .sk-hits-list-hit__details {
   min-width: 150px;
   position: relative;
-  padding: 0 10 0 10;
+  padding: 10px 10px 0px 10px !important;
 }
 
 /* Each grid item. */
 .sk-hits-grid__item {
   transition: 0.3s;
   padding: 0px;
-  margin-left: 10px;
-  margin-right: 10px;
+ /* margin-left: 10px;
+  margin-right: 10px;*/
   max-width: 500px;
-  background-color: #E6E6E6;
-}
-
-.sk-hits-grid__item:hover {
-  box-shadow: 0px 0px 15px 0 rgba(0, 0, 0, 0.8);
+  /*background-color: $backgroundColour;*/
 }
 
 /* The grid item's set name paragraph. */
@@ -119,10 +131,20 @@ html {
   background:#000;
 }
 
+/* The tabs. */
+.ReactTabs__Tab--selected {
+  background-color: #333 !important;
+  color: #ddd !important;
+}
+
+.ReactTabs__Tab {
+  color: #ddd;
+}
+
 /* The card title.*/
 .sk-hits-list-hit__title, .sk-hits-grid-hit__title {
   transition: 0.8s;
-  color: #000;
+  color: $listHitTextColour;
   font-size: 18px;
 }
 .sk-hits-list-hit__title:hover, .sk-hits-grid-hit__title:hover {
@@ -132,7 +154,8 @@ html {
 /* The subtitle text being used everywhere. May change this.*/
 .sk-hits-list-hit__subtitle, .sk-hits-grid-hit__subtitle {
   font-size: 14px;
-  color: #000;
+  margin: 0px !important;
+  color: $listHitTextColour !important;
   &.banned {
     font-weight: bold;
     color: red;
@@ -160,13 +183,14 @@ html {
   cursor: hand;
 }
 .sk-tag-filter:hover {
-  color: #E6E6E6;
+  color: $backgroundColour;
   background-color: #0092D6;
   border-radius: 2px;
 }
 
 /* The card images in list view. */
 .listImg {
+  border-radius: 6px;
   transition: 0.3s;
   position: relative; /* Purely here to make z-index work. */
   &.clicked {
@@ -195,11 +219,19 @@ html {
   }
 }
 .listImg:hover {
-  animation: border-pulsate 2s infinite;
+  /*animation: border-pulsate 2s infinite;*/
 }
 
 .listImgDiv {
   transition: 0.3s;
+}
+
+/* The filter hints. */
+.filterHint {
+  color: #ccc;
+  font-size: small;
+  position: relative;
+  top: -15;
 }
 
 @keyframes border-pulsate {
@@ -210,11 +242,15 @@ html {
 
 /* The card images in grid view. */
 .gridImg {
-  /*border-radius: 12px;*/
+  border-radius: 12px;
   transition: 0.2s;
-  width: 223px*0.8;
-  height: 169px*0.8;
+  width: 223px;
+  height: 169px;
   /*object-fit: contain;*/
+}
+
+.gridImg:hover {
+  box-shadow: 0px 0px 15px 0 rgba(255, 255, 255, 0.5);
 }
 
 /* The cards in the 10 closest tab. */
@@ -265,6 +301,12 @@ html {
   padding-bottom: 10px;
 }
 
+/* The bits cutting off text in the inputFilters. */
+.sk-input-filter__action {
+  width: 0px;
+}
+
+/* The large symbol filters. */
 .filter--symbols, .filter--colours, .filter--colourIdentity {
   
   .sk-item-list {
@@ -292,7 +334,7 @@ html {
     }
     
     &.is-active {
-      background-color: #ccc;
+      background-color: #151515;
         
       .sk-item-list-option__count {
         color: #fff;
@@ -301,6 +343,7 @@ html {
   }
 }
 
+/* The top-of-page filter groups of the large symbols. */
 .filter-group-symbols, .filter-group-colours, .filter-group-colourIdentity {
   .sk-filter-group-items__value {
     &:hover {
@@ -312,4 +355,48 @@ html {
       margin-bottom: -4px;
     }
   } 
+}
+
+$sk-layout-background: #333 !default;
+$sk-layout-panel-background: #222 !default;
+$sk-primary-theme-color: #2a4466 !default;
+$sk-active-bg-color: #eee !default;
+$sk-border-color: #444 !default;
+$sk-title-color: #ddd !default;
+$sk-text-color: #bbb !default;
+$sk-text-secondary-color: #aaa !default;
+$sk-list-text-color: #ccc !default;
+$sk-list-secondary-text-color: #aaa !default;
+$sk-action-text-color: #ccc !default;
+$sk-action-active-color: #fff !default;
+$sk-disabled-text-color: #777 !default;
+$sk-remove-action-color: #fa2a00 !default;
+
+$sk-selector-background: #333 !default; 
+$sk-selector-active-background: #08c !default; 
+$sk-selector-border-color: #444 !default; 
+$sk-selector-text-color: #ddd !default; 
+$sk-selector-active-text-color: white !default; 
+
+$sk-selected-filters-background: #333 !default;
+
+@import "node_modules/searchkit/theming/theme.scss";
+
+.my-logo {
+  color:white;
+  flex:0 0 216px;
+  padding:13px 20px;
+  margin-right:15px;
+  line-height: 16px;
+}
+
+.sk-layout__filters {
+  background: none;
+  padding: 20px 15px;
+  margin: 0;
+}
+
+.sk-layout__results {
+  padding: 20px 15px;
+  margin: 0;
 }

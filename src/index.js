@@ -306,7 +306,7 @@ export class App extends React.Component<any, any> {
     //let imgUrl = '../cropped2/crops' + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid + '.jpg';
     return (
       <div className={bemBlocks.item().mix(bemBlocks.container("item"))}>
-          <img className='gridaImg' 
+          <img className='gridImg' 
             style={{height: 311}} 
             src={imgUrl} 
             onClick={this.handleClick.bind(this, source)}
@@ -315,6 +315,39 @@ export class App extends React.Component<any, any> {
       </div>
     )
   }
+
+  CardHitsTable = (props)=> {  
+  const { result } = props;
+  let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/' + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid + '.jpg';
+  return (
+    <div style={{width: '100%', boxSizing: 'border-box', padding: 8}}>
+      <table className="sk-table sk-table-striped" style={{width: '100%', boxSizing: 'border-box'}}>
+        <thead>
+          <tr>
+            <th></th> <th>Name</th> <th>Mana cost</th> <th>CMC</th>
+          </tr>
+        </thead>
+        <tbody>
+        {map(result=> (
+          <tr key={result._id}>
+            <td style={{margin: 0, padding: 0, width: 40}}>
+              <img data-qa="poster" src={imgUrl} style={{width: 40}}/>
+            </td>
+            <td>{result._source.name}</td>
+            <td>{result._source.prettyCost}</td>
+            <td>{result._source.cmc}</td>
+          </tr>
+          ))}
+          </tbody>
+      </table>
+    </div>
+    )  
+  }
+
+  //<InputFilter id="artistName" searchThrottleTime={500} title="Artist name" placeholder="Search artist name" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["artists"]} />
+  //<span className="filterHint"><i>Use ~ for CARDNAME</i></span>
+  //,
+                      //{key:"table", title:"Table", itemComponent:this.CardHitsTable}
 
   render() {
     return (
@@ -333,7 +366,7 @@ export class App extends React.Component<any, any> {
                 queryOptions={{"minimum_should_match": this.state.matchPercent}}
                 autofocus={true}
                 searchOnChange={true}
-                searchThrottleTime={500}
+                searchThrottleTime={1000}
                 queryFields={["name"]}/>
             </div>
           </div>
@@ -346,10 +379,11 @@ export class App extends React.Component<any, any> {
                 <option value="AND">AND</option>
                 <option value="OR">OR</option>
               </select>
-              <InputFilter id="rulesText" searchThrottleTime={500} title="Rules text" placeholder="Search rules text" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["namelessText"]} />
-              <InputFilter id="flavourText" searchThrottleTime={500} title="Flavour text" placeholder="Search flavour text" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["flavors"]} />
-              <InputFilter id="typeLine" searchThrottleTime={500} title="Type text" placeholder="Search type text" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["type"]} />
-              <InputFilter id="artistName" searchThrottleTime={500} title="Artist name" placeholder="Search artist name" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["artists.raw"]} />
+              <InputFilter id="rulesText" searchThrottleTime={1000} title="Rules text" placeholder="Use ~ for cardname" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["namelessText"]} />
+              
+              <InputFilter id="flavourText" searchThrottleTime={1000} title="Flavour text" placeholder="Search flavour text" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["flavors"]} />
+              <InputFilter id="typeLine" searchThrottleTime={1000} title="Type text" placeholder="Search type text" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["type"]} />
+              
               <RefinementListFilter id="power" title="Power" field="power.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="toughness" title="Toughness" field="toughness.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="symbols" title="Symbols" field="symbols" size={6} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
@@ -361,20 +395,21 @@ export class App extends React.Component<any, any> {
               <RefinementListFilter id="supertype" title="Supertype" field="supertypes.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="type" title="Type" field="types.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="subtype" title="Subtype" field="subtypes.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="artists" title="Artist name" field="artists.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="setcodes" title="Set" field="codeNames.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.operator} itemComponent={SetRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="formats" title="Formats" field="formats.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
             </div>
 
-            <div className="sk-layout__results sk-results-list">
+            <div className="sk-layout__result sk-results-list">
               <div className="sk-results-list__action-bar sk-action-bar">
                 <div className="sk-action-bar-row">
                   <HitsStats />
                   <ViewSwitcherToggle/>
                   <SortingSelector options={[
-                    {label:"Name (ascending)", field: "name.raw", order: "asc", defaultOption:true},
+                    {label:"Name (ascending)", field: "name.raw", order: "asc"},
                     {label:"Name (descending)", field: "name.raw", order: "desc"},
                     {label:"Relevance (ascending)", field:"_score", order:"asc"},
-                    {label:"Relevance (descending)", field:"_score", order:"desc"},
+                    {label:"Relevance (descending)", field:"_score", order:"desc", defaultOption:true},
                     {label:"Colour (ascending)", field:"colors", order:"asc"},
                     {label:"Colour (descending)", field:"colors", order:"desc"},
                     {label:"CMC (ascending)", field:"cmc", order:"asc"},

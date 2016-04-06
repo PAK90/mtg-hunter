@@ -170,7 +170,7 @@ var CardHitsListItem = React.createClass({
 	    var extraInfo, flavour, pt, legalities, otherSide;
     	if (source.power) {
     		pt = ( <div className={bemBlocks.item("subtitle") + " tagFiltered"} style={{display:"inline-flex"}}>		
-		        <span style={{color: "#666"}}><b>{'P/T:'}</b></span>
+		        <span style={{color: "#ddd"}}><b>{'P/T:'}</b></span>
 		        <span>&nbsp;</span>
 		        <TagFilterConfig field="power.raw" id="powerField" title="Power" operator="AND" searchkit={this.searchkit} />
 		        <TagFilter field="power.raw" value={source.power} />
@@ -360,7 +360,7 @@ var CardHitsListItem = React.createClass({
 		    		<div className={"listImgDiv "} style={{display:'inline-block'}}>
 		          		<img className={(this.state.clickedCard ? "clicked " : "") + "listImg "+ this.state.currentImageLayout }
 		            		src={imgUrl} 
-		            		style={{borderRadius: this.state.clickedCard ? "10" : "3", cursor:"hand"}} 
+		            		style={{borderRadius: this.state.clickedCard ? "10" : "6", cursor:"hand"}} 
 		            		width="100"
 		            		onClick={this.handleClick.bind(this, source)} />
 		        	</div>
