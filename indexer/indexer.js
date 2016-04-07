@@ -50,7 +50,11 @@ module.exports = class Indexer {
             "generate_number_parts" : true,
             "catenate_all" : true,
             "preserve_original":true,
-            "catenate_numbers":true
+            "catenate_numbers":true,
+            "type_table": [
+              "+ => ALPHANUM",
+              "- => ALPHANUM"
+            ]
           }
         },
         "analyzer": {
