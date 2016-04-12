@@ -147,7 +147,7 @@ function bulkLoop() {
     let cardDocs = _.map(cards.slice(i, i+1000), (card)=> {
       //card.codes = _.map(card.multiverseids, "setCode");
       card.cmc = card.cmc ? card.cmc : 0; // If there's no cmc, set it to 0. This is to fix lands.
-      //card.formats = _.map(card.legalities, banCards().bind(this));
+      //card.formats = _.map(card.legalities, banCards());
       card.formats = _.map(card.legalities, function(legalities, i) {
         var setCode = card.multiverseids[card.multiverseids.length-1].setCode;
         //console.log(legalities.format + ' ' + setCode);
@@ -163,7 +163,7 @@ function bulkLoop() {
       card.colourCount = card.colors ? card.colors.length : 0; // If it doesn't have colours it won't exist so hopefully it's false-y and will go to 0.
       card.colors = card.colors || "Colourless";
       card.prettyCost = card.manaCost ? card.manaCost.replace(/[{}]/g, '') : null;
-      card.symbols = _.uniq(symbolize(card.manaCost)); // Extract all symbols from {} that aren't numeric. Not Remove duplicates with _.uniq, as a devotion test.
+      card.symbols = _.uniq(symbolize(card.manaCost)); // Extract all symbols from {} that aren't numeric. Remove duplicates with _.uniq.
       //card.artists = _.uniq(_.map(card.multiverseids, "artist"));
       //card.flavors = _.uniq(_.map(card.multiverseids, "flavor"));
       //card.rarities = _.uniq(_.map(card.multiverseids, "rarity"));
