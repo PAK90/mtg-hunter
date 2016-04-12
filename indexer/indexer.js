@@ -52,6 +52,7 @@ module.exports = class Indexer {
             "preserve_original":true,
             "catenate_numbers":true,
             "type_table": [
+              "/ => ALPHANUM",
               "+ => ALPHANUM",
               "- => ALPHANUM"
             ]

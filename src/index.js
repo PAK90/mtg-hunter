@@ -379,11 +379,9 @@ export class App extends React.Component<any, any> {
                 <option value="AND">AND</option>
                 <option value="OR">OR</option>
               </select>
-              <InputFilter id="rulesText" searchThrottleTime={1000} title="Rules text" placeholder="Use ~ for cardname" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["namelessText"]} />
-              
-              <InputFilter id="flavourText" searchThrottleTime={1000} title="Flavour text" placeholder="Search flavour text" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["flavors"]} />
-              <InputFilter id="typeLine" searchThrottleTime={1000} title="Type text" placeholder="Search type text" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["type"]} />
-              
+              <InputFilter id="rulesText" searchThrottleTime={1000} title="Rules text" placeholder="Use ~ for cardname" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["namelessText.raw"]} />              
+              <InputFilter id="flavourText" searchThrottleTime={1000} title="Flavour text" placeholder="Search flavour text" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["multiverseids.flavor"]} />
+              <InputFilter id="typeLine" searchThrottleTime={1000} title="Type text" placeholder="Search type text" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["type"]} />              
               <RefinementListFilter id="power" title="Power" field="power.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="toughness" title="Toughness" field="toughness.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="symbols" title="Symbols" field="symbols" size={6} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
@@ -391,12 +389,12 @@ export class App extends React.Component<any, any> {
               <RefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="colourIdentity" title="Colour Identity" field="colorIdentity" size={6} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="colourCount" title="Colour Count" field="colourCount" size={6} operator={this.state.operator} orderKey="_term" containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="rarity" title="Rarity" field="rarities.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="rarity" title="Rarity" field="multiverseids.rarity.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="supertype" title="Supertype" field="supertypes.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="type" title="Type" field="types.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="subtype" title="Subtype" field="subtypes.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="artists" title="Artist name" field="artists.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="setcodes" title="Set" field="codeNames.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.operator} itemComponent={SetRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="artists" title="Artist name" field="multiverseids.artist.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="setcodes" title="Set" field="multiverseids.setName.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.operator} itemComponent={SetRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="formats" title="Formats" field="formats.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
             </div>
 
@@ -440,6 +438,7 @@ export class App extends React.Component<any, any> {
         </div>
       </div>
       </SearchkitProvider>
+      <p style={{color: '#999', paddingLeft: 15}}>Wizards of the Coast, Magic: The Gathering, and their logos are trademarks of Wizards of the Coast LLC. © 1995-2016 Wizards. All rights reserved. MTG:Hunter is not affiliated with Wizards of the Coast LLC.</p>
       </div>
     )}
 }

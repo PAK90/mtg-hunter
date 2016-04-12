@@ -90,9 +90,15 @@ let stringWithRaw = {
 };
 
 let mapping = {
-  artists:stringWithRaw,
-  rarities:stringWithRaw,
-  flavors:stringWithRaw,
+  multiverseids: {
+    properties: {
+      artist:stringWithRaw,
+      rarity:stringWithRaw,
+      flavor:stringWithRaw,
+      setCode:stringWithRaw,
+      setName:stringWithRaw
+    }
+  },
   cmc:{type:"integer"},
   colorIdentify:stringWithRaw,
   colors:stringWithRaw,
@@ -106,12 +112,11 @@ let mapping = {
   rarity:stringWithRaw,
   subtypes:stringWithRaw,
   text:{type:"string"},
+  namelessText:stringWithRaw,
   toughness:stringWithRaw,
   type:stringWithRaw,
   supertypes:stringWithRaw,
   types:stringWithRaw,
-  codes:stringWithRaw,
-  codeNames:stringWithRaw,
   formats:stringWithRaw
 };
 
@@ -122,7 +127,13 @@ let cardIndexer = new indexer(
 
 // Strips out cards banned in certain formats.
 function banCards(legalities) {
+  var setCode = card.multiverseids[card.multiverseids.length-1].setCode;
+  console.log(legalities.format + ' ' + setCode);
   if (legalities.legality == "Legal") {
+    if ((setCode == "FRF" || setCode == "KTK") && (legalities.format == "Standard")) {
+      console.log("overriding faulty KTK and FRF standard info.");
+      return false;
+    }
     return legalities.format;
   }
 }
@@ -134,21 +145,33 @@ function bulkLoop() {
   setTimeout(function() {
     console.log(i + ' to ' + (i + 999) + ' (' + cards.slice(i,i+1000).length + ')');
     let cardDocs = _.map(cards.slice(i, i+1000), (card)=> {
-      card.codes = _.map(card.multiverseids, "setCode");
-      card.formats = _.map(card.legalities, banCards);
-      card.codeNames = _.map(card.multiverseids, "setName");
+      //card.codes = _.map(card.multiverseids, "setCode");
+      card.cmc = card.cmc ? card.cmc : 0; // If there's no cmc, set it to 0. This is to fix lands.
+      //card.formats = _.map(card.legalities, banCards().bind(this));
+      card.formats = _.map(card.legalities, function(legalities, i) {
+        var setCode = card.multiverseids[card.multiverseids.length-1].setCode;
+        //console.log(legalities.format + ' ' + setCode);
+        if (legalities.legality == "Legal") {
+          if ((setCode == "FRF" || setCode == "KTK") && (legalities.format == "Standard")) {
+            console.log("overriding faulty KTK and FRF standard info.");
+            return false;
+          }
+          return legalities.format;
+        }
+      }.bind(this));
+      //card.codeNames = _.map(card.multiverseids, "setName");
       card.colourCount = card.colors ? card.colors.length : 0; // If it doesn't have colours it won't exist so hopefully it's false-y and will go to 0.
       card.colors = card.colors || "Colourless";
       card.prettyCost = card.manaCost ? card.manaCost.replace(/[{}]/g, '') : null;
       card.symbols = _.uniq(symbolize(card.manaCost)); // Extract all symbols from {} that aren't numeric. Not Remove duplicates with _.uniq, as a devotion test.
-      card.artists = _.uniq(_.map(card.multiverseids, "artist"));
-      card.flavors = _.uniq(_.map(card.multiverseids, "flavor"));
-      card.rarities = _.uniq(_.map(card.multiverseids, "rarity"));
+      //card.artists = _.uniq(_.map(card.multiverseids, "artist"));
+      //card.flavors = _.uniq(_.map(card.multiverseids, "flavor"));
+      //card.rarities = _.uniq(_.map(card.multiverseids, "rarity"));
       // Generate new rules text to search on that anonymizes names. Keep original intact for display purposes.
       // Tuktuk is a special case, because of 'Tuktuk the Reborn' appearing in the text.
       card.namelessText = card.name == "Tuktuk the Explorer" ? card.text.replace(card.name, '~') : anonymizeRulesText(card.name, card.text);
       //card.colourCount = countColours(card.symbols); // Count unique colours. ['w','ug'] = 3, ['r','u','w'] = 3, ['c'] = 0 since colourless isn't a colour. Replaced by line 30.
-      card.rulings = card.rulings ? card.rulings.map(function(ruling) { return bracketRulings(ruling, card); }.bind(this)) : null;
+      //card.rulings = card.rulings ? card.rulings.map(function(ruling) { return bracketRulings(ruling, card); }.bind(this)) : null;
       return card;
     });
     i += 1000;
