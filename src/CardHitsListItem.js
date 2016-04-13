@@ -192,15 +192,15 @@ var CardHitsListItem = React.createClass({
     		<div>	
 		        <span className={bemBlocks.item("subtitle")}><b>{'Set: '}</b></span>
 		        <div className={bemBlocks.item("subtitle")} style={{display:"inline-flex"}}>
-			        <TagFilterConfig field="codeNames.raw" id="codeNames" title="Set name" operator="AND" searchkit={this.searchkit} />
-			        <TagFilter field="codeNames.raw" value={this.state.currentSetName} />
+			        <TagFilterConfig field="multiverseids.setName.raw" id="codeNames" title="Set name" operator="AND" searchkit={this.searchkit} />
+			        <TagFilter field="multiverseids.setName.raw" value={this.state.currentSetName} />
 		        </div>
 		        <span className={bemBlocks.item("subtitle")}>{(this.state.currentNumber ? ' (#' + this.state.currentNumber + ')' : '')}</span>
 		        <br/>
 		        <span className={bemBlocks.item("subtitle")}><b>{'Artist: '}</b></span>
 		        <div className={bemBlocks.item("subtitle")} style={{display:"inline-flex"}}>
-			        <TagFilterConfig field="artists.raw" id="artistNames" title="Artist name" operator="AND" searchkit={this.searchkit} />
-			        <TagFilter field="artists.raw" value={this.state.currentArtist} />
+			        <TagFilterConfig field="multiverseids.artist.raw" id="artistNames" title="Artist name" operator="AND" searchkit={this.searchkit} />
+			        <TagFilter field="multiverseids.artist.raw" value={this.state.currentArtist} />
 		        </div>
 		        <br/>
 	        </div>

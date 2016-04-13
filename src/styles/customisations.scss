@@ -63,6 +63,7 @@ body {
 
 .sk-results-list {
   background-color: #222;
+  padding-left: 280px !important;
 }
 
 .sk-hits-list-hit:hover {
@@ -391,9 +392,29 @@ $sk-selected-filters-background: #333 !default;
 }
 
 .sk-layout__filters {
-  background: none;
+  background: #333;
   padding: 20px 15px;
   margin: 0;
+  position: fixed;
+  top: 60;
+  bottom: 0;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  max-width: 262px;
+}
+
+.sk-layout__filters:hover {
+  overflow-y: scroll;
+}
+
+::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.2); 
+      border-radius: 6px;
+} /* this will style the thumb, ignoring the track */
+ 
+::-webkit-scrollbar {
+      background-color: rgba(0,0,0,0);
+      width: 8px;
 }
 
 .sk-layout__results {
