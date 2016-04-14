@@ -13,7 +13,7 @@ var ent = require('ent');
 const nl2br = require('react-nl2br');
 const omit = require("lodash/omit");
 const map = require("lodash/map");
-
+import Modal from 'react-overlays/lib/Modal';
 
 import {
   SearchBox,
@@ -241,6 +241,38 @@ const CostMultiSelect = <MultiSelect
   optionRenderer={(option) => <span><CostSymbols cost={option.value} /> ({option.doc_count})</span>}
    />
 
+
+const modalStyle = {
+  position: 'fixed',
+  zIndex: 1040,
+  top: 0, bottom: 0, left: 0, right: 0
+};
+
+const backdropStyle = {
+  ...modalStyle,
+  zIndex: 'auto',
+  backgroundColor: '#000',
+  opacity: 0.5
+};
+
+const dialogStyle = function() {
+  // we use some psuedo random coords so nested modals
+  // don't sit right on top of each other.
+  let top = 50 + Math.random();
+  let left = 50 + Math.random();
+
+  return {
+    position: 'absolute',
+    width: 400,
+    top: top + '%', left: left + '%',
+    transform: `translate(-${top}%, -${left}%)`,
+    border: '1px solid #e5e5e5',
+    backgroundColor: 'white',
+    boxShadow: '0 5px 15px rgba(0,0,0,.5)',
+    padding: 20
+  };
+};
+
 export class App extends React.Component<any, any> {
 
   constructor() {
@@ -248,6 +280,7 @@ export class App extends React.Component<any, any> {
     const host = "http://localhost:9200/cards/card";
     this.searchkit = new SearchkitManager(host);
     this.state = {hoveredId: '',
+      showModal: false,
       clickedCard: '',
       matchPercent: '100%',
       operator: "AND",
@@ -281,6 +314,14 @@ export class App extends React.Component<any, any> {
 
   handleOperatorChange(e){
     this.setState({operator: e.target.value})
+  }
+
+  close(){
+    this.setState({ showModal: false });
+  }
+
+  open(){
+    this.setState({ showModal: true });
   }
 
   getSetIcons(source) {
@@ -361,6 +402,27 @@ export class App extends React.Component<any, any> {
               <div className="my-logo"><span>MtG:Hunter</span><br/>
               <a href="http://searchkit.co/" style={{textDecoration:"none"}}>
               <span className="my-logo-small">Made with Searchkit</span></a></div>
+              <div className="my-logo"><button style={{backgroundColor: 'transparent', border: '0px', font: "inherit", color: "#eee"}} 
+                onClick={this.open.bind(this)}>About</button><br/></div>
+              <Modal
+                aria-labelledby='modal-label'
+                style={modalStyle}
+                backdropStyle={backdropStyle}
+                show={this.state.showModal}
+                onHide={this.close.bind(this)}
+              >
+                <div style={dialogStyle()} >
+                  <p>MtG:Hunter is made with <a href="https://facebook.github.io/react/tips/introduction.html"style={{textDecoration:"none"}}>ReactJS</a>, 
+                    <a href="http://searchkit.co/" style={{textDecoration:"none"}}> Searchkit</a> and a veritable smorgasbord of webpack doing unholy things with CSS files.</p>
+                  <p>To report a bug or request a feature, send a message to <a href="mailto:admin@mtg-hunter.com" style={{textDecoration:"none"}}>admin@mtg-hunter.com</a></p>
+                  <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+                    <input type="hidden" name="cmd" value="_s-xclick"/>
+                    <input type="hidden" name="hosted_button_id" value="QGRS3ZY2ZBAFW"/>
+                    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!"/>
+                    <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1"/>
+                  </form>
+                </div>
+              </Modal>
               <SearchBox
                 translations={{"searchbox.placeholder": "search card names"}}
                 queryOptions={{"minimum_should_match": this.state.matchPercent}}
