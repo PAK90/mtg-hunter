@@ -1,5 +1,6 @@
 var fs = require('fs'),
 	_ = require("lodash"),
+	path = require('path'),
 	fetch = require('node-fetch'),
 	request = require('request'),
 	parseString = require('xml2js').parseString,
@@ -9,6 +10,8 @@ let cardIndexer = new Indexer(
   "http://localhost:9200",  
   "cards", "card"
 );
+
+var failedRequests = [];
 
 var setNamesToChange = {tuples:[["Limited Edition Alpha","Alpha Edition"],
 						["Limited Edition Beta","Beta Edition"],
@@ -50,14 +53,24 @@ function checkForSetNameReplacement(setName) {
 
 // Don't forget; From The Vault cards ONLY HAVE FOIL PRICES. Probably other promos too.
 
-function getESData2() {
+function getESData2(isSecondRun) {
 	console.log("about to fetch");
-	return new Promise(function(resolve, reject) {
-		fetch('http://localhost:9200/cards/card/_search?from=0&size=5000')
-		.then(function(res) {
-	        resolve( res.json());
-	    })
-	})
+	if (isSecondRun) {
+		return new Promise(function(resolve, reject) {
+			fetch('http://localhost:9200/cards/card/_search?from=0&size=10000')
+			.then(function(res) {
+		        resolve( res.json() );
+		    })
+		})
+	}
+	else {
+		return new Promise(function(resolve, reject) {
+			fetch('http://localhost:9200/cards/card/_search?from=10000&size=10000')
+			.then(function(res) {
+		        resolve( res.json() );
+		    })
+		})	
+	}
 }
 
 function getTCGPlayerPrices(doc) {
@@ -96,6 +109,8 @@ function requestPrices(multiIdObject, priceUrl) {
 		  	}
 		  	else {
 		  		console.log(body + ' with link ' + priceUrl); // Product not found.
+		  		failedRequests.push(priceUrl+'\n');
+		  		//console.log(failedRequests);
 		  	}
 			resolve(multiIdObject);
 		  	//console.log(thisMultiId);
@@ -103,55 +118,62 @@ function requestPrices(multiIdObject, priceUrl) {
 	});
 }
 
-async function printDocs(){
+async function printDocs(isSecondRun){
   // "await" resolution or rejection of the promise
   // use try/catch for error handling
-  try {
-    var docs = await getESData2();
-    //console.log(docs);
-    var startTime = Date.now();
-    // now you can write this like syncronous code!
-    for (var hit = 0; hit < docs.hits.hits.length; hit++) {
-      //console.log('\n+++++++++++'+docs.hits.hits[hit]._id);
-      for (var edition = 0; edition < docs.hits.hits[hit]._source.multiverseids.length; edition++ ) {
-      	//console.log(docs.hits.hits[hit]._source.multiverseids[edition]);
-      	var setName = docs.hits.hits[hit]._source.multiverseids[edition].setName; 
-		setName = checkForSetNameReplacement(setName); // Ensure the set name is TCGPlayer compatible.
-		// Have to change fuse/split card names to reflect both prices.
-		var name = docs.hits.hits[hit]._source.name;
-		if (docs.hits.hits[hit]._source.layout == "split") {
-			name = docs.hits.hits[hit]._source.names[0] + ' // ' + docs.hits.hits[hit]._source.names[1];
-		}
-		// If it's a DFC, use the original side's name.
-		else if ((docs.hits.hits[hit]._source.layout == "double-faced" || docs.hits.hits[hit]._source.layout == "flip")
-					&& docs.hits.hits[hit]._source.name == docs.hits.hits[hit]._source.names[1]) {
-			name = docs.hits.hits[hit]._source.names[0];
-		}
-		// If it's a token, append "Token" to the name.
-		else if (docs.hits.hits[hit]._source.layout == "token") {
-			name = name + " Token";
-		}
-		// Remove all "" from the name (like Ach, Hans Run and Kongming, Sleeping Dragon)
-		name = name.replace(/"/g,"");
-		var priceUrl = "http://partner.tcgplayer.com/x3/phl.asmx/p?pk=MTGHUNTER&s="+setName+"&p="+name;
-		docs.hits.hits[hit]._source.multiverseids[edition] = await requestPrices(docs.hits.hits[hit]._source.multiverseids[edition], priceUrl);
-      }
-      //console.log('\n====='+JSON.stringify(docs.hits.hits[hit]._source));
-      // Now send this modified data back to the ES server with an update push.
-      cardIndexer.updateSingleDocument(docs.hits.hits[hit]);
-      console.log("---done " + docs.hits.hits[hit]._source.name + ". elapsed time: " + (Date.now() - startTime) / 1000);
+    try {
+	    var docs = await getESData2();
+	    //console.log(docs);
+	    var startTime = Date.now();
+	    // now you can write this like syncronous code!
+	    for (var hit = 0; hit < docs.hits.hits.length; hit++) {
+	        //console.log('\n+++++++++++'+docs.hits.hits[hit]._id);
+	        for (var edition = 0; edition < docs.hits.hits[hit]._source.multiverseids.length; edition++ ) {
+		      	//console.log(docs.hits.hits[hit]._source.multiverseids[edition]);
+		      	var setName = docs.hits.hits[hit]._source.multiverseids[edition].setName; 
+				setName = checkForSetNameReplacement(setName); // Ensure the set name is TCGPlayer compatible.
+				// Have to change fuse/split card names to reflect both prices.
+				var name = docs.hits.hits[hit]._source.name;
+				if (docs.hits.hits[hit]._source.layout == "split") {
+					name = docs.hits.hits[hit]._source.names[0] + ' // ' + docs.hits.hits[hit]._source.names[1];
+				}
+				// If it's a DFC, use the original side's name.
+				else if ((docs.hits.hits[hit]._source.layout == "double-faced" || docs.hits.hits[hit]._source.layout == "flip")
+							&& docs.hits.hits[hit]._source.name == docs.hits.hits[hit]._source.names[1]) {
+					name = docs.hits.hits[hit]._source.names[0];
+				}
+				// If it's a token, append "Token" to the name.
+				else if (docs.hits.hits[hit]._source.layout == "token") {
+					name = name + " Token";
+				}
+				// Remove all "" from the name (like Ach, Hans Run and Kongming, Sleeping Dragon)
+				name = name.replace(/"/g,"");
+				var priceUrl = "http://partner.tcgplayer.com/x3/phl.asmx/p?pk=MTGHUNTER&s="+setName+"&p="+name;
+				docs.hits.hits[hit]._source.multiverseids[edition] = await requestPrices(docs.hits.hits[hit]._source.multiverseids[edition], priceUrl);
+	        }
+	    	//console.log('\n====='+JSON.stringify(docs.hits.hits[hit]._source));
+	    	// Now send this modified data back to the ES server with an update push.
+	    	cardIndexer.updateSingleDocument(docs.hits.hits[hit]);
+	    	console.log("---done " + docs.hits.hits[hit]._source.name + ". elapsed time: " + (Date.now() - startTime) / 1000);
+    	}
+		//console.log(JSON.stringify(docs));
+    } catch (e) {
+	    // promise was rejected and we can handle errors with try/catch!
     }
-    
-	//console.log(JSON.stringify(docs));
-  } catch (e) {
-    // promise was rejected and we can handle errors with try/catch!
-  }
 }
 
-function main2() {
-	printDocs();
+async function main2() {
+	await printDocs(false); // False means first run.
+	console.log("FINISHED RUN 1.");
+	//await printDocs(true); // True means second run.
+	//console.log("FINISHED RUN 2. writing errors to " + __dirname);
+	fs.writeFile(path.join(__dirname, 'failedRequests.json'), JSON.stringify(failedRequests, null, '  '), 'utf8', this);
 }
 
-main2();
+function launcher() {
+	main2();
+}
+
+launcher();
 
 //);
