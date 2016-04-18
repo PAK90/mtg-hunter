@@ -96,7 +96,11 @@ let mapping = {
       rarity:stringWithRaw,
       flavor:stringWithRaw,
       setCode:stringWithRaw,
-      setName:stringWithRaw
+      setName:stringWithRaw,
+      lowPrice:{type:"float"},
+      medPrice:{type:"float"},
+      hiPrice:{type:"float"},
+      storeLink:{type:"string"}
     }
   },
   cmc:{type:"integer"},

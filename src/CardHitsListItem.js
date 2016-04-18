@@ -41,6 +41,11 @@ var CardHitsListItem = React.createClass({
             currentOriginalText: source.multiverseids[result._source.multiverseids.length - 1].originalText,
             currentSetName: source.multiverseids[result._source.multiverseids.length - 1].setName,
             currentNumber: source.multiverseids[result._source.multiverseids.length - 1].number,
+            currentLowPrice: source.multiverseids[result._source.multiverseids.length - 1].lowPrice,
+            currentMedPrice: source.multiverseids[result._source.multiverseids.length - 1].medPrice,
+            currentHiPrice: source.multiverseids[result._source.multiverseids.length - 1].hiPrice,
+            currentFoilPrice: source.multiverseids[result._source.multiverseids.length - 1].foilPrice,
+            currentStoreLink: source.multiverseids[result._source.multiverseids.length - 1].storeLink,
             currentSelectedTab: 0,
             currentImageLayout: '',
         };
@@ -71,7 +76,12 @@ var CardHitsListItem = React.createClass({
 			currentFlavor: multi.flavor,
 			currentOriginalText: multi.originalText,
 			currentSetName: multi.setName,
-			currentNumber: multi.number});
+			currentNumber: multi.number,
+			currentLowPrice: multi.lowPrice,
+            currentMedPrice: multi.medPrice,
+            currentHiPrice: multi.hiPrice,
+            currentFoilPrice: multi.foilPrice,
+            currentStoreLink: multi.storeLink});
 	},
 
 	onCardNameHover(card) {
@@ -167,7 +177,19 @@ var CardHitsListItem = React.createClass({
 	    source.taggedText = this.generateTextCostSymbols(source.text);
 
 	    // Define 'details' tab information here.
-	    var extraInfo, flavour, pt, legalities, otherSide;
+	    var extraInfo, flavour, pt, legalities, otherSide, price;
+	    if (this.state.currentMedPrice || this.state.currentFoilPrice) {
+	    	price = ( <div style={{fontSize: "x-small"}}>
+    			<a href={this.state.currentStoreLink} target="_blank">
+    				<span className={bemBlocks.item("subtitle")} style={{fontSize: "inherit"}}><b>{this.state.currentMedPrice == "0" ? '' : 'Paper: '}</b></span>
+    				<span className={bemBlocks.item("subtitle")}>{this.state.currentMedPrice == "0" ? '' : '$'+this.state.currentMedPrice}</span>
+    				<span className={bemBlocks.item("subtitle")}><b>{(this.state.currentFoilPrice != "0" && this.state.currentMedPrice != "0") ? '  ' : ''}</b></span>
+    				<span className={bemBlocks.item("subtitle")} style={{fontSize: "inherit"}}><b>{this.state.currentFoilPrice == "0" ? '' : 'Foil: '}</b></span>
+    				<span className={bemBlocks.item("subtitle")}>{this.state.currentFoilPrice == "0" ? '' : '$'+this.state.currentFoilPrice}</span>
+    			</a>
+    		</div> )
+	    }
+	    else { price = <div/>}
     	if (source.power) {
     		pt = ( <div className={bemBlocks.item("subtitle") + " tagFiltered"} style={{display:"inline-flex"}}>		
 		        <span style={{color: "#ddd"}}><b>{'P/T:'}</b></span>
@@ -369,9 +391,7 @@ var CardHitsListItem = React.createClass({
 	    				{/* Block 3; the title + text and set icons. */}
 		        		<div style={{display:'flex'}}>
 				        	<div className={bemBlocks.item("details")} style={{display:'inline-block'}}>
-				        		<a href={'http://shop.tcgplayer.com/magic/' + this.state.currentSetName.replace(/[^\w\s]/gi, '') + '/' + source.name} target="_blank">
-				         			<h2 className={bemBlocks.item("title")}>{source.name} {source.tagCost} ({source.cmc ? source.cmc : 0}) {otherSide}</h2>
-				         		</a>
+				         		<h2 className={bemBlocks.item("title")}>{source.name} {source.tagCost} ({source.cmc ? source.cmc : 0}) {otherSide} {price}</h2>
 				         		{/* The type line is special since it's made of TagFilters. */}
 						        <div style={{display:"inline-flex"}} className={bemBlocks.item("subtitle") + " typeLine"}>
 						        	<TagFilterConfig field="supertypes.raw" id="supertypeField" title="Supertype" operator="AND" searchkit={this.searchkit} />

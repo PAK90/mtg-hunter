@@ -438,6 +438,7 @@ export class App extends React.Component<any, any> {
 
             <div className="sk-layout__filters">
               <RangeFilter id="cmc" min={0} max={16} title="Converted Cost" field="cmc" showHistogram={true}/>
+              <DynamicRangeFilter id="paperPrice" title="Paper Price" field="multiverseids.medPrice"/>
               <select value={this.state.operator} onChange={this.handleOperatorChange.bind(this) }>
                 <option value="AND">AND</option>
                 <option value="OR">OR</option>
@@ -474,7 +475,15 @@ export class App extends React.Component<any, any> {
                     {label:"Colour (ascending)", field:"colors", order:"asc"},
                     {label:"Colour (descending)", field:"colors", order:"desc"},
                     {label:"CMC (ascending)", field:"cmc", order:"asc"},
-                    {label:"CMC (descending)", field:"cmc", order:"desc"}
+                    {label:"CMC (descending)", field:"cmc", order:"desc"},
+                    {label:"Price (ascending)", key:"medPriceAsc", fields: [
+                      {field:"multiverseids.medPrice", options: {order:"asc"}},
+                      {field:"multiverseids.foilPrice", options: {order:"asc"}}
+                    ]},
+                    {label:"Price (descending)", key:"medPriceDesc", fields: [
+                      {field:"multiverseids.foilPrice", options: {order:"desc"}},
+                      {field:"multiverseids.medPrice", options: {order:"desc"}}
+                    ]}
                   ]} />
                   <PageSizeSelector options={[4,12,24]} listComponent={Toggle}/>
                 </div>

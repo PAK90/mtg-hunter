@@ -17,11 +17,11 @@ module.exports = class Indexer {
   }
 
   queue(fns){
-    let queue = Promise.resolve(true)
+    let queue2 = Promise.resolve(true)
     for (let f of fns) {
-      queue = queue.then(f.bind(this))
+      queue2 = queue2.then(f.bind(this))
     }
-    return queue
+    return queue2
   }
   deleteIndex(){
     console.log("DELETE Index")
@@ -103,6 +103,17 @@ module.exports = class Indexer {
     console.log('Sending commands...')
     return this.client.bulk({requestTimeout: Infinity, body:commands}).then((res)=> {
       console.log(`indexed ${res.items.length} items in ${res.took}ms`)
+    }).catch((e)=> {
+      console.log(e)
+    })
+  }
+
+  updateSingleDocument(doc) {
+    //console.log("giving: "+this.index + ' ' + this.type + ' ' + doc._id);
+    //console.log(command[1]);
+    return this.client.update({requestTimeout: Infinity, 
+                               body: {doc: doc._source}, index: this.index, type: this.type, id: doc._id}).then((res)=> {
+      //console.log(`updated in ${res.took}ms`)
     }).catch((e)=> {
       console.log(e)
     })

@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "lint": "eslint src",
-    "index": "node --harmony indexer/cardIndexer"
+    "index": "node --harmony indexer/cardIndexer",
+    "prices": "babel-node indexer/getCardPrices"
   },
   "repository": "git:",
   "author": "Pēteris Arvīds Kļaviņš",
@@ -34,6 +35,9 @@
     "webpack-dev-server": "^1.14.0"
   },
   "dependencies": {
+    "babel-plugin-syntax-async-functions": "^6.1.4",
+    "babel-plugin-transform-regenerator": "^6.1.4",
+    "babel-polyfill": "^6.1.4",
     "bluebird": "^3.3.0",
     "classnames": "^2.2.1",
     "deep-equal": "^1.0.1",
