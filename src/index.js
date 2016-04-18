@@ -49,7 +49,7 @@ import {RefinementListFilter} from './modRefineListFilter.js';
 import CardDetailPanel from './CardDetailPanel';
 import CardHitsListItem from './CardHitsListItem';
 import CardHitsGridItem from './CardHitsGridItem';
-import CostSymbols from './costSymbols';
+import CostSymbols from './CostSymbols';
 import {MultiSelect} from './MultiSelect';
 //console.log("multiselect is " + MultiSelect);
 
