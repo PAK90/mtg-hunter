@@ -2,8 +2,8 @@
 @import url(//fonts.googleapis.com/css?family=Dosis:400,600);
 
 html {
-  /*font-family:"Open Sans";*/
-  font-family: 'Dosis';
+  font-family:"Open Sans";
+  /*font-family: 'Dosis';*/
 }
 
 $backgroundColour: #333;
@@ -64,6 +64,7 @@ body {
 .sk-results-list {
   background-color: #222;
   padding-left: 280px !important;
+  width: 100%;
 }
 
 .sk-hits-list-hit:hover {

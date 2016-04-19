@@ -32,6 +32,9 @@ module.exports = class Indexer {
   createIndex(){
     console.log("POST Index")
     let settings = {
+      "index": {
+          "max_result_window" : 20000
+      },
       "analysis": {
         "char_filter": {
            "replace": {
@@ -73,7 +76,6 @@ module.exports = class Indexer {
           }
         }
       }
-
     }
     console.log(settings)
     return this.client.indices.create(

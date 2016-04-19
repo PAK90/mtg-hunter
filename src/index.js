@@ -26,6 +26,7 @@ import {
   GroupedSelectedFilters,
   HierarchicalMenuFilter,
   NumericRefinementListFilter,
+  RangeSliderHistogramInput,
   SortingSelector,
   SearchkitComponent,
   SearchkitProvider,
@@ -51,6 +52,7 @@ import CardHitsListItem from './CardHitsListItem';
 import CardHitsGridItem from './CardHitsGridItem';
 import CostSymbols from './CostSymbols';
 import {MultiSelect} from './MultiSelect';
+import {TogglePanel} from './TogglePanel';
 //console.log("multiselect is " + MultiSelect);
 
 String.prototype.replaceAll = function(s,r){return this.split(s).join(r)};
@@ -390,6 +392,18 @@ export class App extends React.Component<any, any> {
   //,
                       //{key:"table", title:"Table", itemComponent:this.CardHitsTable}
 
+              /*<select value={this.state.operator} onChange={this.handleOperatorChange.bind(this) }>
+                <option value="AND">AND</option>
+                <option value="OR">OR</option>
+              </select>*/
+
+              /*rightComponent={(
+                              <select value={this.state.operator} onChange={this.handleOperatorChange.bind(this) }>
+                                <option value="AND">AND</option>
+                                <option value="OR">OR</option>
+                              </select>
+                            )}*/ 
+
   render() {
     return (
       <div>
@@ -438,7 +452,7 @@ export class App extends React.Component<any, any> {
 
             <div className="sk-layout__filters">
               <RangeFilter id="cmc" min={0} max={16} title="Converted Cost" field="cmc" showHistogram={true}/>
-              <DynamicRangeFilter id="paperPrice" title="Paper Price" field="multiverseids.medPrice"/>
+              <RangeFilter id="paperPrice" min={0} max={9500} rangeComponent={RangeSliderHistogramInput} title="Paper Price" field="multiverseids.medPrice" showHistogram={true}/>
               <select value={this.state.operator} onChange={this.handleOperatorChange.bind(this) }>
                 <option value="AND">AND</option>
                 <option value="OR">OR</option>
@@ -447,7 +461,7 @@ export class App extends React.Component<any, any> {
               <InputFilter id="flavourText" searchThrottleTime={1000} title="Flavour text" placeholder="Search flavour text" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["multiverseids.flavor"]} prefixQueryFields={["multiverseids.flavor"]}/>
               <InputFilter id="typeLine" searchThrottleTime={1000} title="Type text" placeholder="Search type text" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["type"]} prefixQueryFields={["type"]}/>              
               <RefinementListFilter id="power" title="Power" field="power.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="toughness" title="Toughness" field="toughness.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="toughness" title="Toughness" field="toughness.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>} />
               <RefinementListFilter id="symbols" title="Symbols" field="symbols" size={6} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="manaCost" title="Mana Cost" field="prettyCost.raw" showMore={false} listComponent={CostMultiSelect} size={0} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>

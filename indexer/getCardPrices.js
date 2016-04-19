@@ -53,24 +53,14 @@ function checkForSetNameReplacement(setName) {
 
 // Don't forget; From The Vault cards ONLY HAVE FOIL PRICES. Probably other promos too.
 
-function getESData2(isSecondRun) {
+function getESData2() {
 	console.log("about to fetch");
-	if (isSecondRun) {
-		return new Promise(function(resolve, reject) {
-			fetch('http://localhost:9200/cards/card/_search?from=0&size=10000')
-			.then(function(res) {
-		        resolve( res.json() );
-		    })
-		})
-	}
-	else {
-		return new Promise(function(resolve, reject) {
-			fetch('http://localhost:9200/cards/card/_search?from=10000&size=10000')
-			.then(function(res) {
-		        resolve( res.json() );
-		    })
-		})	
-	}
+	return new Promise(function(resolve, reject) {
+		fetch('http://localhost:9200/cards/card/_search?from=0&size=17000')
+		.then(function(res) {
+	        resolve( res.json() );
+	    })
+	})
 }
 
 function getTCGPlayerPrices(doc) {
@@ -109,7 +99,7 @@ function requestPrices(multiIdObject, priceUrl) {
 		  	}
 		  	else {
 		  		console.log(body + ' with link ' + priceUrl); // Product not found.
-		  		failedRequests.push(priceUrl+'\n');
+		  		failedRequests.push(priceUrl);
 		  		//console.log(failedRequests);
 		  	}
 			resolve(multiIdObject);
@@ -118,7 +108,7 @@ function requestPrices(multiIdObject, priceUrl) {
 	});
 }
 
-async function printDocs(isSecondRun){
+async function printDocs(){
   // "await" resolution or rejection of the promise
   // use try/catch for error handling
     try {
@@ -163,10 +153,8 @@ async function printDocs(isSecondRun){
 }
 
 async function main2() {
-	await printDocs(false); // False means first run.
-	console.log("FINISHED RUN 1.");
-	//await printDocs(true); // True means second run.
-	//console.log("FINISHED RUN 2. writing errors to " + __dirname);
+	await printDocs(); // False means first run.
+	console.log("FINISHED RUN 1. Writing failed requests.");
 	fs.writeFile(path.join(__dirname, 'failedRequests.json'), JSON.stringify(failedRequests, null, '  '), 'utf8', this);
 }
 
