@@ -414,7 +414,7 @@ var CardHitsListItem = React.createClass({
 						        <h3 className={bemBlocks.item("subtitle")}>{source.taggedText}{pt}</h3>
 						    </div>
 				        	<div style={{width: '150px', position: 'relative', right: '10px', display:'inline-block'}}>
-				          		<p style={{textAlign:'center'}}>{this.getSetIcons(source)}</p>
+				          		<p style={{textAlign:'center', maxHeight: '200px', overflowY: 'scroll'}}>{this.getSetIcons(source)}</p>
 				        	</div>	
 				        </div>
 	    				{/* The tab panel is by itself under block 3. */}

@@ -48,6 +48,7 @@
     "lodash": "^4.3.0",
     "moment": "^2.11.2",
     "mtg-json": "^1.0.1",
+    "node-fetch": "^1.5.1",
     "normalize.css": "^3.0.3",
     "nuka-carousel": "^1.0.2",
     "query-string": "^3.0.0",
@@ -71,6 +72,7 @@
     "underscore": "^1.8.3",
     "velocity-animate": "^1.2.3",
     "velocity-react": "^1.1.1",
-    "warning": "^2.1.0"
+    "warning": "^2.1.0",
+    "xml2js": "^0.4.16"
   }
 }
