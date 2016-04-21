@@ -84,6 +84,10 @@ var CardHitsListItem = React.createClass({
             currentStoreLink: multi.storeLink});
 	},
 
+	handleNewComment(comment) {
+		console.log(comment.text);
+	},
+
 	onCardNameHover(card) {
 		console.log("hovered card is " + card);
 		//this.setState({currentImageMultiId: language.multiverseid});
@@ -351,6 +355,7 @@ var CardHitsListItem = React.createClass({
 	            	<Tab>Rulings</Tab>
 	            	<Tab>Languages</Tab>
 	            	<Tab>10 closest cards</Tab>
+	            	<Tab>Comments</Tab>
 	        	</TabList>
             	<TabPanel>
 					<div className='extraDetails'>{flavour}{extraInfo}{legalities}</div> 
@@ -363,6 +368,15 @@ var CardHitsListItem = React.createClass({
 		        </TabPanel>
 		        <TabPanel>
 		          {closest10}
+		        </TabPanel>
+		        <TabPanel>
+			        <ReactDisqusThread
+		                shortname="mtg-hunter"
+		                identifier={source.name}
+		                title={"Card: "+source.name}
+		                url="http://localhost:3333/"
+		                category_id="4523863"
+		                onNewComment={this.handleNewComment}/>
 		        </TabPanel>
         	</Tabs>)
 	    }

@@ -12,6 +12,7 @@ let cardIndexer = new Indexer(
 );
 
 var failedRequests = [];
+var successfulRequests = [];
 
 var setNamesToChange = {tuples:[["Limited Edition Alpha","Alpha Edition"],
 						["Limited Edition Beta","Beta Edition"],
@@ -56,24 +57,11 @@ function checkForSetNameReplacement(setName) {
 function getESData2() {
 	console.log("about to fetch");
 	return new Promise(function(resolve, reject) {
-		fetch('http://localhost:9200/cards/card/_search?from=0&size=17000')
+		fetch('http://localhost:9200/cards/card/_search?from=0&size=18000')
 		.then(function(res) {
 	        resolve( res.json() );
 	    })
 	})
-}
-
-function getTCGPlayerPrices(doc) {
-	for (var multiId = 0; multiId < doc._source.multiverseids.length; multiId++) { // Loop over all editions in the doc.
-		var setName = doc._source.multiverseids[multiId].setName; 
-		setName = checkForSetNameReplacement(setName); // Ensure the set name is TCGPlayer compatible.
-		var priceUrl = "http://partner.tcgplayer.com/x3/phl.asmx/p?pk=TCGTEST&s="+setName+"&p="+doc._source.name;
-		requestPrices(doc._source.multiverseids[multiId], priceUrl).then(function(result) {
-			doc._source.multiverseids[multiId] = result;
-			console.log(doc._source.multiverseids[multiId]);
-		});
-	}
-	//console.log('doc id: ' + doc._id);
 }
 
 function requestPrices(multiIdObject, priceUrl) {
@@ -144,7 +132,9 @@ async function printDocs(){
 	    	//console.log('\n====='+JSON.stringify(docs.hits.hits[hit]._source));
 	    	// Now send this modified data back to the ES server with an update push.
 	    	cardIndexer.updateSingleDocument(docs.hits.hits[hit]);
-	    	console.log("---done " + docs.hits.hits[hit]._source.name + ". elapsed time: " + (Date.now() - startTime) / 1000);
+	    	var successString = "---done " + docs.hits.hits[hit]._source.name + ". elapsed time: " + (Date.now() - startTime) / 1000 + '. doc # ' + hit;
+	    	console.log(successString);
+	    	successfulRequests.push(successString);
     	}
 		//console.log(JSON.stringify(docs));
     } catch (e) {
@@ -153,9 +143,10 @@ async function printDocs(){
 }
 
 async function main2() {
-	await printDocs(); // False means first run.
+	await printDocs();
 	console.log("FINISHED RUN 1. Writing failed requests.");
 	fs.writeFile(path.join(__dirname, 'failedRequests.json'), JSON.stringify(failedRequests, null, '  '), 'utf8', this);
+	fs.writeFile(path.join(__dirname, 'successfulRequests.json'), JSON.stringify(successfulRequests, null, '  '), 'utf8', this);
 }
 
 function launcher() {
