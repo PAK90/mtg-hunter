@@ -4,7 +4,8 @@ var fs = require('fs'),
 	fetch = require('node-fetch'),
 	request = require('request'),
 	parseString = require('xml2js').parseString,
-	Indexer = require('./indexer');
+	Indexer = require('./indexer'),
+	csvParser = require('babyparse');
 
 let cardIndexer = new Indexer(
   "http://localhost:9200",  
@@ -64,6 +65,26 @@ function getESData2() {
 	})
 }
 
+function getCardhoarderData() {
+	console.log("about to get");
+	return new Promise(function(resolve, reject) {
+		fetch('https://www.cardhoarder.com/affiliates/pricefile/672200')
+		.then(function(res) {
+			resolve(res.text());
+	    });
+	});
+}
+
+function getCardhoarderFoilData() {
+	console.log("about to get foil");
+	return new Promise(function(resolve, reject) {
+		fetch('https://www.cardhoarder.com/affiliates/pricefile/672200/foil')
+		.then(function(res) {
+			resolve(res.text());
+	    });
+	});
+}
+
 function requestPrices(multiIdObject, priceUrl) {
 	//console.log("requesting priceUrl " + priceUrl);
 	return new Promise(function(resolve) {
@@ -100,7 +121,29 @@ async function printDocs(){
   // "await" resolution or rejection of the promise
   // use try/catch for error handling
     try {
-	    var docs = await getESData2();
+	    var docs = await getESData2(); // Get TCGPlayer data.
+		var csv = await getCardhoarderData(); // Get Cardhoarder non-foil data.
+		var foilCsv = await getCardhoarderFoilData(); // Get Cardhoarder non-foil data.
+
+		csv = csv.replace(/^(.*)$/m,'');
+		csv = csv.replace(/[\n]+/,''); // These two regexes remove the useless first line of date text, so it can have a proper header.
+		var parsed = csvParser.parse(csv, {
+			header: true
+		});
+		foilCsv = foilCsv.replace(/^(.*)$/m,'');
+		foilCsv = foilCsv.replace(/[\n]+/,'');
+		var parsedFoil = csvParser.parse(foilCsv, {
+			header: true
+		});
+		// Now turn this csv into an object keyed on the mtgo ID, so we don't have to do array searching twice later on.
+		var mtgoKeyedFoils = new Object();
+		console.log(parsedFoil.data.length);
+		parsedFoil.data.forEach(function(card) {
+			//console.log(card.MTGO_ID);
+			mtgoKeyedFoils[card.MTGO_ID] = card;
+			//console.log(mtgoKeyedFoils[card.MTGO_ID]);
+		});
+
 	    //console.log(docs);
 	    var startTime = Date.now();
 	    // now you can write this like syncronous code!
@@ -127,7 +170,35 @@ async function printDocs(){
 				// Remove all "" from the name (like Ach, Hans Run and Kongming, Sleeping Dragon)
 				name = name.replace(/"/g,"");
 				var priceUrl = "http://partner.tcgplayer.com/x3/phl.asmx/p?pk=MTGHUNTER&s="+setName+"&p="+name;
+				// Await the blessed data from the TCGPlayer API.
 				docs.hits.hits[hit]._source.multiverseids[edition] = await requestPrices(docs.hits.hits[hit]._source.multiverseids[edition], priceUrl);
+
+				// For Cardhoarder, use find to find the right object in the array.
+				var setCode = docs.hits.hits[hit]._source.multiverseids[edition].setCode;
+				var targetCard = _.find(parsed.data, {
+					"NAME":name, "MTGJSON_SET":setCode
+				}, this);
+				// If it didn't find a match, this will be undefined, so check on that.
+				if (targetCard) {
+					console.log("target mtgo card: "+ targetCard.NAME + ' ' + targetCard.PRICE_TIX + ' ' + targetCard.MTGO_ID);
+					if (mtgoKeyedFoils[(parseInt(targetCard.MTGO_ID) + 1)]) { // If the foil exists, set the foil price.
+						//console.log("YHAY FOIL.");
+						docs.hits.hits[hit]._source.multiverseids[edition].mtgoFoilPrice = parseFloat(mtgoKeyedFoils[(parseInt(targetCard.MTGO_ID) + 1)].PRICE_TIX);	
+					}
+					else {
+						docs.hits.hits[hit]._source.multiverseids[edition].mtgoFoilPrice = null;	
+					}
+					docs.hits.hits[hit]._source.multiverseids[edition].mtgoPrice = parseFloat(targetCard.PRICE_TIX);
+					docs.hits.hits[hit]._source.multiverseids[edition].mtgoStoreLink = "https://www.cardhoarder.com/cards/"+targetCard.MTGO_ID+"?affiliate_id=mtghunter";
+				}
+				else
+				{
+					console.log("no online version.");
+					docs.hits.hits[hit]._source.multiverseids[edition].mtgoPrice = null;
+					docs.hits.hits[hit]._source.multiverseids[edition].mtgoStoreLink = null;
+					docs.hits.hits[hit]._source.multiverseids[edition].mtgoFoilPrice = null;
+					failedRequests.push("mtgo not found: " + name + ' ' + setCode);
+				}
 	        }
 	    	//console.log('\n====='+JSON.stringify(docs.hits.hits[hit]._source));
 	    	// Now send this modified data back to the ES server with an update push.
@@ -144,9 +215,32 @@ async function printDocs(){
 
 async function main2() {
 	await printDocs();
-	console.log("FINISHED RUN 1. Writing failed requests.");
+	console.log("FINISHED RUN 1. Writing failed/successful requests.");
 	fs.writeFile(path.join(__dirname, 'failedRequests.json'), JSON.stringify(failedRequests, null, '  '), 'utf8', this);
 	fs.writeFile(path.join(__dirname, 'successfulRequests.json'), JSON.stringify(successfulRequests, null, '  '), 'utf8', this);
+	//console.log("csv " +csv);
+	/*var csv = await getCardhoarderData();
+	/*csv = csv.split('\n').slice(0, -1);
+	csv = csv.join('\n');*/
+	/*csv = csv.replace(/^(.*)$/m,'');
+	csv = csv.replace(/[\n]+/,'');
+	var parsed = csvParser.parse(csv, {
+		header: true
+	});
+	/*var rows = csv.split('\n');
+	//rows = slice(0,10);
+	var row_data;
+	rows.forEach(function(string, index) {
+		row_data = string.split('\t');
+		//console.log("data: "+row_data[0]);
+	});
+	console.log(rows);*/
+	
+	/*var targetCard = _.find(parsed.data, {
+		"NAME":"Rocky Tar Pit","MTGJSON_SET":"MIR"
+	});
+	console.log(JSON.stringify(parsed.data[333].NAME));
+	console.log(targetCard);*/
 }
 
 function launcher() {

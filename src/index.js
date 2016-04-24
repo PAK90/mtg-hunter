@@ -360,8 +360,7 @@ export class App extends React.Component<any, any> {
   }
 
   CardHitsTable = (props)=> {  
-  const { result } = props;
-  let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/' + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid + '.jpg';
+  const { hits } = props;
   return (
     <div style={{width: '100%', boxSizing: 'border-box', padding: 8}}>
       <table className="sk-table sk-table-striped" style={{width: '100%', boxSizing: 'border-box'}}>
@@ -371,17 +370,18 @@ export class App extends React.Component<any, any> {
           </tr>
         </thead>
         <tbody>
-        {map(result=> (
-          <tr key={result._id}>
+        {map(hits, hit=> (
+          <tr key={hit._id}>
             <td style={{margin: 0, padding: 0, width: 40}}>
-              <img data-qa="poster" src={imgUrl} style={{width: 40}}/>
+              <img data-qa="poster" src={
+  'https://image.deckbrew.com/mtg/multiverseid/' + hit._source.multiverseids[hit._source.multiverseids.length - 1].multiverseid + '.jpg'} style={{width: 40}}/>
             </td>
-            <td>{result._source.name}</td>
-            <td>{result._source.prettyCost}</td>
-            <td>{result._source.cmc}</td>
+            <td>{hit._source.name}</td>
+            <td>{this.generateTitleCostSymbols(hit._source.manaCost)}</td>
+            <td>{hit._source.cmc}</td>
           </tr>
-          ))}
-          </tbody>
+          )), this}
+        </tbody>
       </table>
     </div>
     )  
@@ -390,7 +390,8 @@ export class App extends React.Component<any, any> {
   //<InputFilter id="artistName" searchThrottleTime={500} title="Artist name" placeholder="Search artist name" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["artists"]} />
   //<span className="filterHint"><i>Use ~ for CARDNAME</i></span>
   //,
-                      //{key:"table", title:"Table", itemComponent:this.CardHitsTable}
+                      //,
+                      //{key:"table", title:"Table", listComponent:this.CardHitsTable}
 
               /*<select value={this.state.operator} onChange={this.handleOperatorChange.bind(this) }>
                 <option value="AND">AND</option>
@@ -466,7 +467,7 @@ export class App extends React.Component<any, any> {
               <RefinementListFilter id="manaCost" title="Mana Cost" field="prettyCost.raw" showMore={false} listComponent={CostMultiSelect} size={0} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="colourIdentity" title="Colour Identity" field="colorIdentity" size={6} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="colourCount" title="Colour Count" field="colourCount" size={6} operator={this.state.operator} orderKey="_term" containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="colorCount" title="Colour Count" field="colourCount" size={6} operator={this.state.operator} orderKey="_term" containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="rarity" title="Rarity" field="multiverseids.rarity.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="supertype" title="Supertype" field="supertypes.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="type" title="Type" field="types.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
@@ -495,8 +496,16 @@ export class App extends React.Component<any, any> {
                       {field:"multiverseids.foilPrice", options: {order:"asc"}}
                     ]},
                     {label:"Price (descending)", key:"medPriceDesc", fields: [
-                      {field:"multiverseids.foilPrice", options: {order:"desc"}},
-                      {field:"multiverseids.medPrice", options: {order:"desc"}}
+                      {field:"multiverseids.medPrice", options: {order:"desc"}},
+                      {field:"multiverseids.foilPrice", options: {order:"desc"}}
+                    ]},                    
+                    {label:"MTGO Price (ascending)", key:"mtgoMedPriceAsc", fields: [
+                      {field:"multiverseids.mtgoPrice", options: {order:"asc"}},
+                      {field:"multiverseids.mtgoFoilPrice", options: {order:"asc"}}
+                    ]},
+                    {label:"MTGO Price (descending)", key:"mtgoMedPriceDesc", fields: [
+                      {field:"multiverseids.mtgoPrice", options: {order:"desc"}},
+                      {field:"multiverseids.mtgoFoilPrice", options: {order:"desc"}}
                     ]}
                   ]} />
                   <PageSizeSelector options={[4,12,24]} listComponent={Toggle}/>

@@ -11,7 +11,7 @@ var Tab = ReactTabs.Tab;
 var Tabs = ReactTabs.Tabs;
 var TabList = ReactTabs.TabList;
 var TabPanel = ReactTabs.TabPanel;
-var ReactDisqusThread = require('react-disqus-thread');
+var Rating = require('react-rating');
 //var cards = require('./multiIdName.json');
 //var modCards = cards;
 // Turn cards object keys into the format returned by the python script.
@@ -46,6 +46,9 @@ var CardHitsListItem = React.createClass({
             currentHiPrice: source.multiverseids[result._source.multiverseids.length - 1].hiPrice,
             currentFoilPrice: source.multiverseids[result._source.multiverseids.length - 1].foilPrice,
             currentStoreLink: source.multiverseids[result._source.multiverseids.length - 1].storeLink,
+            currentMtgoPrice: source.multiverseids[result._source.multiverseids.length - 1].mtgoPrice,
+            currentFoilMtgoPrice: source.multiverseids[result._source.multiverseids.length - 1].mtgoFoilPrice,
+            currentMtgoStoreLink: source.multiverseids[result._source.multiverseids.length - 1].mtgoStoreLink,
             currentSelectedTab: 0,
             currentImageLayout: '',
         };
@@ -81,11 +84,11 @@ var CardHitsListItem = React.createClass({
             currentMedPrice: multi.medPrice,
             currentHiPrice: multi.hiPrice,
             currentFoilPrice: multi.foilPrice,
-            currentStoreLink: multi.storeLink});
-	},
-
-	handleNewComment(comment) {
-		console.log(comment.text);
+            currentStoreLink: multi.storeLink,
+            currentMtgoPrice: multi.mtgoPrice,
+			currentFoilMtgoPrice: multi.mtgoFoilPrice,
+			currentMtgoStoreLink: multi.mtgoStoreLink
+        });
 	},
 
 	onCardNameHover(card) {
@@ -119,7 +122,7 @@ var CardHitsListItem = React.createClass({
       		let rarity = multis.rarity.charAt(0) == "B" ? "C" : multis.rarity.charAt(0); // Replace 'basic' rarity with common.
       		let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + multis.multiverseid;
       		return (
-            	<img className={(this.state.currentMultiId == multis.multiverseid ? "clicked " : "") + "setIcon " + rarity } src={'./src/img/sets/' + multis.setName.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-' + rarity + '.jpg'} 
+            	<img key={i} className={(this.state.currentMultiId == multis.multiverseid ? "clicked " : "") + "setIcon " + rarity } src={'./src/img/sets/' + multis.setName.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-' + rarity + '.jpg'} 
 	                title={multis.setName}
 	                onClick={this.handleSetIconClick.bind(this, multis)}/>
 	            )
@@ -181,19 +184,52 @@ var CardHitsListItem = React.createClass({
 	    source.taggedText = this.generateTextCostSymbols(source.text);
 
 	    // Define 'details' tab information here.
-	    var extraInfo, flavour, pt, legalities, otherSide, price;
-	    if (this.state.currentMedPrice || this.state.currentFoilPrice) {
-	    	price = ( <div style={{fontSize: "x-small"}}>
-    			<a href={this.state.currentStoreLink} target="_blank">
-    				<span className={bemBlocks.item("subtitle")} style={{fontSize: "inherit"}}><b>{this.state.currentMedPrice == "0" ? '' : 'Paper: '}</b></span>
-    				<span className={bemBlocks.item("subtitle")}>{this.state.currentMedPrice == "0" ? '' : '$'+this.state.currentMedPrice}</span>
-    				<span className={bemBlocks.item("subtitle")}><b>{(this.state.currentFoilPrice != "0" && this.state.currentMedPrice != "0") ? '  ' : ''}</b></span>
-    				<span className={bemBlocks.item("subtitle")} style={{fontSize: "inherit"}}><b>{this.state.currentFoilPrice == "0" ? '' : 'Foil: '}</b></span>
-    				<span className={bemBlocks.item("subtitle")}>{this.state.currentFoilPrice == "0" ? '' : '$'+this.state.currentFoilPrice}</span>
-    			</a>
-    		</div> )
+	    var extraInfo, flavour, pt, legalities, otherSide, price, foilPrice, mtgoPrice, mtgoFoilPrice;
+
+	    // Start with a separate div for all 4 potential prices.
+	    if (this.state.currentMedPrice) {
+	    	price = ( <a href={this.state.currentStoreLink} target="_blank">
+	    		<div className="priceContainer">
+    				<span className={bemBlocks.item("subtitle") + " price"}>{'$'+this.state.currentMedPrice}</span>
+    				<br/>
+    				<span className={bemBlocks.item("subtitle") + " price priceDescriptor"} style={{fontSize: "inherit"}}><b>{'Paper'}</b></span>
+    			</div>
+    		</a> )
 	    }
 	    else { price = <div/>}
+	    if (this.state.currentFoilPrice) {
+	    	foilPrice = ( <a href={this.state.currentStoreLink} target="_blank">
+    			<div className="priceContainer">
+					<span className={bemBlocks.item("subtitle") + " price"}>{'$'+this.state.currentFoilPrice}</span>
+					<br/>
+					<span className={bemBlocks.item("subtitle") + " price priceDescriptor"} style={{fontSize: "inherit"}}><b>{'Foil'}</b></span>
+				</div>
+			</a> )
+	    }
+	    else { foilPrice = <div/>}
+	    if (this.state.currentMtgoPrice) {
+	    	mtgoPrice = ( <a href={this.state.currentMtgoStoreLink} target="_blank">
+    			<div className="priceContainer">
+    				<span className={bemBlocks.item("subtitle") + " price"}>{this.state.currentMtgoPrice}</span><span> TIX</span>
+    				<br/>
+    				<span className={bemBlocks.item("subtitle") + " price priceDescriptor"} style={{fontSize: "inherit"}}><b>{'MTGO'}</b></span>
+    			</div>
+    		</a>)
+	    }
+	    else { mtgoPrice = <div/> }
+	    if (this.state.currentFoilMtgoPrice) {	
+	    	mtgoFoilPrice = ( <a href={this.state.currentMtgoStoreLink.replace(/\d+/, function(mtgoId) { // Increment the url id by 1 to get foil url.
+    				return Number(mtgoId) + 1;
+    			})} target="_blank">
+    				<div className="priceContainer">
+    				<span className={bemBlocks.item("subtitle") + " price"}>{this.state.currentFoilMtgoPrice}</span><span> TIX</span>
+    				<br/>
+    				<span className={bemBlocks.item("subtitle") + " price priceDescriptor"} style={{fontSize: "inherit"}}><b>{'MTGO Foil'}</b></span>
+    			</div>
+    		</a> )
+	    }
+	    else { mtgoFoilPrice = <div/> }
+
     	if (source.power) {
     		pt = ( <div className={bemBlocks.item("subtitle") + " tagFiltered"} style={{display:"inline-flex"}}>		
 		        <span style={{color: "#ddd"}}><b>{'P/T:'}</b></span>
@@ -235,7 +271,7 @@ var CardHitsListItem = React.createClass({
 	    	legalities = (<div>
 		        <span className={bemBlocks.item("subtitle")}><b>{'Legalities: '}</b></span>
 		        { source.legalities.map(function(legality, i) {
-		        	return (<div>
+		        	return (<div key={i}>
 				        	<div className={bemBlocks.item("subtitle")} style={{display:"inline-flex"}}>
 					        <TagFilterConfig field="formats.raw" id="artistNames" title="Format name" operator="AND" searchkit={this.searchkit} />
 					        <TagFilter field="formats.raw" value={legality.format} />
@@ -263,7 +299,7 @@ var CardHitsListItem = React.createClass({
     	if (source.rulings) {
     		rulings = (<div>
     			{ source.rulings.map(function(ruling, i) {
-    				return <div><span className={bemBlocks.item("subtitle")}><b>{ruling.date + ": "}</b></span>
+    				return <div key={i}><span className={bemBlocks.item("subtitle")}><b>{ruling.date + ": "}</b></span>
     							<span className={bemBlocks.item("subtitle")}>{this.generateCardHoverSpan(ruling.text)}</span></div>
     			}.bind(this))}
     			</div>
@@ -285,7 +321,7 @@ var CardHitsListItem = React.createClass({
     	if (source.multiverseids[whichMultiIndex].foreignNames) {
     		languages = (<div>
     			{ source.multiverseids[whichMultiIndex].foreignNames.map(function(language, i) {
-    				return <div><span onMouseOver={this.onLanguageHover.bind(this, language)} className={bemBlocks.item("subtitle")}><b>{language.language + ": "}</b></span>
+    				return <div key={i}><span onMouseOver={this.onLanguageHover.bind(this, language)} className={bemBlocks.item("subtitle")}><b>{language.language + ": "}</b></span>
     							<span onMouseOver={this.onLanguageHover.bind(this, language)} 
     							onMouseOut={this.onLanguageHoverOut.bind(this, language)} 
     							className={bemBlocks.item("subtitle")}>{language.name}</span></div>
@@ -321,7 +357,7 @@ var CardHitsListItem = React.createClass({
     	if (source.closestCards) {
     		closest10 = (<div>
     			{source.closestCards.map(function(card, i) {
-    				return <div style={elemInlineBlock}>
+    				return <div key={i} style={elemInlineBlock}>
     					<span style={spanStyle}>{Math.round(card.deviation * 10000)/10000}</span>
     					<img className="closestImg" src={'https://image.deckbrew.com/mtg/multiverseid/'+card.multiId+'.jpg'}/>
 	                	</div>
@@ -335,15 +371,8 @@ var CardHitsListItem = React.createClass({
 
 
 		        /*<TabPanel>
-			        <ReactDisqusThread
-		                shortname="mtg-hunter"
-		                identifier={this.state.currentSetName + ': ' + source.name}
-		                title={this.state.currentSetName + ': ' + source.name}
-		                url="http://localhost:3333/"
-		                category_id="4523863"/>
-		        </TabPanel>
-		        <TabPanel>
 		          <h2>Hello from expensive card!</h2>
+		          <script type='text/javascript' src='http://www.intensedebate.com/js/genericCommentWrapperV2.js'></script>
 		        </TabPanel>*/
 
     	// Define the tab stuff here.
@@ -370,13 +399,7 @@ var CardHitsListItem = React.createClass({
 		          {closest10}
 		        </TabPanel>
 		        <TabPanel>
-			        <ReactDisqusThread
-		                shortname="mtg-hunter"
-		                identifier={source.name}
-		                title={"Card: "+source.name}
-		                url="http://localhost:3333/"
-		                category_id="4523863"
-		                onNewComment={this.handleNewComment}/>
+		        	Comments coming soon!
 		        </TabPanel>
         	</Tabs>)
 	    }
@@ -388,12 +411,14 @@ var CardHitsListItem = React.createClass({
 	    // The <p> tag helps to align the symbols in the centre, and probably other important css-y stuff.
 	    // this.state.clickedCard is '' when unclicked, which is apparently false-y enough to use for a bool.
 
-						        /*<h3 className={bemBlocks.item("subtitle")}><b>{source.type}</b></h3>*/
+						        /*<h3 className={bemBlocks.item("subtitle")}><b>{source.type}</b></h3>
+						        
+		            	<Rating start={0} stop={5} initialRate={4} />*/
 	    return (
 	    	<div className={bemBlocks.item().mix(bemBlocks.container("item"))} style={{display: 'block'}}>
 	    		<div style={{display: 'flex'}}>
 	    			{/* Block 1; the card image. */}
-		    		<div className={"listImgDiv "} style={{display:'inline-block'}}>
+		    		<div className={"listImgDiv "} >
 		          		<img className={(this.state.clickedCard ? "clicked " : "") + "listImg "+ this.state.currentImageLayout }
 		            		src={imgUrl} 
 		            		style={{borderRadius: this.state.clickedCard ? "10" : "6", cursor:"hand"}} 
@@ -402,30 +427,33 @@ var CardHitsListItem = React.createClass({
 		        	</div>
 	    			{/* Block 2; the title + text, details tabs, and set icons. Width = 100% to stretch it out and 'align right' the set icons. */}
 		        	<div style={{width:'100%'}}>
-	    				{/* Block 3; the title + text and set icons. */}
+	    				{/* Block 3; the title + text, prices and set icons. */}
 		        		<div style={{display:'flex'}}>
 				        	<div className={bemBlocks.item("details")} style={{display:'inline-block'}}>
-				         		<h2 className={bemBlocks.item("title")}>{source.name} {source.tagCost} ({source.cmc ? source.cmc : 0}) {otherSide} {price}</h2>
+				         		<h2 className={bemBlocks.item("title")}>{source.name} {source.tagCost} ({source.cmc ? source.cmc : 0}) {otherSide} </h2>
 				         		{/* The type line is special since it's made of TagFilters. */}
 						        <div style={{display:"inline-flex"}} className={bemBlocks.item("subtitle") + " typeLine"}>
 						        	<TagFilterConfig field="supertypes.raw" id="supertypeField" title="Supertype" operator="AND" searchkit={this.searchkit} />
 						        	{_.map(source.supertypes,supertype => 
-						        		<div style={{display:"inline-flex"}}>
+						        		<div key={supertype} style={{display:"inline-flex"}}>
 						        			<TagFilter field="supertypes.raw" value={supertype} /><span>&nbsp;</span>
 						        		</div>)}
 						        	<TagFilterConfig field="types.raw" id="typeField" title="Type" operator="AND" searchkit={this.searchkit} />
 						        	{_.map(source.types,type => 
-						        		<div style={{display:"inline-flex"}}>
+						        		<div key={type} style={{display:"inline-flex"}}>
 						        			<TagFilter field="types.raw" value={type} /><span>&nbsp;</span>
 						        		</div>)}
 						        	{source.subtypes ? <span>—&nbsp;</span> : <span/>}
 						        	<TagFilterConfig field="subtypes.raw" id="subtypeField" title="Subtype" operator="AND" searchkit={this.searchkit} />
 						        	{_.map(source.subtypes,subtype => 
-						        		<div style={{display:"inline-flex"}}>
+						        		<div key={subtype} style={{display:"inline-flex"}}>
 						        			<TagFilter field="subtypes.raw" value={subtype} /><span>&nbsp;</span>
 						        		</div>)}
 						        </div>
 						        <h3 className={bemBlocks.item("subtitle")}>{source.taggedText}{pt}</h3>
+						    </div>
+						    <div style={{width: '80', position: 'relative', right: '10px', textAlign:"center", paddingLeft:"5"}}>
+						    	{price}{foilPrice}{mtgoPrice}{mtgoFoilPrice}
 						    </div>
 				        	<div style={{width: '150px', position: 'relative', right: '10px', display:'inline-block'}}>
 				          		<p style={{textAlign:'center', maxHeight: '200px', overflowY: 'scroll'}}>{this.getSetIcons(source)}</p>

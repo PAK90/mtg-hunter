@@ -100,7 +100,10 @@ let mapping = {
       lowPrice:{type:"float"},
       medPrice:{type:"float"},
       hiPrice:{type:"float"},
-      storeLink:{type:"string"}
+      storeLink:{type:"string"},
+      mtgoStoreLink:{type:"string"},
+      mtgoPrice:{type:"float"},
+      mtgoFoilPrice:{type:"float"}
     }
   },
   cmc:{type:"integer"},

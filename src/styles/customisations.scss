@@ -63,7 +63,7 @@ body {
 
 .sk-results-list {
   background-color: #222;
-  padding-left: 280px !important;
+  padding-left: 270px !important;
   width: 100%;
 }
 
@@ -169,7 +169,22 @@ body {
     /*margin-bottom: -2px;*/
     font-weight: bold;
   }
+  &.priceDescriptor {
+
+  }
 }
+
+/* The div containing each individual price. */
+.priceContainer {
+  font-size: x-small;
+  padding: 2px;
+  background-color: #222;
+  transition: 0.3s;
+}
+.priceContainer:hover {
+  background-color: #1D5A7D;
+}
+
 
 /* The grid view's title and text area. */
 .titleAndTextColumn {
