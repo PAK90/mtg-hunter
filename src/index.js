@@ -417,7 +417,7 @@ export class App extends React.Component<any, any> {
               <div className="my-logo"><span>MtG:Hunter</span><br/>
               <a href="http://searchkit.co/" style={{textDecoration:"none"}}>
               <span className="my-logo-small">Made with Searchkit</span></a></div>
-              <div className="my-logo"><button style={{backgroundColor: 'transparent', border: '0px', font: "inherit", color: "#eee"}} 
+              <div className="my-logo"><button style={{backgroundColor: 'transparent', border: '0px', font: "inherit", color: "#eee", cursor:"pointer"}} 
                 onClick={this.open.bind(this)}>About</button><br/></div>
               <Modal
                 aria-labelledby='modal-label'
@@ -454,6 +454,7 @@ export class App extends React.Component<any, any> {
             <div className="sk-layout__filters">
               <RangeFilter id="cmc" min={0} max={16} title="Converted Cost" field="cmc" showHistogram={true}/>
               <RangeFilter id="paperPrice" min={0} max={10000} rangeComponent={RangeSliderHistogramInput} title="Paper Price" field="multiverseids.medPrice" showHistogram={true}/>
+              <RangeFilter id="mtgoPrice" min={0} max={160} rangeComponent={RangeSliderHistogramInput} title="MTGO Price" field="multiverseids.mtgoPrice" showHistogram={true}/>
               <select value={this.state.operator} onChange={this.handleOperatorChange.bind(this) }>
                 <option value="AND">AND</option>
                 <option value="OR">OR</option>
