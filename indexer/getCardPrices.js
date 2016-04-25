@@ -122,7 +122,7 @@ async function printDocs(){
   // use try/catch for error handling
     try {
 	    var docs = await getESData2(); // Get TCGPlayer data.
-		var csv = await getCardhoarderData(); // Get Cardhoarder non-foil data.
+		/*var csv = await getCardhoarderData(); // Get Cardhoarder non-foil data.
 		var foilCsv = await getCardhoarderFoilData(); // Get Cardhoarder non-foil data.
 
 		csv = csv.replace(/^(.*)$/m,'');
@@ -142,7 +142,7 @@ async function printDocs(){
 			//console.log(card.MTGO_ID);
 			mtgoKeyedFoils[card.MTGO_ID] = card;
 			//console.log(mtgoKeyedFoils[card.MTGO_ID]);
-		});
+		});*/
 
 	    //console.log(docs);
 	    var startTime = Date.now();
@@ -174,7 +174,7 @@ async function printDocs(){
 				docs.hits.hits[hit]._source.multiverseids[edition] = await requestPrices(docs.hits.hits[hit]._source.multiverseids[edition], priceUrl);
 
 				// For Cardhoarder, use find to find the right object in the array.
-				var setCode = docs.hits.hits[hit]._source.multiverseids[edition].setCode;
+				/*var setCode = docs.hits.hits[hit]._source.multiverseids[edition].setCode;
 				var targetCard = _.find(parsed.data, {
 					"NAME":name, "MTGJSON_SET":setCode
 				}, this);
@@ -182,7 +182,6 @@ async function printDocs(){
 				if (targetCard) {
 					console.log("target mtgo card: "+ targetCard.NAME + ' ' + targetCard.PRICE_TIX + ' ' + targetCard.MTGO_ID);
 					if (mtgoKeyedFoils[(parseInt(targetCard.MTGO_ID) + 1)]) { // If the foil exists, set the foil price.
-						//console.log("YHAY FOIL.");
 						docs.hits.hits[hit]._source.multiverseids[edition].mtgoFoilPrice = parseFloat(mtgoKeyedFoils[(parseInt(targetCard.MTGO_ID) + 1)].PRICE_TIX);	
 					}
 					else {
@@ -197,8 +196,8 @@ async function printDocs(){
 					docs.hits.hits[hit]._source.multiverseids[edition].mtgoPrice = null;
 					docs.hits.hits[hit]._source.multiverseids[edition].mtgoStoreLink = null;
 					docs.hits.hits[hit]._source.multiverseids[edition].mtgoFoilPrice = null;
-					failedRequests.push("mtgo not found: " + name + ' ' + setCode);
-				}
+					failedCardhoarderRequests.push("mtgo not found: " + name + ' ' + setCode);
+				}*/
 	        }
 	    	//console.log('\n====='+JSON.stringify(docs.hits.hits[hit]._source));
 	    	// Now send this modified data back to the ES server with an update push.
@@ -218,29 +217,7 @@ async function main2() {
 	console.log("FINISHED RUN 1. Writing failed/successful requests.");
 	fs.writeFile(path.join(__dirname, 'failedRequests.json'), JSON.stringify(failedRequests, null, '  '), 'utf8', this);
 	fs.writeFile(path.join(__dirname, 'successfulRequests.json'), JSON.stringify(successfulRequests, null, '  '), 'utf8', this);
-	//console.log("csv " +csv);
-	/*var csv = await getCardhoarderData();
-	/*csv = csv.split('\n').slice(0, -1);
-	csv = csv.join('\n');*/
-	/*csv = csv.replace(/^(.*)$/m,'');
-	csv = csv.replace(/[\n]+/,'');
-	var parsed = csvParser.parse(csv, {
-		header: true
-	});
-	/*var rows = csv.split('\n');
-	//rows = slice(0,10);
-	var row_data;
-	rows.forEach(function(string, index) {
-		row_data = string.split('\t');
-		//console.log("data: "+row_data[0]);
-	});
-	console.log(rows);*/
-	
-	/*var targetCard = _.find(parsed.data, {
-		"NAME":"Rocky Tar Pit","MTGJSON_SET":"MIR"
-	});
-	console.log(JSON.stringify(parsed.data[333].NAME));
-	console.log(targetCard);*/
+	//fs.writeFile(path.join(__dirname, 'failedCardhoarderRequests.json'), JSON.stringify(failedCardhoarderRequests, null, '  '), 'utf8', this);
 }
 
 function launcher() {

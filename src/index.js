@@ -27,6 +27,7 @@ import {
   HierarchicalMenuFilter,
   NumericRefinementListFilter,
   RangeSliderHistogramInput,
+  RangeSliderInput,
   SortingSelector,
   SearchkitComponent,
   SearchkitProvider,
@@ -453,8 +454,8 @@ export class App extends React.Component<any, any> {
 
             <div className="sk-layout__filters">
               <RangeFilter id="cmc" min={0} max={16} title="Converted Cost" field="cmc" showHistogram={true}/>
-              <RangeFilter id="paperPrice" min={0} max={10000} rangeComponent={RangeSliderHistogramInput} title="Paper Price" field="multiverseids.medPrice" showHistogram={true}/>
-              <RangeFilter id="mtgoPrice" min={0} max={160} rangeComponent={RangeSliderHistogramInput} title="MTGO Price" field="multiverseids.mtgoPrice" showHistogram={true}/>
+              <RangeFilter id="paperPrice" min={0} max={10000} rangeComponent={RangeSliderInput} title="Paper Price" field="multiverseids.medPrice" showHistogram={true}/>
+              <RangeFilter id="mtgoPrice" min={0} max={160} rangeComponent={RangeSliderInput} title="MTGO Price" field="multiverseids.mtgoPrice" showHistogram={true}/>
               <select value={this.state.operator} onChange={this.handleOperatorChange.bind(this) }>
                 <option value="AND">AND</option>
                 <option value="OR">OR</option>

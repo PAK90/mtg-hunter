@@ -190,7 +190,7 @@ var CardHitsListItem = React.createClass({
 	    if (this.state.currentMedPrice) {
 	    	price = ( <a href={this.state.currentStoreLink} target="_blank">
 	    		<div className="priceContainer">
-    				<span className={bemBlocks.item("subtitle") + " price"}>{'$'+this.state.currentMedPrice}</span>
+    				<span className={bemBlocks.item("subtitle") + " price"}>{'$'+this.state.currentMedPrice.toFixed(2)}</span>
     				<br/>
     				<span className={bemBlocks.item("subtitle") + " price priceDescriptor"} style={{fontSize: "inherit"}}><b>{'Paper'}</b></span>
     			</div>
@@ -200,7 +200,7 @@ var CardHitsListItem = React.createClass({
 	    if (this.state.currentFoilPrice) {
 	    	foilPrice = ( <a href={this.state.currentStoreLink} target="_blank">
     			<div className="priceContainer">
-					<span className={bemBlocks.item("subtitle") + " price"}>{'$'+this.state.currentFoilPrice}</span>
+					<span className={bemBlocks.item("subtitle") + " price"}>{'$'+this.state.currentFoilPrice.toFixed(2)}</span>
 					<br/>
 					<span className={bemBlocks.item("subtitle") + " price priceDescriptor"} style={{fontSize: "inherit"}}><b>{'Foil'}</b></span>
 				</div>
@@ -210,7 +210,7 @@ var CardHitsListItem = React.createClass({
 	    if (this.state.currentMtgoPrice) {
 	    	mtgoPrice = ( <a href={this.state.currentMtgoStoreLink} target="_blank">
     			<div className="priceContainer">
-    				<span className={bemBlocks.item("subtitle") + " price"}>{this.state.currentMtgoPrice}</span><span> TIX</span>
+    				<span className={bemBlocks.item("subtitle") + " price"}>{this.state.currentMtgoPrice.toFixed(2)}</span><span> TIX</span>
     				<br/>
     				<span className={bemBlocks.item("subtitle") + " price priceDescriptor"} style={{fontSize: "inherit"}}><b>{'MTGO'}</b></span>
     			</div>
@@ -222,7 +222,7 @@ var CardHitsListItem = React.createClass({
     				return Number(mtgoId) + 1;
     			})} target="_blank">
     				<div className="priceContainer">
-    				<span className={bemBlocks.item("subtitle") + " price"}>{this.state.currentFoilMtgoPrice}</span><span> TIX</span>
+    				<span className={bemBlocks.item("subtitle") + " price"}>{this.state.currentFoilMtgoPrice.toFixed(2)}</span><span> TIX</span>
     				<br/>
     				<span className={bemBlocks.item("subtitle") + " price priceDescriptor"} style={{fontSize: "inherit"}}><b>{'MTGO Foil'}</b></span>
     			</div>

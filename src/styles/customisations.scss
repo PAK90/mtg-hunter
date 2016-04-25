@@ -179,6 +179,8 @@ body {
   font-size: x-small;
   padding: 2px;
   background-color: #222;
+  border: 1px solid #333;
+  margin-bottom: -1;
   transition: 0.3s;
 }
 .priceContainer:hover {
@@ -372,6 +374,15 @@ body {
       margin-bottom: -4px;
     }
   } 
+}
+
+/* The range input text boxes. */
+.sk-range-input__input {
+  border: 1px solid #555 !important;
+  background-color: #444;
+}
+.sk-range-input__submit {
+  background-color: #444 !important;
 }
 
 $sk-layout-background: #333 !default;
