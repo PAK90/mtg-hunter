@@ -488,7 +488,7 @@ export class App extends React.Component<any, any> {
                     {label:"Name (ascending)", field: "name.raw", order: "asc"},
                     {label:"Name (descending)", field: "name.raw", order: "desc"},
                     {label:"Relevance (ascending)", field:"_score", order:"asc"},
-                    {label:"Relevance (descending)", field:"_score", order:"desc", defaultOption:true},
+                    {label:"Relevance (descending)", field:"_score", order:"desc"},
                     {label:"Colour (ascending)", field:"colors", order:"asc"},
                     {label:"Colour (descending)", field:"colors", order:"desc"},
                     {label:"CMC (ascending)", field:"cmc", order:"asc"},
@@ -496,7 +496,7 @@ export class App extends React.Component<any, any> {
                     {label:"Price (ascending)", field:"multiverseids.medPrice", order:"asc"},
                     {label:"Price (descending)", field:"multiverseids.medPrice", order:"desc"},
                     {label:"MTGO Price (ascending)",  field:"multiverseids.mtgoPrice", order:"asc"},
-                    {label:"MTGO Price (descending)",  field:"multiverseids.mtgoPrice", order:"desc"}
+                    {label:"MTGO Price (descending)",  field:"multiverseids.mtgoPrice", order:"desc", defaultOption:true}
                   ]} />
                   <PageSizeSelector options={[4,12,24]} listComponent={Toggle}/>
                 </div>
