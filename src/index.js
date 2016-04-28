@@ -493,22 +493,10 @@ export class App extends React.Component<any, any> {
                     {label:"Colour (descending)", field:"colors", order:"desc"},
                     {label:"CMC (ascending)", field:"cmc", order:"asc"},
                     {label:"CMC (descending)", field:"cmc", order:"desc"},
-                    {label:"Price (ascending)", key:"medPriceAsc", fields: [
-                      {field:"multiverseids.medPrice", options: {order:"asc"}},
-                      {field:"multiverseids.foilPrice", options: {order:"asc"}}
-                    ]},
-                    {label:"Price (descending)", key:"medPriceDesc", fields: [
-                      {field:"multiverseids.medPrice", options: {order:"desc"}},
-                      {field:"multiverseids.foilPrice", options: {order:"desc"}}
-                    ]},                    
-                    {label:"MTGO Price (ascending)", key:"mtgoMedPriceAsc", fields: [
-                      {field:"multiverseids.mtgoPrice", options: {order:"asc"}},
-                      {field:"multiverseids.mtgoFoilPrice", options: {order:"asc"}}
-                    ]},
-                    {label:"MTGO Price (descending)", key:"mtgoMedPriceDesc", fields: [
-                      {field:"multiverseids.mtgoPrice", options: {order:"desc"}},
-                      {field:"multiverseids.mtgoFoilPrice", options: {order:"desc"}}
-                    ]}
+                    {label:"Price (ascending)", field:"multiverseids.medPrice", order:"asc"},
+                    {label:"Price (descending)", field:"multiverseids.medPrice", order:"desc"},
+                    {label:"MTGO Price (ascending)",  field:"multiverseids.mtgoPrice", order:"asc"},
+                    {label:"MTGO Price (descending)",  field:"multiverseids.mtgoPrice", order:"desc"}
                   ]} />
                   <PageSizeSelector options={[4,12,24]} listComponent={Toggle}/>
                 </div>

@@ -42,6 +42,7 @@
     "bluebird": "^3.3.0",
     "classnames": "^2.2.1",
     "deep-equal": "^1.0.1",
+    "disqus": "^0.1.0",
     "elasticsearch": "^10.1.3",
     "ent": "^2.2.0",
     "highcharts-release": "^4.2.1",

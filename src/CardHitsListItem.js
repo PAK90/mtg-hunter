@@ -12,6 +12,14 @@ var Tabs = ReactTabs.Tabs;
 var TabList = ReactTabs.TabList;
 var TabPanel = ReactTabs.TabPanel;
 var Rating = require('react-rating');
+var ReactDisqusThread = require('react-disqus-thread');
+/*var Disqus = require('disqus');
+
+var disqus = new Disqus({
+    api_secret : 'var',
+    api_key : 'var',
+    access_token : 'var'
+});*/
 //var cards = require('./multiIdName.json');
 //var modCards = cards;
 // Turn cards object keys into the format returned by the python script.
@@ -173,6 +181,16 @@ var CardHitsListItem = React.createClass({
 		}
 		return tagged;
 	},
+
+	/*handleNewComment: function(comment) {
+		var newComment = comment.text.replace(/\[(.*?)\]/g, '<a href="http://mtg-hunter.com/?q=$1" target="_blank">$1</a>');
+		console.log(newComment);
+		disqus.request('posts/update', {post: comment.id, message: newComment}, function(data) {
+			if (data.error) {
+				console.log(error)
+			}
+		})
+	},*/
 
 	render: function() {
 	    var {bemBlocks, result} = this.props;
@@ -399,7 +417,13 @@ var CardHitsListItem = React.createClass({
 		          {closest10}
 		        </TabPanel>
 		        <TabPanel>
-		        	Comments coming soon!
+		        	<ReactDisqusThread
+		        		key={source.multiverseids[result._source.multiverseids.length - 1].multiverseid}
+ 		                shortname="mtg-hunter"
+ 		                identifier={(source.multiverseids[result._source.multiverseids.length - 1].multiverseid).toString()}
+ 		                title={source.name}
+ 		                url={"http://mtg-hunter.com/?q="+source.name}
+ 		                category_id="4523863"/>
 		        </TabPanel>
         	</Tabs>)
 	    }
