@@ -79,8 +79,9 @@ var CardHitsListItem = React.createClass({
 		this.setState({currentSelectedTab: index});
 	},
 
-	handleSetIconClick(multi) {
+	handleSetIconClick(evt, multi) {
 		// Set the new multiId. Eventually this will work for flavour and original text too.
+		evt.stopPropagation();
 		this.setState({currentMultiId: multi.multiverseid,
 			currentImageMultiId: multi.multiverseid,
 			currentArtist: multi.artist,
@@ -132,7 +133,7 @@ var CardHitsListItem = React.createClass({
       		return (
             	<img key={i} className={(this.state.currentMultiId == multis.multiverseid ? "clicked " : "") + "setIcon " + rarity } src={'./src/img/sets/' + multis.setName.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-' + rarity + '.jpg'} 
 	                title={multis.setName}
-	                onClick={this.handleSetIconClick.bind(this, multis)}/>
+	                onClick={(evt) => this.handleSetIconClick(evt, multis)}/>
 	            )
 	    	}.bind(this))
     	return setImages;
@@ -182,6 +183,10 @@ var CardHitsListItem = React.createClass({
 		return tagged;
 	},
 
+	suppressClick: function(evt) {
+		evt.stopPropagation();
+	},
+
 	/*handleNewComment: function(comment) {
 		var newComment = comment.text.replace(/\[(.*?)\]/g, '<a href="http://mtg-hunter.com/?q=$1" target="_blank">$1</a>');
 		console.log(newComment);
@@ -206,7 +211,7 @@ var CardHitsListItem = React.createClass({
 
 	    // Start with a separate div for all 4 potential prices.
 	    if (this.state.currentMedPrice) {
-	    	price = ( <a href={this.state.currentStoreLink} target="_blank">
+	    	price = ( <a href={this.state.currentStoreLink} target="_blank" onClick={(evt) => this.suppressClick(evt)}>
 	    		<div className="priceContainer">
     				<span className={bemBlocks.item("subtitle") + " price"}>{'$'+this.state.currentMedPrice.toFixed(2)}</span>
     				<br/>
@@ -216,7 +221,7 @@ var CardHitsListItem = React.createClass({
 	    }
 	    else { price = <div/>}
 	    if (this.state.currentFoilPrice) {
-	    	foilPrice = ( <a href={this.state.currentStoreLink} target="_blank">
+	    	foilPrice = ( <a href={this.state.currentStoreLink} target="_blank" onClick={(evt) => this.suppressClick(evt)}>
     			<div className="priceContainer">
 					<span className={bemBlocks.item("subtitle") + " price"}>{'$'+this.state.currentFoilPrice.toFixed(2)}</span>
 					<br/>
@@ -226,7 +231,7 @@ var CardHitsListItem = React.createClass({
 	    }
 	    else { foilPrice = <div/>}
 	    if (this.state.currentMtgoPrice) {
-	    	mtgoPrice = ( <a href={this.state.currentMtgoStoreLink} target="_blank">
+	    	mtgoPrice = ( <a href={this.state.currentMtgoStoreLink} target="_blank" onClick={(evt) => this.suppressClick(evt)}>
     			<div className="priceContainer">
     				<span className={bemBlocks.item("subtitle") + " price"}>{this.state.currentMtgoPrice.toFixed(2)}</span><span> TIX</span>
     				<br/>
@@ -238,7 +243,7 @@ var CardHitsListItem = React.createClass({
 	    if (this.state.currentFoilMtgoPrice) {	
 	    	mtgoFoilPrice = ( <a href={this.state.currentMtgoStoreLink.replace(/\d+/, function(mtgoId) { // Increment the url id by 1 to get foil url.
     				return Number(mtgoId) + 1;
-    			})} target="_blank">
+    			})} target="_blank" onClick={(evt) => this.suppressClick(evt)}>
     				<div className="priceContainer">
     				<span className={bemBlocks.item("subtitle") + " price"}>{this.state.currentFoilMtgoPrice.toFixed(2)}</span><span> TIX</span>
     				<br/>
@@ -252,11 +257,11 @@ var CardHitsListItem = React.createClass({
     		pt = ( <div className={bemBlocks.item("subtitle") + " tagFiltered"} style={{display:"inline-flex"}}>		
 		        <span style={{color: "#ddd"}}><b>{'P/T:'}</b></span>
 		        <span>&nbsp;</span>
-		        <TagFilterConfig field="power.raw" id="powerField" title="Power" operator="AND" searchkit={this.searchkit} />
-		        <TagFilter field="power.raw" value={source.power} />
+		        <TagFilterConfig field="power.raw" id="powerField" title="Power" operator="AND" searchkit={this.searchkit} onClick={(evt) => this.suppressClick(evt)}/>
+		        <TagFilter field="power.raw" value={source.power}/>
 		        <span>/</span>
-		        <TagFilterConfig field="toughness.raw" id="toughnessField" title="Toughness" operator="AND" searchkit={this.searchkit} />
-		        <TagFilter field="toughness.raw" value={source.toughness} />
+		        <TagFilterConfig field="toughness.raw" id="toughnessField" title="Toughness" operator="AND" searchkit={this.searchkit} onClick={(evt) => this.suppressClick(evt)}/>
+		        <TagFilter field="toughness.raw" value={source.toughness}/>
 		        <br/>
 	        </div> )
     	}
@@ -271,15 +276,15 @@ var CardHitsListItem = React.createClass({
     	extraInfo = (
     		<div>	
 		        <span className={bemBlocks.item("subtitle")}><b>{'Set: '}</b></span>
-		        <div className={bemBlocks.item("subtitle")} style={{display:"inline-flex"}}>
-			        <TagFilterConfig field="multiverseids.setName.raw" id="codeNames" title="Set name" operator="AND" searchkit={this.searchkit} />
+		        <div className={bemBlocks.item("subtitle")} style={{display:"inline-flex"}} onClick={(evt) => this.suppressClick(evt)}>
+			        <TagFilterConfig field="multiverseids.setName.raw" id="codeNames" title="Set name" operator="AND" searchkit={this.searchkit}/>
 			        <TagFilter field="multiverseids.setName.raw" value={this.state.currentSetName} />
 		        </div>
 		        <span className={bemBlocks.item("subtitle")}>{(this.state.currentNumber ? ' (#' + this.state.currentNumber + ')' : '')}</span>
 		        <br/>
 		        <span className={bemBlocks.item("subtitle")}><b>{'Artist: '}</b></span>
-		        <div className={bemBlocks.item("subtitle")} style={{display:"inline-flex"}}>
-			        <TagFilterConfig field="multiverseids.artist.raw" id="artistNames" title="Artist name" operator="AND" searchkit={this.searchkit} />
+		        <div className={bemBlocks.item("subtitle")} style={{display:"inline-flex"}} onClick={(evt) => this.suppressClick(evt)}>
+			        <TagFilterConfig field="multiverseids.artist.raw" id="artistNames" title="Artist name" operator="AND" searchkit={this.searchkit}/>
 			        <TagFilter field="multiverseids.artist.raw" value={this.state.currentArtist} />
 		        </div>
 		        <br/>
@@ -289,9 +294,9 @@ var CardHitsListItem = React.createClass({
 	    	legalities = (<div>
 		        <span className={bemBlocks.item("subtitle")}><b>{'Legalities: '}</b></span>
 		        { source.legalities.map(function(legality, i) {
-		        	return (<div key={i}>
+		        	return (<div key={i} onClick={(evt) => this.suppressClick(evt)}>
 				        	<div className={bemBlocks.item("subtitle")} style={{display:"inline-flex"}}>
-					        <TagFilterConfig field="formats.raw" id="artistNames" title="Format name" operator="AND" searchkit={this.searchkit} />
+					        <TagFilterConfig field="formats.raw" id="artistNames" title="Format name" operator="AND" searchkit={this.searchkit}/>
 					        <TagFilter field="formats.raw" value={legality.format} />
 				        </div>
 		        		<span className={legality.legality == "Banned" ? bemBlocks.item("subtitle") + ' banned' : bemBlocks.item("subtitle") + ' legal'}>{': '+legality.legality}</span><br/>
@@ -302,10 +307,12 @@ var CardHitsListItem = React.createClass({
 	    }
     	else { legalities = <div/> }
     	if (source.layout == "flip" || source.layout == "double-faced" || source.layout == "split") {
+    		var otherSideName = source.name == source.names[0] ? source.names[1] : source.names[0];
     		otherSide = (
     			<span onMouseOver={this.onLayoutHover.bind(this, source)}
     				onMouseOut={this.onLayoutHoverOut}
-    				className={bemBlocks.item("subtitle")}><b>{source.name == source.names[0] ? source.names[1] : source.names[0]}</b></span>
+    				className={bemBlocks.item("subtitle")}><b><a href={"http://mtg-hunter.com/?q="+otherSideName} 
+    															target="_blank" onClick={(evt) => this.suppressClick(evt)}>{otherSideName}</a></b></span>
     		)
     	}
     	else {
@@ -397,7 +404,7 @@ var CardHitsListItem = React.createClass({
     	var selectedInfo;
 	    if (this.state.clickedCard) {
         	selectedInfo = (<Tabs selectedIndex={this.state.currentSelectedTab} onSelect={this.handleTabSelect}>
-        		<TabList>
+        		<TabList onClick={(evt) => this.suppressClick(evt)}>
 	        		<Tab>Details</Tab>
 	            	<Tab>Rulings</Tab>
 	            	<Tab>Languages</Tab>
@@ -408,7 +415,7 @@ var CardHitsListItem = React.createClass({
 					<div className='extraDetails'>{flavour}{extraInfo}{legalities}</div> 
 		        </TabPanel>
 		        <TabPanel>
-		          <div className='extraDetails'>{rulings}</div> 
+		          <div className='extraDetails'>{rulings}</div>
 		        </TabPanel>
 		        <TabPanel>
 		          <div className='extraDetails'>{languages}</div> 
@@ -439,7 +446,7 @@ var CardHitsListItem = React.createClass({
 						        
 		            	<Rating start={0} stop={5} initialRate={4} />*/
 	    return (
-	    	<div className={bemBlocks.item().mix(bemBlocks.container("item"))} style={{display: 'block'}}>
+	    	<div className={bemBlocks.item().mix(bemBlocks.container("item"))} style={{display: 'block'}} onClick={this.handleClick.bind(this, source)}>
 	    		<div style={{display: 'flex'}}>
 	    			{/* Block 1; the card image. */}
 		    		<div className={"listImgDiv "} >
@@ -447,28 +454,28 @@ var CardHitsListItem = React.createClass({
 		            		src={imgUrl} 
 		            		style={{borderRadius: this.state.clickedCard ? "10" : "6", cursor:"hand"}} 
 		            		width="100"
-		            		onClick={this.handleClick.bind(this, source)} />
+		            		/>
 		        	</div>
 	    			{/* Block 2; the title + text, details tabs, and set icons. Width = 100% to stretch it out and 'align right' the set icons. */}
 		        	<div style={{width:'100%'}}>
 	    				{/* Block 3; the title + text, prices and set icons. */}
 		        		<div style={{display:'flex'}}>
 				        	<div className={bemBlocks.item("details")} style={{display:'inline-block'}}>
-				         		<h2 className={bemBlocks.item("title")}>{source.name} {source.tagCost} ({source.cmc ? source.cmc : 0}) {otherSide} </h2>
+				         		<h2 className={bemBlocks.item("title")}><a href={"http://mtg-hunter.com/?q="+source.name} target="_blank" onClick={(evt) => this.suppressClick(evt)}>{source.name}</a> {source.tagCost} ({source.cmc ? source.cmc : 0}) {otherSide} </h2>
 				         		{/* The type line is special since it's made of TagFilters. */}
-						        <div style={{display:"inline-flex"}} className={bemBlocks.item("subtitle") + " typeLine"}>
-						        	<TagFilterConfig field="supertypes.raw" id="supertypeField" title="Supertype" operator="AND" searchkit={this.searchkit} />
+						        <div style={{display:"inline-flex"}} className={bemBlocks.item("subtitle") + " typeLine"} onClick={(evt) => this.suppressClick(evt)}>
+						        	<TagFilterConfig field="supertypes.raw" id="supertypeField" title="Supertype" operator="AND" searchkit={this.searchkit}/>
 						        	{_.map(source.supertypes,supertype => 
 						        		<div key={supertype} style={{display:"inline-flex"}}>
 						        			<TagFilter field="supertypes.raw" value={supertype} /><span>&nbsp;</span>
 						        		</div>)}
-						        	<TagFilterConfig field="types.raw" id="typeField" title="Type" operator="AND" searchkit={this.searchkit} />
+						        	<TagFilterConfig field="types.raw" id="typeField" title="Type" operator="AND" searchkit={this.searchkit}/>
 						        	{_.map(source.types,type => 
 						        		<div key={type} style={{display:"inline-flex"}}>
 						        			<TagFilter field="types.raw" value={type} /><span>&nbsp;</span>
 						        		</div>)}
 						        	{source.subtypes ? <span>—&nbsp;</span> : <span/>}
-						        	<TagFilterConfig field="subtypes.raw" id="subtypeField" title="Subtype" operator="AND" searchkit={this.searchkit} />
+						        	<TagFilterConfig field="subtypes.raw" id="subtypeField" title="Subtype" operator="AND" searchkit={this.searchkit}/>
 						        	{_.map(source.subtypes,subtype => 
 						        		<div key={subtype} style={{display:"inline-flex"}}>
 						        			<TagFilter field="subtypes.raw" value={subtype} /><span>&nbsp;</span>

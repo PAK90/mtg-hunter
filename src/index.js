@@ -92,7 +92,13 @@ var Animations = {
     })
 };
 
+class GlobalManager {
+  onChange(whatever) {
+    this.callback(whatever);
+  }
+}
 
+var manager = new GlobalManager();
 
 function imageFromColor(color){
   color = color.toLowerCase()
