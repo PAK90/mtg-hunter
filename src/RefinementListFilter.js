@@ -9,7 +9,7 @@ export class TestRefinementListFilter extends FacetFilter {
   getAccessorOptions(){
     const defaultOptions = super.getAccessorOptions()
     return {
-      defaultOptions,
+      ...defaultOptions,
       min_doc_count: 0  
     }
   }
