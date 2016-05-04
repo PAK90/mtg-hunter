@@ -239,16 +239,14 @@ const InitialLoaderComponent = (props) => {
   const className = block()
                     .mix(bemBlocks.container("item"));*/
   return <div >
-    loading please wait...
+    Loading, please wait...
   </div>
 }
-
 
 const CostMultiSelect = <MultiSelect 
   valueRenderer={(option) => <CostSymbols cost={option.value} />}
   optionRenderer={(option) => <span><CostSymbols cost={option.value} /> ({option.doc_count})</span>}
    />
-
 
 const modalStyle = {
   position: 'fixed',
