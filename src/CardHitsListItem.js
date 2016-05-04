@@ -34,6 +34,36 @@ var disqus = new Disqus({
     }
 }*/
 
+class PatchedTagFilter extends TagFilter {
+
+  constructor(){
+    super()
+    this.handleClick = (evt) => {
+      evt.stopPropagation()
+      evt.preventDefault()
+      super.handleClick()
+    }
+  }
+
+  render() {
+    const { value, children } = this.props
+
+    var className = "sk-tag-filter"
+    if (this.isActive()) className += " is-active"
+
+    if (children){
+      return (
+        <div key={value} onClick={this.handleClick} className={className}>{this.props.children}</div>
+      )
+    } else {
+      // No children, use the value instead
+      return (
+        <div key={value} onClick={this.handleClick} className={className}>{value}</div>
+      )
+    }
+  }
+}
+
 var CardHitsListItem = React.createClass({
 	getInitialState: function() {  	
 	    var {bemBlocks, result} = this.props;
@@ -258,10 +288,10 @@ var CardHitsListItem = React.createClass({
 		        <span style={{color: "#ddd"}}><b>{'P/T:'}</b></span>
 		        <span>&nbsp;</span>
 		        <TagFilterConfig field="power.raw" id="powerField" title="Power" operator="AND" searchkit={this.searchkit} onClick={(evt) => this.suppressClick(evt)}/>
-		        <TagFilter field="power.raw" value={source.power}/>
+		        <PatchedTagFilter field="power.raw" value={source.power}/>
 		        <span>/</span>
 		        <TagFilterConfig field="toughness.raw" id="toughnessField" title="Toughness" operator="AND" searchkit={this.searchkit} onClick={(evt) => this.suppressClick(evt)}/>
-		        <TagFilter field="toughness.raw" value={source.toughness}/>
+		        <PatchedTagFilter field="toughness.raw" value={source.toughness}/>
 		        <br/>
 	        </div> )
     	}
@@ -278,14 +308,14 @@ var CardHitsListItem = React.createClass({
 		        <span className={bemBlocks.item("subtitle")}><b>{'Set: '}</b></span>
 		        <div className={bemBlocks.item("subtitle")} style={{display:"inline-flex"}} onClick={(evt) => this.suppressClick(evt)}>
 			        <TagFilterConfig field="multiverseids.setName.raw" id="codeNames" title="Set name" operator="AND" searchkit={this.searchkit}/>
-			        <TagFilter field="multiverseids.setName.raw" value={this.state.currentSetName} />
+			        <PatchedTagFilter field="multiverseids.setName.raw" value={this.state.currentSetName} />
 		        </div>
 		        <span className={bemBlocks.item("subtitle")}>{(this.state.currentNumber ? ' (#' + this.state.currentNumber + ')' : '')}</span>
 		        <br/>
 		        <span className={bemBlocks.item("subtitle")}><b>{'Artist: '}</b></span>
 		        <div className={bemBlocks.item("subtitle")} style={{display:"inline-flex"}} onClick={(evt) => this.suppressClick(evt)}>
 			        <TagFilterConfig field="multiverseids.artist.raw" id="artistNames" title="Artist name" operator="AND" searchkit={this.searchkit}/>
-			        <TagFilter field="multiverseids.artist.raw" value={this.state.currentArtist} />
+			        <PatchedTagFilter field="multiverseids.artist.raw" value={this.state.currentArtist} />
 		        </div>
 		        <br/>
 	        </div>
@@ -297,7 +327,7 @@ var CardHitsListItem = React.createClass({
 		        	return (<div key={i} onClick={(evt) => this.suppressClick(evt)}>
 				        	<div className={bemBlocks.item("subtitle")} style={{display:"inline-flex"}}>
 					        <TagFilterConfig field="formats.raw" id="artistNames" title="Format name" operator="AND" searchkit={this.searchkit}/>
-					        <TagFilter field="formats.raw" value={legality.format} />
+					        <PatchedTagFilter field="formats.raw" value={legality.format} />
 				        </div>
 		        		<span className={legality.legality == "Banned" ? bemBlocks.item("subtitle") + ' banned' : bemBlocks.item("subtitle") + ' legal'}>{': '+legality.legality}</span><br/>
 		        	</div>)
@@ -467,18 +497,18 @@ var CardHitsListItem = React.createClass({
 						        	<TagFilterConfig field="supertypes.raw" id="supertypeField" title="Supertype" operator="AND" searchkit={this.searchkit}/>
 						        	{_.map(source.supertypes,supertype => 
 						        		<div key={supertype} style={{display:"inline-flex"}}>
-						        			<TagFilter field="supertypes.raw" value={supertype} /><span>&nbsp;</span>
+						        			<PatchedTagFilter field="supertypes.raw" value={supertype} /><span>&nbsp;</span>
 						        		</div>)}
 						        	<TagFilterConfig field="types.raw" id="typeField" title="Type" operator="AND" searchkit={this.searchkit}/>
 						        	{_.map(source.types,type => 
 						        		<div key={type} style={{display:"inline-flex"}}>
-						        			<TagFilter field="types.raw" value={type} /><span>&nbsp;</span>
+						        			<PatchedTagFilter field="types.raw" value={type} /><span>&nbsp;</span>
 						        		</div>)}
 						        	{source.subtypes ? <span>—&nbsp;</span> : <span/>}
 						        	<TagFilterConfig field="subtypes.raw" id="subtypeField" title="Subtype" operator="AND" searchkit={this.searchkit}/>
 						        	{_.map(source.subtypes,subtype => 
 						        		<div key={subtype} style={{display:"inline-flex"}}>
-						        			<TagFilter field="subtypes.raw" value={subtype} /><span>&nbsp;</span>
+						        			<PatchedTagFilter field="subtypes.raw" value={subtype} /><span>&nbsp;</span>
 						        		</div>)}
 						        </div>
 						        <h3 className={bemBlocks.item("subtitle")}>{source.taggedText}{pt}</h3>

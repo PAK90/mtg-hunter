@@ -47,7 +47,7 @@ import {
   DynamicRangeFilter,
   FilterGroup, FilterGroupItem
 } from "searchkit";
-import {RefinementListFilter} from './modRefineListFilter.js';
+import {RefinementListFilter, OnlyRefinementListFilter} from './modRefineListFilter.js';
 import CardDetailPanel from './CardDetailPanel';
 import CardHitsListItem from './CardHitsListItem';
 import CardHitsGridItem from './CardHitsGridItem';
@@ -92,13 +92,12 @@ var Animations = {
     })
 };
 
-class GlobalManager {
-  onChange(whatever) {
-    this.callback(whatever);
-  }
+// Make a view switcher that accepts props.
+class NewViewSwitcher extends ViewSwitcherHits {
+  componentWillReceiveProps(nextProps){
+        this.accessor.options = nextProps.hitComponents;
+    }
 }
-
-var manager = new GlobalManager();
 
 function imageFromColor(color){
   color = color.toLowerCase()
@@ -473,8 +472,8 @@ export class App extends React.Component<any, any> {
               <RefinementListFilter id="toughness" title="Toughness" field="toughness.raw" size={5} operator={this.state.operator} containerComponent={<Panel  collapsable={true} defaultCollapsed={true}/>} />
               <RefinementListFilter id="symbols" title="Symbols" field="symbols" size={6} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="manaCost" title="Mana Cost" field="prettyCost.raw" showMore={false} listComponent={CostMultiSelect} size={0} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="colourIdentity" title="Colour Identity" field="colorIdentity" size={6} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <OnlyRefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <OnlyRefinementListFilter id="colourIdentity" title="Colour Identity" field="colorIdentity" size={6} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="colorCount" title="Colour Count" field="colourCount" size={6} operator={this.state.operator} orderKey="_term" containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="rarity" title="Rarity" field="multiverseids.rarity.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="supertype" title="Supertype" field="supertypes.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
@@ -513,11 +512,11 @@ export class App extends React.Component<any, any> {
                 </div>
 
               </div>
-                <ViewSwitcherHits
+                <NewViewSwitcher
                     hitsPerPage={12}
                     hitComponents = {[
                       {key:"grid", title:"Grid", itemComponent:this.CardHitsGridItem},
-                      {key:"list", title:"List", itemComponent:CardHitsListItem, defaultOption:true}
+                      {key:"list", title:"List", itemComponent:<CardHitsListItem updateCardName={this.handleClick} currentCard={this.state.clickedCard}/>, defaultOption:true}
                     ]}
                     scrollTo="body"
                 />
@@ -533,7 +532,7 @@ export class App extends React.Component<any, any> {
         textAlign: 'center',
         position: 'absolute',
         maxWidth: 630,
-        right: 60}}>Wizards of the Coast, Magic: The Gathering, and their logos are trademarks of Wizards of the Coast LLC. © 1995-2016 Wizards. All rights reserved. MTG:Hunter is not affiliated with Wizards of the Coast LLC.</p>
+        right: 60}}>Wizards of the Coast, Magic: The Gathering, and their logos are trademarks of Wizards of the Coast LLC. © 1995-2016 Wizards. All rights reserved. MtG:Hunter is not affiliated with Wizards of the Coast LLC.</p>
       </div>
     )}
 }
