@@ -8,7 +8,7 @@ var ent = require('ent');
 const nl2br = require('react-nl2br');
 var ReactTabs = require('react-tabs');
 var Tab = ReactTabs.Tab;
-var Tabs = ReactTabs.Tabs;
+var Tabs = require("./Tabs");
 var TabList = ReactTabs.TabList;
 var TabPanel = ReactTabs.TabPanel;
 var Rating = require('react-rating');
@@ -432,7 +432,7 @@ var CardHitsListItem = React.createClass({
 
     	// Define the tab stuff here.
     	var selectedInfo;
-	    if (this.state.clickedCard) {
+	    if (this.props.currentCard == source.name) {
         	selectedInfo = (<Tabs selectedIndex={this.state.currentSelectedTab} onSelect={this.handleTabSelect}>
         		<TabList onClick={(evt) => this.suppressClick(evt)}>
 	        		<Tab>Details</Tab>
@@ -470,19 +470,21 @@ var CardHitsListItem = React.createClass({
 	    // In the style for the set icons, 'relative' enables cards like Forest to grow the div around them to fit all the symbols.
 	    // In the future, might want an 'open/close' <p> tag for that, since it's pretty useless seeing all those symbols anyway.
 	    // The <p> tag helps to align the symbols in the centre, and probably other important css-y stuff.
-	    // this.state.clickedCard is '' when unclicked, which is apparently false-y enough to use for a bool.
+	    // this.props.currentCard is '' when unclicked, which is apparently false-y enough to use for a bool.
 
 						        /*<h3 className={bemBlocks.item("subtitle")}><b>{source.type}</b></h3>
 						        
 		            	<Rating start={0} stop={5} initialRate={4} />*/
+
+		var commentCount = <span className="disqus-comment-count" data-disqus-identifier={(source.multiverseids[result._source.multiverseids.length - 1].multiverseid).toString()}>N comments</span>
 	    return (
-	    	<div className={bemBlocks.item().mix(bemBlocks.container("item"))} style={{display: 'block'}} onClick={this.handleClick.bind(this, source)}>
+	    	<div className={bemBlocks.item().mix(bemBlocks.container("item"))} style={{display: 'block'}} onClick={() => this.props.updateCardName(source)}>
 	    		<div style={{display: 'flex'}}>
 	    			{/* Block 1; the card image. */}
 		    		<div className={"listImgDiv "} >
-		          		<img className={(this.state.clickedCard ? "clicked " : "") + "listImg "+ this.state.currentImageLayout }
+		          		<img className={(this.props.currentCard == source.name ? "clicked " : "") + "listImg "+ this.state.currentImageLayout }
 		            		src={imgUrl} 
-		            		style={{borderRadius: this.state.clickedCard ? "10" : "6", cursor:"hand"}} 
+		            		style={{borderRadius: this.props.currentCard == source.name ? "10" : "6", cursor:"hand"}} 
 		            		width="100"
 		            		/>
 		        	</div>
@@ -491,7 +493,7 @@ var CardHitsListItem = React.createClass({
 	    				{/* Block 3; the title + text, prices and set icons. */}
 		        		<div style={{display:'flex'}}>
 				        	<div className={bemBlocks.item("details")} style={{display:'inline-block'}}>
-				         		<h2 className={bemBlocks.item("title")}><a href={"http://mtg-hunter.com/?q="+source.name} target="_blank" onClick={(evt) => this.suppressClick(evt)}>{source.name}</a> {source.tagCost} ({source.cmc ? source.cmc : 0}) {otherSide} </h2>
+				         		<h2 className={bemBlocks.item("title")}><a href={"http://mtg-hunter.com/?q="+source.name} target="_blank" onClick={(evt) => this.suppressClick(evt)}>{source.name}</a> {source.tagCost} ({source.cmc ? source.cmc : 0}) {otherSide} {commentCount}</h2>
 				         		{/* The type line is special since it's made of TagFilters. */}
 						        <div style={{display:"inline-flex"}} className={bemBlocks.item("subtitle") + " typeLine"} onClick={(evt) => this.suppressClick(evt)}>
 						        	<TagFilterConfig field="supertypes.raw" id="supertypeField" title="Supertype" operator="AND" searchkit={this.searchkit}/>

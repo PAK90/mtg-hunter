@@ -291,6 +291,8 @@ export class App extends React.Component<any, any> {
       matchPercent: '100%',
       operator: "AND",
       all: 'collapse'};
+    // Bind the prop function to this scope.
+    this.handleClick = this.handleClick.bind(this)
   }
 
   hide() {
