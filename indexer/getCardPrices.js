@@ -118,6 +118,43 @@ function requestPrices(multiIdObject, priceUrl) {
 	});
 }
 
+function anonymizeRulesText(name, text) {
+  	if (!text) return;
+	text = text.replace("æ","ae").replace("Æ","Ae").replace('û','u').replace('ú','u').replace('â','a').replace('ö','o').replace("á","a").replace("é","e");
+	var forbiddenWords = ["Skulk","Madness","Investigate","Delirium","Flying","Warrior","Soldier","Wizard","The","Defender","Enchanted","Double","First","Flash","Enchanted","Indestructible","Enchanted","Prowess","Reach","Enchanted","Vigilance","Exile","Enchanted","Fight","Regenerate","Sacrifice","Absorb","Enchanted","Battle","Cascade","Champion","Changeling","Clash","Dash","Devour","Dredge","Echo","Epic","Evoke","Exalted","Flanking","Fortify","Frenzy","Enchanted","Graft","Gravestorm","Haunt","Infect","Living","Madness","Manifest","Miracle","Modular","Monstrosity","Offering","Overload","Persist","Poisonous","Populate","Provoke","Prowl","Rampage","Rebound","Recover","Reinforce","Renown","Replicate","Ripple","Scavenge","Shadow","Soulbond","Split","Storm","Sunburst","Suspend","Totem","Transfigure","Transmute","Transform","Undying","Unleash","Unearth","Vanishing","Wither","Battalion","Bloodrush","Channel","Domain","Fateful","Ferocious","Grandeour","Hellbent","Heroic","Join","Kinship","Morbid","Radiance","Raid","Sweep","Threshold","Bury","Fear","Intimidate","Protection","Shroud","Substance"]
+	// First do a pass with the name as normal. Use regex so that it repeats beyond the first occurrence.
+	text = text.replace(new RegExp(name, 'g'), '~');
+	// Now with a first name. Since 'flying' occurs in names and is a keyword, don't do that. Duplicate for other keywords.
+	let firstName = name.split(' ')[0];
+	if (!_.includes(forbiddenWords, firstName) && name != "Erase (Not the Urza's Legacy One)") {
+	    //console.log('Finding and replacing '+firstName);
+	    text = text.replace(new RegExp(firstName, 'g'), '~');
+	}
+	let beforeComma = name.split(' ,')[0];
+	if (!_.includes(forbiddenWords, beforeComma) && name != "Erase (Not the Urza's Legacy One)") {
+	    //console.log('Finding and replacing '+beforeComma);
+	    text = text.replace(new RegExp(beforeComma, 'g'), '~');
+	}
+	let beforeThe = name.split(' the')[0];
+	if (!_.includes(forbiddenWords, beforeThe) && name != "Erase (Not the Urza's Legacy One)") {
+	    //console.log('Finding and replacing '+beforeThe);
+	    text = text.replace(new RegExp(beforeThe, 'g'), '~');
+	}
+	return text;
+}
+
+function normalizeChars(text) {
+	if (!text) return;
+	var originalText = text;
+	text = text.replace("æ","ae").replace("Æ","Ae").replace('û','u').replace('ú','u').replace('â','a').replace('ö','o').replace("á","a").replace("é","e");
+	// If there's been any changes in the rules text, return true so it can be returned for anonymizing.
+	if (text == originalText) return false;
+	else {
+		console.log("inequality with rules text: " + text);
+		return true;
+	}
+}
+
 async function printDocs(){
   // "await" resolution or rejection of the promise
   // use try/catch for error handling
@@ -201,6 +238,11 @@ async function printDocs(){
 				}
 	        }
 	    	//console.log('\n====='+JSON.stringify(docs.hits.hits[hit]._source));
+	    	//temp fix: update all namelessText with the 'standard' set of char replacements for special chars.
+	    	//console.log("about to check chars")
+	    	if (normalizeChars(docs.hits.hits[hit]._source.namelessText)) {
+	    		docs.hits.hits[hit]._source.namelessText = anonymizeRulesText(docs.hits.hits[hit]._source.name, docs.hits.hits[hit]._source.namelessText);
+	    	}
 	    	// Now send this modified data back to the ES server with an update push.
 	    	cardIndexer.updateSingleDocument(docs.hits.hits[hit]);
 	    	var successString = "---done " + docs.hits.hits[hit]._source.name + ". elapsed time: " + (Date.now() - startTime) / 1000 + '. doc # ' + hit;
