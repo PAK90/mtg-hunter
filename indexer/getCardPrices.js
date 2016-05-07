@@ -240,9 +240,9 @@ async function printDocs(){
 	    	//console.log('\n====='+JSON.stringify(docs.hits.hits[hit]._source));
 	    	//temp fix: update all namelessText with the 'standard' set of char replacements for special chars.
 	    	//console.log("about to check chars")
-	    	if (normalizeChars(docs.hits.hits[hit]._source.namelessText)) {
+	    	/*if (normalizeChars(docs.hits.hits[hit]._source.namelessText)) {
 	    		docs.hits.hits[hit]._source.namelessText = anonymizeRulesText(docs.hits.hits[hit]._source.name, docs.hits.hits[hit]._source.namelessText);
-	    	}
+	    	}*/
 	    	// Now send this modified data back to the ES server with an update push.
 	    	cardIndexer.updateSingleDocument(docs.hits.hits[hit]);
 	    	var successString = "---done " + docs.hits.hits[hit]._source.name + ". elapsed time: " + (Date.now() - startTime) / 1000 + '. doc # ' + hit;
