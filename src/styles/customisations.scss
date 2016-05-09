@@ -96,6 +96,14 @@ body {
   margin-left: 3px;
 }
 
+/* Adding some padding to range sliders for large numbers. */
+.sk-range-slider {
+  padding-right:10px;
+}
+
+/* The 'only' checkboxes. */
+
+
 /* The checkboxes. */
 .sk-refinement-list-option__checkbox {
   display:none;

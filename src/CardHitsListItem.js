@@ -88,8 +88,16 @@ var CardHitsListItem = React.createClass({
             currentFoilMtgoPrice: source.multiverseids[result._source.multiverseids.length - 1].mtgoFoilPrice,
             currentMtgoStoreLink: source.multiverseids[result._source.multiverseids.length - 1].mtgoStoreLink,
             currentSelectedTab: 0,
-            currentImageLayout: '',
+            currentImageLayout: ''
         };
+    },
+
+    componentDidMount() {
+    	DISQUSWIDGETS.getCount({reset:true});
+    },
+
+    componentDidUpdate() {
+    	DISQUSWIDGETS.getCount({reset:true});
     },
 
     handleClick(source) {
@@ -477,7 +485,7 @@ var CardHitsListItem = React.createClass({
 		            	<Rating start={0} stop={5} initialRate={4} />*/
 
 		var commentCount = <span className="disqus-comment-count" onClick={function() {this.setState({currentSelectedTab: 4})}.bind(this)} 
-			data-disqus-identifier={(source.multiverseids[result._source.multiverseids.length - 1].multiverseid).toString()}
+			data-disqus-identifier={(source.multiverseids[result._source.multiverseids.length - 1].multiverseid).toString()} 
 			style={{fontVariant:"small-caps", float:"right", cursor:"hand", paddingRight:8, fontSize:"smaller"}}>0 Comments</span>
 
 	    return (

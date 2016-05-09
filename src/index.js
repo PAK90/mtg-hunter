@@ -290,6 +290,7 @@ export class App extends React.Component<any, any> {
       clickedCard: '',
       matchPercent: '100%',
       operator: "AND",
+      only: false,
       all: 'collapse'};
     // Bind the prop function to this scope.
     this.handleClick = this.handleClick.bind(this)
@@ -298,6 +299,13 @@ export class App extends React.Component<any, any> {
   hide() {
     this.setState({clickedCard: ''});
   }
+
+  /*componentDidMount() {
+    if (DISQUSWIDGETS) {
+      DISQUSWIDGETS.getCount();
+      this.forceUpdate();
+    }
+  }*/
 
   handleClick(source) {
     // If clicked on a different card, change the name.
@@ -322,6 +330,10 @@ export class App extends React.Component<any, any> {
 
   handleOperatorChange(e){
     this.setState({operator: e.target.value})
+  }
+
+  handleOnlyChange(e){
+    this.setState({only: e.target.checked})
   }
 
   close(){
@@ -393,6 +405,10 @@ export class App extends React.Component<any, any> {
     )  
   }
 
+  suppressClick(evt) {
+    evt.stopPropagation();
+  }
+
   //<InputFilter id="artistName" searchThrottleTime={500} title="Artist name" placeholder="Search artist name" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["artists"]} />
   //<span className="filterHint"><i>Use ~ for CARDNAME</i></span>
   //,
@@ -405,11 +421,20 @@ export class App extends React.Component<any, any> {
               </select>*/
 
               /*rightComponent={(
-                              <select value={this.state.operator} onChange={this.handleOperatorChange.bind(this) }>
+                              <select value={this.state.operator} onChange={this.handleOperatorChange.bind(this)} onClick={(evt) => this.suppressClick(evt)}>
                                 <option value="AND">AND</option>
                                 <option value="OR">OR</option>
                               </select>
                             )}*/ 
+
+              /*<OnlyRefinementListFilter id="colourIdentity" title="Colour Identity" field="colorIdentity" size={6} operator={this.state.operator} only={this.state.only} 
+                            itemComponent={SymbolRefineList} containerComponent={<TogglePanel rightComponent={(<span>
+                              <input type="checkbox" className="onlyCheckbox" label="Only" value={this.state.only} onChange={this.handleOnlyChange.bind(this)} onClick={(evt) => this.suppressClick(evt)}/>
+                              <select value={this.state.operator} onChange={this.handleOperatorChange.bind(this)} onClick={(evt) => this.suppressClick(evt)} >
+                                <option value="AND">AND</option>
+                                <option value="OR">OR</option>
+                              </select></span>
+                            )} collapsable={true} defaultCollapsed={true}/>}/>*/
 
   render() {
     return (
@@ -468,12 +493,13 @@ export class App extends React.Component<any, any> {
               <InputFilter id="rulesText" searchThrottleTime={1000} title="Rules text" placeholder="Use ~ for cardname" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["namelessText"]} prefixQueryFields={["namelessText"]}/>
               <InputFilter id="flavourText" searchThrottleTime={1000} title="Flavour text" placeholder="Search flavour text" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["multiverseids.flavor"]} prefixQueryFields={["multiverseids.flavor"]}/>
               <InputFilter id="typeLine" searchThrottleTime={1000} title="Type text" placeholder="Search type text" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["type"]} prefixQueryFields={["type"]}/>              
-              <RefinementListFilter id="power" title="Power" field="power.raw" size={5} operator={this.state.operator} containerComponent={<Panel  collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="toughness" title="Toughness" field="toughness.raw" size={5} operator={this.state.operator} containerComponent={<Panel  collapsable={true} defaultCollapsed={true}/>} />
+              <RefinementListFilter id="power" title="Power" field="power.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="toughness" title="Toughness" field="toughness.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>} />
               <RefinementListFilter id="symbols" title="Symbols" field="symbols" size={6} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="manaCost" title="Mana Cost" field="prettyCost.raw" showMore={false} listComponent={CostMultiSelect} size={0} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="colourIdentity" title="Colour Identity" field="colorIdentity" size={6} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+              <OnlyRefinementListFilter id="colourIdentity" title="Colour Identity" field="colorIdentity" size={6} operator={this.state.operator} only={this.state.only} 
+                            itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="colorCount" title="Colour Count" field="colourCount" size={6} operator={this.state.operator} orderKey="_term" containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="rarity" title="Rarity" field="multiverseids.rarity.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="supertype" title="Supertype" field="supertypes.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>

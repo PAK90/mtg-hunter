@@ -8,6 +8,7 @@
  */
 
 import * as React from "react";
+import Toggle from "searchkit";
 
 const bemBlock = require('bem-cn')
 
@@ -58,7 +59,7 @@ export class TogglePanel extends React.Component {
         const arrowClass = collapsed ? 'sk-arrow-right' : 'sk-arrow-down'
         titleDiv = (
           <div className={block("header").state({ collapsable })} onClick={this.toggleCollapsed.bind(this)}>
-            {rightComponent ? < div style={{ float: 'right' }}>{rightComponent}</div> : undefined}
+            {rightComponent ? < div style={{ float: 'right' }} >{rightComponent}</div> : undefined}
             <span className={arrowClass}/>&nbsp;{title}
           </div>
         )

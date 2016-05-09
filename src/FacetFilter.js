@@ -35,11 +35,11 @@ export class FacetFilter extends SearchkitComponent {
   }
   getAccessorOptions(){
     const {
-      field, id, operator, title, include, exclude,
+      field, id, operator, only, title, include, exclude,
       size, translations, orderKey, orderDirection
     } = this.props
     return {
-      id, operator, title, size, include, exclude,
+      id, operator, only, title, size, include, exclude,
       translations, orderKey, orderDirection
     }
   }
@@ -59,6 +59,10 @@ export class FacetFilter extends SearchkitComponent {
   componentDidUpdate(prevProps) {
     if (prevProps.operator != this.props.operator) {
       this.accessor.options.operator = this.props.operator
+      this.searchkit.performSearch()
+    }
+    if (prevProps.only != this.props.only) {
+      this.accessor.options.only = this.props.only
       this.searchkit.performSearch()
     }
   }

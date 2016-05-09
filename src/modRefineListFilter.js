@@ -17,5 +17,10 @@ export class OnlyRefinementListFilter extends TestRefinementListFilter {
       this.accessor.options.operator = this.props.operator;
       this.searchkit.performSearch();
     }
+
+    if (prevProps.only != this.props.only){
+      this.accessor.options.only = this.props.only;
+      this.searchkit.performSearch();
+    }
   }
 }
