@@ -499,7 +499,14 @@ export class App extends React.Component<any, any> {
               <RefinementListFilter id="manaCost" title="Mana Cost" field="prettyCost.raw" showMore={false} listComponent={CostMultiSelect} size={0} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator={this.state.operator} itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <OnlyRefinementListFilter id="colourIdentity" title="Colour Identity" field="colorIdentity" size={6} operator={this.state.operator} only={this.state.only} 
-                            itemComponent={SymbolRefineList} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
+                            itemComponent={SymbolRefineList} containerComponent={<TogglePanel rightComponent={(<span>
+                              <input onClick={(evt) => this.suppressClick(evt)} type="checkbox" id="onlyIdentityBox" className="onlyCheckbox" value={this.state.only} onChange={this.handleOnlyChange.bind(this)} />
+                              <label onClick={(evt) => this.suppressClick(evt)} htmlFor="onlyIdentityBox">Only</label>
+                              <select size='2' value={this.state.operator} className="toggle" onChange={this.handleOperatorChange.bind(this)} onClick={(evt) => this.suppressClick(evt)}>
+                                <option value="AND">AND</option>
+                                <option value="OR">OR</option>
+                              </select></span>
+                            )} collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="colorCount" title="Colour Count" field="colourCount" size={6} operator={this.state.operator} orderKey="_term" containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="rarity" title="Rarity" field="multiverseids.rarity.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="supertype" title="Supertype" field="supertypes.raw" size={5} operator={this.state.operator} containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}/>
@@ -524,8 +531,8 @@ export class App extends React.Component<any, any> {
                     {label:"Colour (descending)", field:"colors", order:"desc"},
                     {label:"CMC (ascending)", field:"cmc", order:"asc"},
                     {label:"CMC (descending)", field:"cmc", order:"desc"},
-                    {label:"Price (ascending)", field:"multiverseids.medPrice", order:"asc"},
-                    {label:"Price (descending)", field:"multiverseids.medPrice", order:"desc"},
+                    {label:"Paper Price (ascending)", field:"multiverseids.medPrice", order:"asc"},
+                    {label:"Paper Price (descending)", field:"multiverseids.medPrice", order:"desc"},
                     {label:"MTGO Price (ascending)",  field:"multiverseids.mtgoPrice", order:"asc"},
                     {label:"MTGO Price (descending)",  field:"multiverseids.mtgoPrice", order:"desc", defaultOption:true}
                   ]} />

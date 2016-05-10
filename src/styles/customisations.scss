@@ -102,6 +102,41 @@ body {
 }
 
 /* The 'only' checkboxes. */
+.onlyCheckbox {
+  display: none;
+}
+.onlyCheckbox + label {
+  display: inline;
+  position: relative;
+  padding: 5px;
+  border: 1px solid #444;
+  border-radius: 3px;
+  color: #ddd;
+  font-weight: 500;
+  font-size: 14px;
+  background-color: #222;
+  cursor: pointer;
+}
+
+.onlyCheckbox:checked + label {
+  background-color: #08c;
+  border-color: #08c;
+  color: #fff;
+}
+
+/* The AND/OR selectors. */
+.toggle{
+  font-size:18px;
+  height:1.25em;
+  overflow:hidden;
+  border-radius:5px;
+}
+.toggle option{
+  display:inline-block;
+  width:50px;
+  text-align:center;
+}
+
 
 
 /* The checkboxes. */
