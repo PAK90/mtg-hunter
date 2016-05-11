@@ -112,12 +112,12 @@ export class FacetAccessor extends FilterBasedAccessor {
     var onlyBoolBuilder = this.getOnlyBoolBuilder()
 
     if(filterTerms.length > 0){
-      // Add only filters first, so that they get overwritten (properly) in the FiltersMap prop.
-      // Only do 'only' if the 'only' option is true.
+      // Doing another addFilter would override the must_not ones, so push them to an array and add that instead.
+      let filtersToAdd = [boolBuilder(filterTerms)]
       if (this.options.only) {
-        query = query.addFilter(this.uuid, onlyBoolBuilder(onlyFilterTerms))
+        filtersToAdd.push(onlyBoolBuilder(onlyFilterTerms))
       }
-      query = query.addFilter(this.uuid, boolBuilder(filterTerms))
+      query = query.addFilter(this.uuid, BoolMust(filtersToAdd))
         .addSelectedFilters(selectedFilters)
     }
 

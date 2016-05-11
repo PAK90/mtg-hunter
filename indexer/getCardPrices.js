@@ -130,7 +130,7 @@ function anonymizeRulesText(name, text) {
 	    //console.log('Finding and replacing '+firstName);
 	    text = text.replace(new RegExp(firstName, 'g'), '~');
 	}
-	let beforeComma = name.split(' ,')[0];
+	let beforeComma = name.split(',')[0];
 	if (!_.includes(forbiddenWords, beforeComma) && name != "Erase (Not the Urza's Legacy One)") {
 	    //console.log('Finding and replacing '+beforeComma);
 	    text = text.replace(new RegExp(beforeComma, 'g'), '~');
@@ -240,9 +240,12 @@ async function printDocs(){
 	    	//console.log('\n====='+JSON.stringify(docs.hits.hits[hit]._source));
 	    	//temp fix: update all namelessText with the 'standard' set of char replacements for special chars.
 	    	//console.log("about to check chars")
-	    	/*if (normalizeChars(docs.hits.hits[hit]._source.namelessText)) {
+	    	//if (normalizeChars(docs.hits.hits[hit]._source.namelessText)) {
+	    	// Had an error in anonymizing, but only in names with commas, so check for that before spending ages fixing it.
+	    	if (name.indexOf(",") !== -1) {
 	    		docs.hits.hits[hit]._source.namelessText = anonymizeRulesText(docs.hits.hits[hit]._source.name, docs.hits.hits[hit]._source.namelessText);
-	    	}*/
+	    	}
+	    	//}
 	    	// Now send this modified data back to the ES server with an update push.
 	    	cardIndexer.updateSingleDocument(docs.hits.hits[hit]);
 	    	var successString = "---done " + docs.hits.hits[hit]._source.name + ". elapsed time: " + (Date.now() - startTime) / 1000 + '. doc # ' + hit;

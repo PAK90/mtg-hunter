@@ -108,7 +108,7 @@ body {
 .onlyCheckbox + label {
   display: inline;
   position: relative;
-  padding: 5px;
+  padding: 0px 4px;
   border: 1px solid #444;
   border-radius: 3px;
   color: #ddd;
@@ -125,19 +125,13 @@ body {
 }
 
 /* The AND/OR selectors. */
-.toggle{
-  font-size:18px;
-  height:1.25em;
-  overflow:hidden;
-  border-radius:5px;
+.darkToggle {
+  padding-left: 3px;
 }
-.toggle option{
-  display:inline-block;
-  width:50px;
-  text-align:center;
+.darkToggle .sk-toggle__item {
+  background-color: #222;
+  padding: 0px 4px;
 }
-
-
 
 /* The checkboxes. */
 .sk-refinement-list-option__checkbox {
