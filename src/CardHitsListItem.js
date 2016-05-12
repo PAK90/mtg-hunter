@@ -245,7 +245,7 @@ var CardHitsListItem = React.createClass({
 	    source.taggedText = this.generateTextCostSymbols(source.text);
 
 	    // Define 'details' tab information here.
-	    var extraInfo, flavour, pt, legalities, otherSide, price, foilPrice, mtgoPrice, mtgoFoilPrice;
+	    var extraInfo, flavour, pt, legalities, otherSide, price, foilPrice, mtgoPrice, mtgoFoilPrice, cycleInfo;
 
 	    // Start with a separate div for all 4 potential prices.
 	    if (this.state.currentMedPrice) {
@@ -363,7 +363,7 @@ var CardHitsListItem = React.createClass({
     		rulings = (<div>
     			{ source.rulings.map(function(ruling, i) {
     				return <div key={i}><span className={bemBlocks.item("subtitle")}><b>{ruling.date + ": "}</b></span>
-    							<span className={bemBlocks.item("subtitle")}>{this.generateCardHoverSpan(ruling.text)}</span></div>
+    							<span className={bemBlocks.item("subtitle")}>{this.generateTextCostSymbols(ruling.text)}</span></div>
     			}.bind(this))}
     			</div>
     		)
@@ -395,6 +395,20 @@ var CardHitsListItem = React.createClass({
     	else {
     		languages = <div><span className={bemBlocks.item("subtitle")}>No other languages!</span></div>;
     	}
+    	if (source.cycle) {
+    		cycleInfo = (<div><span className={bemBlocks.item("subtitle")}><b>{"Cycle: "}</b>{source.name + " is part of the " + source.cycle + " cycle, along with "}</span>
+    			{ source.cycleCards.map(function(cycleCard, i) {
+    				var j = i + 1;
+    				if (this.props.result._source.cycleCards.length != j) {
+    					return <span key={i} className={bemBlocks.item("subtitle")}>{cycleCard.name + ", "}</span>
+    				}
+    				else {
+    					return <span key={i} className={bemBlocks.item("subtitle")}>{" and " + cycleCard.name + "."}</span>	
+    				}
+    			}.bind(this))}
+    			</div>)
+    	}
+    	else {cycleInfo = <div/>}
 
     	// Define comments!
 
@@ -450,7 +464,7 @@ var CardHitsListItem = React.createClass({
 	            	<Tab>Comments</Tab>
 	        	</TabList>
             	<TabPanel>
-					<div className='extraDetails'>{flavour}{extraInfo}{legalities}</div> 
+					<div className='extraDetails'>{flavour}{extraInfo}{legalities}{cycleInfo}</div> 
 		        </TabPanel>
 		        <TabPanel>
 		          <div className='extraDetails'>{rulings}</div>
@@ -486,7 +500,7 @@ var CardHitsListItem = React.createClass({
 
 		var commentCount = <span className="disqus-comment-count" onClick={function() {this.setState({currentSelectedTab: 4})}.bind(this)} 
 			data-disqus-identifier={(source.multiverseids[result._source.multiverseids.length - 1].multiverseid).toString()} 
-			style={{fontVariant:"small-caps", float:"right", cursor:"hand", paddingRight:8, fontSize:"smaller"}}>0 Comments</span>
+			style={{fontVariant:"small-caps", float:"right", cursor:"pointer", paddingRight:8, fontSize:"smaller"}}>0 Comments</span>
 
 	    return (
 	    	<div className={bemBlocks.item().mix(bemBlocks.container("item"))} style={{display: 'block'}} onClick={() => this.props.updateCardName(source)}>
@@ -495,7 +509,7 @@ var CardHitsListItem = React.createClass({
 		    		<div className={"listImgDiv "} >
 		          		<img className={(this.props.currentCard == source.name ? "clicked " : "") + "listImg "+ this.state.currentImageLayout }
 		            		src={imgUrl} 
-		            		style={{borderRadius: this.props.currentCard == source.name ? "10" : "6", cursor:"hand"}} 
+		            		style={{borderRadius: this.props.currentCard == source.name ? "10" : "6", cursor:"pointer"}} 
 		            		width="100"
 		            		/>
 		        	</div>

@@ -48,7 +48,7 @@ function anonymizeRulesText(name, text) {
     //console.log('Finding and replacing '+firstName);
     text = text.replace(new RegExp(firstName, 'g'), '~');
   }
-  let beforeComma = name.split(' ,')[0];
+  let beforeComma = name.split(',')[0];
   if (!_.includes(forbiddenWords, beforeComma) && name != "Erase (Not the Urza's Legacy One)") {
     //console.log('Finding and replacing '+beforeComma);
     text = text.replace(new RegExp(beforeComma, 'g'), '~');
@@ -124,7 +124,8 @@ let mapping = {
   type:stringWithRaw,
   supertypes:stringWithRaw,
   types:stringWithRaw,
-  formats:stringWithRaw
+  formats:stringWithRaw,
+  cycle:stringWithRaw
 };
 
 let cardIndexer = new indexer(

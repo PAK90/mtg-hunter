@@ -121,6 +121,28 @@ module.exports = class Indexer {
     })
   }
 
+  searchSingleDocument(phrase) {
+    var result;
+    return new Promise(function(resolve, reject) {
+      this.client.search({
+        index: this.index,
+        type: this.type,
+        body: {
+          query: {
+            match_phrase: {
+              name: phrase
+            }
+          }
+        }
+      }).then(function (resp) {
+          //console.log(resp.hits.hits);
+          resolve(resp.hits.hits);
+      }, function (err) {
+          reject(err.message);
+      });
+    }.bind(this))
+  }
+
   createMappingAndIndex(){
     return this.queue([
       this.deleteIndex,

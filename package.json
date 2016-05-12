@@ -7,7 +7,8 @@
     "start": "node server.js",
     "lint": "eslint src",
     "index": "node --harmony indexer/cardIndexer",
-    "prices": "babel-node indexer/getCardPrices"
+    "prices": "babel-node indexer/getCardPrices",
+    "cycles": "babel-node indexer/makeCycles"
   },
   "repository": "git:",
   "author": "Pēteris Arvīds Kļaviņš",
