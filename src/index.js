@@ -334,6 +334,7 @@ export class App extends React.Component<any, any> {
       artistsOperator: "AND",
       setcodesOperator: "AND",
       formatsOperator: "AND",
+      cyclesOperator: "AND",
       coloursOnly: false,
       colourIdentityOnly: false};
     // Bind the prop function to this scope.
@@ -614,6 +615,12 @@ export class App extends React.Component<any, any> {
               <RefinementListFilter id="formats" title="Formats" field="formats.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.formatsOperator}  
                             containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.formatsOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "formatsOperator")}/>
+                              </div>
+                            )} collapsable={true} defaultCollapsed={true}/>}/>
+
+              <RefinementListFilter id="cycles" title="Cycles" field="cycle.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.cyclesOperator}  
+                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}}>
+                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.cyclesOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "cyclesOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
             </div>

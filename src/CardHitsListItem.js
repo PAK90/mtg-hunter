@@ -53,12 +53,12 @@ class PatchedTagFilter extends TagFilter {
 
     if (children){
       return (
-        <div key={value} onClick={this.handleClick} className={className}>{this.props.children}</div>
+        <span key={value} onClick={this.handleClick} className={className}>{this.props.children}</span>
       )
     } else {
       // No children, use the value instead
       return (
-        <div key={value} onClick={this.handleClick} className={className}>{value}</div>
+        <span key={value} onClick={this.handleClick} className={className}>{value}</span>
       )
     }
   }
@@ -244,6 +244,16 @@ var CardHitsListItem = React.createClass({
 	    source.tagCost = this.generateTitleCostSymbols(source.manaCost);
 	    source.taggedText = this.generateTextCostSymbols(source.text);
 
+	    // Listener for the tooltip position calculator.
+	    document.addEventListener('mousemove', function(e) {
+	    	var tooltipImages = document.querySelectorAll('.tooltipImage');
+	    	for (var i=tooltipImages.length; i--;) {
+		        tooltipImages[i].style.left = e.clientX + 'px';
+		        tooltipImages[i].style.top = e.clientY - 311 + 'px';
+		        //console.log(tooltipImages[i].style.left + ' ' + tooltipImages[i].style.top);
+		    }
+	    },false);
+
 	    // Define 'details' tab information here.
 	    var extraInfo, flavour, pt, legalities, otherSide, price, foilPrice, mtgoPrice, mtgoFoilPrice, cycleInfo;
 
@@ -396,14 +406,25 @@ var CardHitsListItem = React.createClass({
     		languages = <div><span className={bemBlocks.item("subtitle")}>No other languages!</span></div>;
     	}
     	if (source.cycle) {
-    		cycleInfo = (<div><span className={bemBlocks.item("subtitle")}><b>{"Cycle: "}</b>{source.name + " is part of the " + source.cycle + " cycle, along with "}</span>
+	        <TagFilterConfig field="cycle.raw" id="cycles" title="Format name" operator="AND" searchkit={this.searchkit}/>
+	        var pair = source.cycleCards.length == 1 ? true : false;
+	        // If it's a pair, stick a 'true' in there for the scope to see.
+	        if (pair) {source.cycleCards[0].pair = true;}
+    		cycleInfo = (<div><span className={bemBlocks.item("subtitle")}><b>{"Cycle: "}</b>{source.name + " is part of " + (pair ? "a " : "the \"")}<PatchedTagFilter field="cycle.raw" value={source.cycle} />{(pair ? "" : "\" cycle") + ", along with "}</span>
     			{ source.cycleCards.map(function(cycleCard, i) {
     				var j = i + 1;
+    				let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/'+cycleCard.multiId+'.jpg';
     				if (this.props.result._source.cycleCards.length != j) {
-    					return <span key={i} className={bemBlocks.item("subtitle")}>{cycleCard.name + ", "}</span>
+    					return <a className="tooltipLink" href={"http://mtg-hunter.com/?q="+cycleCard.name} target="_blank">
+    						<img className="tooltipImage" src={imgUrl} />
+    						<span key={i} id={cycleCard.multiId} className={bemBlocks.item("subtitle")}>{cycleCard.name + ", "}</span>
+    					</a>
     				}
     				else {
-    					return <span key={i} className={bemBlocks.item("subtitle")}>{" and " + cycleCard.name + "."}</span>	
+    					return <a className="tooltipLink" href={"http://mtg-hunter.com/?q="+cycleCard.name} target="_blank">
+    						<img className="tooltipImage" src={imgUrl} />
+    						<span key={i} id={cycleCard.multiId} className={bemBlocks.item("subtitle")}>{(cycleCard.pair ? " " : " and ") + cycleCard.name + "."}</span>
+    					</a>
     				}
     			}.bind(this))}
     			</div>)

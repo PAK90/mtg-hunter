@@ -133,6 +133,19 @@ body {
   padding: 0px 4px;
 }
 
+/* The cycle card tooltips. */
+.tooltipLink img {
+  float:left;
+  display:none;
+}
+.tooltipLink:hover img{
+  display:block;
+  position:fixed;
+  z-index:1000;
+  overflow:hidden;
+  border-radius: 13px;
+}
+
 /* The checkboxes. */
 .sk-refinement-list-option__checkbox {
   display:none;
