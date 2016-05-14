@@ -93,11 +93,15 @@ var CardHitsListItem = React.createClass({
     },
 
     componentDidMount() {
-    	DISQUSWIDGETS.getCount({reset:true});
+    	if (typeof DISQUSWIDGETS !== 'undefined') {
+    		DISQUSWIDGETS.getCount({reset:true});
+    	}
     },
 
     componentDidUpdate() {
-    	DISQUSWIDGETS.getCount({reset:true});
+    	if (typeof DISQUSWIDGETS !== 'undefined') {
+    		DISQUSWIDGETS.getCount({reset:true});
+    	}
     },
 
     handleClick(source) {
