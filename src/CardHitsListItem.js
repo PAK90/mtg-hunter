@@ -244,6 +244,12 @@ var CardHitsListItem = React.createClass({
 	    source.tagCost = this.generateTitleCostSymbols(source.manaCost);
 	    source.taggedText = this.generateTextCostSymbols(source.text);
 
+	    // test: listeners on comment text to display images.
+	    /*var commentDivs = document.getElementsByClassName('post-message');
+	    for (var comment = 0; comment < commentDivs.length; comment++) {
+	    	commentDivs[0].addEventListener("mouseover", function(e) {console.log(e);});
+	    }*/
+
 	    // Listener for the tooltip position calculator.
 	    document.addEventListener('mousemove', function(e) {
 	    	var tooltipImages = document.querySelectorAll('.tooltipImage');

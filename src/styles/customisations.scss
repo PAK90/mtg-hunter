@@ -87,6 +87,9 @@ body {
   max-width: 500px;
   /*background-color: $backgroundColour;*/
 }
+.sk-hits-grid-hit {
+  flex: 230px 0 0;
+}
 
 /* The grid item's set name paragraph. */
 .currentSetName{
@@ -468,7 +471,7 @@ $sk-selected-filters-background: #333 !default;
 
 .my-logo {
   color:white;
-  flex:0 0 60px;
+  flex:0 0 130px;
   padding:13px 20px;
   margin-right:15px;
   line-height: 16px;
@@ -479,7 +482,7 @@ $sk-selected-filters-background: #333 !default;
   padding: 20px 15px;
   margin: 0;
   position: fixed;
-  top: 60;
+  top: 60px;
   bottom: 0;
   overflow-x: hidden;
   overflow-y: hidden;

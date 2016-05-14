@@ -107,7 +107,8 @@ let mapping = {
     }
   },
   cmc:{type:"integer"},
-  colorIdentify:stringWithRaw,
+  colourCount:stringWithRaw,
+  colorIdentity:stringWithRaw,
   colors:stringWithRaw,
   flavor:{type:"string"},
   imageName:stringWithRaw,
