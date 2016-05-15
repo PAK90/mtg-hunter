@@ -8,7 +8,7 @@ var fs = require('fs'),
 	csvParser = require('babyparse');
 
 let cardIndexer = new Indexer(
-  "localhost:9200",  
+  "http://mtg-hunter.com",  
   "cards", "card"
 );
 

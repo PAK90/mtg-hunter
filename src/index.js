@@ -542,35 +542,35 @@ export class App extends React.Component<any, any> {
               <InputFilter id="flavourText" searchThrottleTime={1000} title="Flavour text" placeholder="Search flavour text" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["multiverseids.flavor"]} prefixQueryFields={["multiverseids.flavor"]}/>
               <InputFilter id="typeLine" searchThrottleTime={1000} title="Type text" placeholder="Search type text" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["type"]} prefixQueryFields={["type"]}/>              
               <RefinementListFilter id="power" title="Power" field="power.raw" size={5} operator={this.state.powerOperator}  
-                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}}>
+                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.powerOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "powerOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="toughness" title="Toughness" field="toughness.raw" size={5} operator={this.state.toughnessOperator}  
-                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}}>
+                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.toughnessOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "toughnessOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="symbols" title="Symbols" field="symbols" size={6} operator={this.state.symbolsOperator} itemComponent={SymbolRefineList}  
-                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}}>
+                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.symbolsOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "symbolsOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="manaCost" title="Mana Cost" field="prettyCost.raw" showMore={false} listComponent={CostMultiSelect} size={0} operator={this.state.manaCostOperator} 
-                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}}>
+                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.manaCostOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "manaCostOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
 
               <OnlyRefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator={this.state.coloursOperator} only={this.state.coloursOnly} 
-                            itemComponent={SymbolRefineList} containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}}>
+                            itemComponent={SymbolRefineList} containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                                 <input onClick={(evt) => this.suppressClick(evt)} type="checkbox" id="onlyColourBox" className="onlyCheckbox" value={this.state.coloursOnly} onChange={this.handleColourOnlyChange.bind(this)} />
                                 <label onClick={(evt) => this.suppressClick(evt)} htmlFor="onlyColourBox">Only</label>
                                 <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.coloursOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "coloursOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
               <OnlyRefinementListFilter id="colourIdentity" title="Colour Identity" field="colorIdentity" size={6} operator={this.state.colourIdentityOperator} only={this.state.colourIdentityOnly} 
-                            itemComponent={SymbolRefineList} containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}}>
+                            itemComponent={SymbolRefineList} containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                                 <input onClick={(evt) => this.suppressClick(evt)} type="checkbox" id="onlyIdentityBox" className="onlyCheckbox" value={this.state.colourIdentityOnly} onChange={this.handleIdentityOnlyChange.bind(this)} />
                                 <label onClick={(evt) => this.suppressClick(evt)} htmlFor="onlyIdentityBox">Only</label>
                                 <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.colourIdentityOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "colourIdentityOperator")}/>
@@ -578,48 +578,48 @@ export class App extends React.Component<any, any> {
                             )} collapsable={true} defaultCollapsed={true}/>}/>
 
               <RefinementListFilter id="colorCount" title="Colour Count" field="colourCount" size={6} operator={this.state.colourCountOperator} orderKey="_term"  
-                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}}>
+                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.colourCountOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "colourCountOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="rarity" title="Rarity" field="multiverseids.rarity.raw" size={5} operator={this.state.rarityOperator}  
-                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}}>
+                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.rarityOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "rarityOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="supertype" title="Supertype" field="supertypes.raw" size={5} operator={this.state.supertypeOperator}  
-                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}}>
+                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.supertypeOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "supertypeOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="type" title="Type" field="types.raw" size={5} operator={this.state.typeOperator}  
-                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}}>
+                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.typeOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "typeOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="subtype" title="Subtype" field="subtypes.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.subtypeOperator}  
-                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}}>
+                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.subtypeOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "subtypeOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="artists" title="Artist name" field="multiverseids.artist.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.artistsOperator}  
-                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}}>
+                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.artistsOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "artistsOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="setcodes" title="Set" field="multiverseids.setName.raw" showMore={false} listComponent={SetMultiSelect} size={0} orderKey="_term" operator={this.state.setcodesOperator}  
-                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}}>
+                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.setcodesOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "setcodesOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="formats" title="Formats" field="formats.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.formatsOperator}  
-                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}}>
+                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.formatsOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "formatsOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
 
               <RefinementListFilter id="cycles" title="Cycles" field="cycle.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.cyclesOperator}  
-                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}}>
+                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.cyclesOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "cyclesOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
