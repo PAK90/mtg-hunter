@@ -102,6 +102,12 @@ var CardHitsListItem = React.createClass({
     	if (typeof DISQUSWIDGETS !== 'undefined') {
     		DISQUSWIDGETS.getCount({reset:true});
     	}
+    	
+	    // test: listeners on comment text to display images.
+	    var commentDivs = document.getElementsByClassName('post-message');
+	    for (var comment = 0; comment < commentDivs.length; comment++) {
+	    	commentDivs[0].addEventListener("mouseover", function(e) {console.log(e)});
+	    }
     },
 
     handleClick(source) {
@@ -248,18 +254,12 @@ var CardHitsListItem = React.createClass({
 	    source.tagCost = this.generateTitleCostSymbols(source.manaCost);
 	    source.taggedText = this.generateTextCostSymbols(source.text);
 
-	    // test: listeners on comment text to display images.
-	    /*var commentDivs = document.getElementsByClassName('post-message');
-	    for (var comment = 0; comment < commentDivs.length; comment++) {
-	    	commentDivs[0].addEventListener("mouseover", function(e) {console.log(e);});
-	    }*/
-
 	    // Listener for the tooltip position calculator.
 	    document.addEventListener('mousemove', function(e) {
 	    	var tooltipImages = document.querySelectorAll('.tooltipImage');
 	    	for (var i=tooltipImages.length; i--;) {
-		        tooltipImages[i].style.left = e.clientX + 'px';
-		        tooltipImages[i].style.top = e.clientY - 311 + 'px';
+		        tooltipImages[i].style.left = e.clientX - 150 + 'px';
+		        tooltipImages[i].style.top = e.clientY - 331 + 'px';
 		        //console.log(tooltipImages[i].style.left + ' ' + tooltipImages[i].style.top);
 		    }
 	    },false);

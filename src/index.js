@@ -45,7 +45,8 @@ import {
   ViewSwitcherHits,
   ViewSwitcherToggle,
   DynamicRangeFilter,
-  FilterGroup, FilterGroupItem
+  FilterGroup, FilterGroupItem,
+  TagFilterConfig, TagFilterList
 } from "searchkit";
 import {RefinementListFilter, OnlyRefinementListFilter} from './modRefineListFilter.js';
 import CardDetailPanel from './CardDetailPanel';
@@ -171,7 +172,7 @@ class FilterGroupImg extends FilterGroup {
                     label={translate(filter.value)}
                     removeFilter={removeFilter} />
       ) 
-    } else if (id == "setcodes") {
+    } else if ((id == "setcodes") /*|| (id == "cycles")*/) {
       return (
         <FilterGroupItemSet key={filter.value}
                     itemKey={filter.value}
@@ -184,23 +185,6 @@ class FilterGroupImg extends FilterGroup {
       return super.renderFilter(filter, bemBlocks)
     }
   }
-}
-
-function generateTitleCostSymbols(source) {
-  // Take the manacost and return a bunch of img divs.
-  var tagged;
-  if (source !== undefined) {
-    source = source.replace(/\//g,''); // Get rid of / in any costs first.
-    // Check that match returns anything.
-    if (source.match(/\{([0-z,½,∞]+)\}/g)) {
-      tagged = source.match(/\{([0-z,½,∞]+)\}/g)
-      .map(function (basename, i) {
-          var src = './src/img/' + basename.substring(1, basename.length - 1).toLowerCase() + '.png';
-          return <img key={i} src={src} height='15px'/>;
-      });
-    }
-  }
-  return tagged;
 }
 
 function generateTextCostSymbols(source) {
@@ -396,20 +380,6 @@ export class App extends React.Component<any, any> {
     this.setState({ showModal: true });
   }
 
-  getSetIcons(source) {
-    // Loop through all multiverseIds, which have their own set code and rarity.
-    var setImages = source.multiverseids.map(function(multis, i) {
-      let rarity = multis.rarity.charAt(0) == "B" ? "C" : multis.rarity.charAt(0); // Replace 'basic' rarity with common.
-      let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + multis.multiverseid;
-      return (
-              <img className='setIcon' src={'./src/img/sets/' + multis.setName.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-' + rarity + '.jpg'} 
-                title={multis.setName}
-                style={{padding: '2px'}}
-                onClick={this.handleClick.bind(this, source)}/>
-               )
-    }.bind(this))
-    return setImages;
-  }
 
   CardHitsGridItem = (props)=> {
     const {bemBlocks, result} = props;
@@ -419,41 +389,97 @@ export class App extends React.Component<any, any> {
     //let imgUrl = '../cropped2/crops' + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid + '.jpg';
     return (
       <div className={bemBlocks.item().mix(bemBlocks.container("item"))}>
+        <a href={"http://mtg-hunter.com/?q="+source.name+"&sort=_score_desc"}>
           <img className='gridImg' 
             style={{height: 311}} 
             src={imgUrl} 
             onClick={this.handleClick.bind(this, source)}
             onMouseOver={this.handleHoverIn.bind(this, source)}
             onMouseOut={this.handleHoverOut.bind(this, source)}/>
+        </a>
       </div>
     )
   }
 
   CardHitsTable = (props)=> {  
-  const { hits } = props;
-  return (
-    <div style={{width: '100%', boxSizing: 'border-box', padding: 8}}>
-      <table className="sk-table sk-table-striped" style={{width: '100%', boxSizing: 'border-box'}}>
-        <thead>
-          <tr>
-            <th></th> <th>Name</th> <th>Mana cost</th> <th>CMC</th>
-          </tr>
-        </thead>
-        <tbody>
-        {map(hits, hit=> (
-          <tr key={hit._id}>
-            <td style={{margin: 0, padding: 0, width: 40}}>
-              <img data-qa="poster" src={
-  'https://image.deckbrew.com/mtg/multiverseid/' + hit._source.multiverseids[hit._source.multiverseids.length - 1].multiverseid + '.jpg'} style={{width: 40}}/>
-            </td>
-            <td>{hit._source.name}</td>
-            <td>{this.generateTitleCostSymbols(hit._source.manaCost)}</td>
-            <td>{hit._source.cmc}</td>
-          </tr>
-          )), this}
-        </tbody>
-      </table>
-    </div>
+    const { hits } = props;
+
+    function getSetIcons(source, scope) {
+      // Loop through all multiverseIds, which have their own set code and rarity.
+      var setImages = source.multiverseids.map(function(multis, i) {
+        let rarity = multis.rarity.charAt(0) == "B" ? "C" : multis.rarity.charAt(0); // Replace 'basic' rarity with common.
+        let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + multis.multiverseid;
+        return (<div>
+                <TagFilterConfig field="multiverseids.setName.raw" id="setNameIconTag" title="Set icon" operator={scope.state.setcodesOperator} searchkit={scope.searchkit}/>
+                <TagFilter field="multiverseids.setName.raw" value={multis.setName}>
+                <img className='setIcon' src={'./src/img/sets/' + multis.setName.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-' + rarity + '.jpg'} 
+                  title={multis.setName}
+                  style={{padding: '2px'}}
+                  />
+                </TagFilter>
+                </div>
+                 )
+      }.bind(this))
+      return setImages;
+    }
+
+    function generateTitleCostSymbols(source) {
+      // Take the manacost and return a bunch of img divs.
+      var tagged;
+      if (source !== undefined) {
+        source = source.replace(/\//g,''); // Get rid of / in any costs first.
+        // Check that match returns anything.
+        if (source.match(/\{([0-z,½,∞]+)\}/g)) {
+          tagged = source.match(/\{([0-z,½,∞]+)\}/g)
+          .map(function (basename, i) {
+              var src = './src/img/' + basename.substring(1, basename.length - 1).toLowerCase() + '.png';
+              return <img key={i} src={src} height='15px'/>;
+          });
+        }
+      }
+      return tagged;
+    }
+    return (
+      <div style={{width: '100%', boxSizing: 'border-box', padding: 8}}>
+        <table className="sk-table sk-table-striped" style={{width: '100%', boxSizing: 'border-box'}}>
+          <thead>
+            <tr>
+              <th></th> <th>Name</th> <th>Mana cost</th> <th>Type</th> <th>Sets</th>
+            </tr>
+          </thead>
+          <tbody>
+          {map(hits, hit=> (
+            <tr key={hit._id}>
+              <td style={{margin: 0, padding: 0, width: 40}}>
+                <img data-qa="poster" src={
+    'https://image.deckbrew.com/mtg/multiverseid/' + hit._source.multiverseids[hit._source.multiverseids.length - 1].multiverseid + '.jpg'} style={{width: 40}}/>
+              </td>
+              <td>{hit._source.name}</td>
+              <td>{generateTitleCostSymbols(hit._source.manaCost)}</td>
+              <td><div style={{display:"inline-flex"}} className={"subtitle typeLine"} >
+                      <TagFilterConfig field="supertypes.raw" id="supertypeField" title="Supertype" operator={this.state.supertypeOperator} searchkit={this.searchkit}/>
+                      {_.map(hit._source.supertypes,supertype => 
+                        <div key={supertype} style={{display:"inline-flex"}}>
+                          <TagFilter field="supertypes.raw" value={supertype} /><span>&nbsp;</span>
+                        </div>)}
+                      <TagFilterConfig field="types.raw" id="typeField" title="Type" operator={this.state.typeOperator} searchkit={this.searchkit}/>
+                      {_.map(hit._source.types,type => 
+                        <div key={type} style={{display:"inline-flex"}}>
+                          <TagFilter field="types.raw" value={type} /><span>&nbsp;</span>
+                        </div>)}
+                      {hit._source.subtypes ? <span>—&nbsp;</span> : <span/>}
+                      <TagFilterConfig field="subtypes.raw" id="subtypeField" title="Subtype" operator={this.state.subtypeOperator} searchkit={this.searchkit}/>
+                      {_.map(hit._source.subtypes,subtype => 
+                        <div key={subtype} style={{display:"inline-flex"}}>
+                          <TagFilter field="subtypes.raw" value={subtype} /><span>&nbsp;</span>
+                        </div>)}
+                    </div></td>
+              <td><div style={{display:'flex'}}>{getSetIcons(hit._source,this)}</div></td>
+            </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     )  
   }
 
@@ -497,7 +523,7 @@ export class App extends React.Component<any, any> {
 
           <div className="sk-layout__top-bar sk-top-bar">
             <div className="sk-top-bar__content">
-              <div className="my-logo"><span>MtG:Hunter</span><br/>
+              <div className="my-logo"><a style={{color:'white', textDecoration:'none'}} href="http://mtg-hunter.com"><span>MtG:Hunter</span></a><br/>
               <a href="http://searchkit.co/" style={{textDecoration:"none"}}>
               <span className="my-logo-small">Made with Searchkit</span></a></div>
               <div className="my-logo"><button style={{backgroundColor: 'transparent', border: '0px', font: "inherit", color: "#eee", cursor:"pointer"}} 
@@ -657,7 +683,8 @@ export class App extends React.Component<any, any> {
                     hitsPerPage={12}
                     hitComponents = {[
                       {key:"grid", title:"Grid", itemComponent:this.CardHitsGridItem},
-                      {key:"list", title:"List", itemComponent:<CardHitsListItem updateCardName={this.handleClick} currentCard={this.state.clickedCard}/>, defaultOption:true}
+                      {key:"list", title:"List", itemComponent:<CardHitsListItem updateCardName={this.handleClick} currentCard={this.state.clickedCard}/>, defaultOption:true},
+                      {key:"table", title:"Table", listComponent:this.CardHitsTable}
                     ]}
                     scrollTo="body"
                 />

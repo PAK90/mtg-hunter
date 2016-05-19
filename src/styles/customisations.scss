@@ -444,6 +444,24 @@ body {
   width: 110;
 }
 
+/* Table stylings. */
+
+.sk-table {
+  color: #ddd;  
+  &.sk-table th {
+    color: #eee;
+    background-color: #444;
+  }
+  &.sk-table-odd td {
+    background-color: #333 !important; 
+  }
+  &.sk-table-striped tr:nth-child(2n-1) td {
+    background-color: #333 !important; 
+  }  
+
+}
+ 
+
 $sk-layout-background: #333 !default;
 $sk-layout-panel-background: #222 !default;
 $sk-primary-theme-color: #2a4466 !default;
