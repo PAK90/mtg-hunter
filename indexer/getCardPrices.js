@@ -16,6 +16,14 @@ var failedRequests = [];
 var failedCardhoarderRequests = [];
 var successfulRequests = [];
 
+var cardsThatMakeTokensWithTheirName = ["Thopter Spy Network", "Thopter Engineer", "Scion Summoner", "Zombie Infestation", "Zombie Master", "Zombie Apocalypse", 
+  "Squirrel Wrangler", "Squirrel Mob", "Squirrel Nest", "Squirrel Farm", "Goblin Rabblemaster", "Goblin Marshal", "Goblin Assault", "Goblin Scouts", "Goblin Offensive",
+  "Goblin Trenches", "Goblin Rally", "Caribou Range", "Saproling Infestation", "Saproling Burst", "Beast Within", "Beast Attack", "Centaur Glade", "Dragon Whisperer",
+  "Dragon Roost", "Dragon Broodmother", "Elemental Mastery", "Elemental Appeal", "Elephant Ambush", "Elephant Guide", "Elephant Resurgence", "Gargoyle Castle", 
+  "Hellion Eruption", "Hellion Crucible", "Griffin Guide", "Hydra Broodmaster", "Knight Watch", "Myr Battlesphere", "Myr Incubator", "Myr Matrix", "Myr Sire", 
+  "Myr Turbine", "Ooze Flux", "Ooze Garden", "Pegasus Refuge", "Pegasus Stampede", "Saproling Symbiosis", "Saproling Cluster", "Sliver Hive", "Sliver Queen", 
+  "Snake Basket", "Snake Pit", "Spider Spawning", "Spike Breeder", "Spirit Bonds", "Spirit Cairn", "Thopter Foundry", "Thopter Assembly", "Thopter Squadron", "Chicken Egg"];
+
 var setNamesToChange = {tuples:[["Limited Edition Alpha","Alpha Edition"],
 						["Limited Edition Beta","Beta Edition"],
 						["Seventh Edition","7th Edition"],
@@ -124,6 +132,10 @@ function anonymizeRulesText(name, text) {
 	var forbiddenWords = ["Skulk","Madness","Investigate","Delirium","Flying","Warrior","Soldier","Wizard","The","Defender","Enchanted","Double","First","Flash","Enchanted","Indestructible","Enchanted","Prowess","Reach","Enchanted","Vigilance","Exile","Enchanted","Fight","Regenerate","Sacrifice","Absorb","Enchanted","Battle","Cascade","Champion","Changeling","Clash","Dash","Devour","Dredge","Echo","Epic","Evoke","Exalted","Flanking","Fortify","Frenzy","Enchanted","Graft","Gravestorm","Haunt","Infect","Living","Madness","Manifest","Miracle","Modular","Monstrosity","Offering","Overload","Persist","Poisonous","Populate","Provoke","Prowl","Rampage","Rebound","Recover","Reinforce","Renown","Replicate","Ripple","Scavenge","Shadow","Soulbond","Split","Storm","Sunburst","Suspend","Totem","Transfigure","Transmute","Transform","Undying","Unleash","Unearth","Vanishing","Wither","Battalion","Bloodrush","Channel","Domain","Fateful","Ferocious","Grandeour","Hellbent","Heroic","Join","Kinship","Morbid","Radiance","Raid","Sweep","Threshold","Bury","Fear","Intimidate","Protection","Shroud","Substance"]
 	// First do a pass with the name as normal. Use regex so that it repeats beyond the first occurrence.
 	text = text.replace(new RegExp(name, 'g'), '~');
+
+	// To avoid doing the 'Thopter token bug', exit here if it's one of the special name-within-a-token cards.
+	if (_.includes(cardsThatMakeTokensWithTheirName, name)) return;
+
 	// Now with a first name. Since 'flying' occurs in names and is a keyword, don't do that. Duplicate for other keywords.
 	let firstName = name.split(' ')[0];
 	if (!_.includes(forbiddenWords, firstName) && name != "Erase (Not the Urza's Legacy One)") {
@@ -187,12 +199,14 @@ async function printDocs(){
 	    // now you can write this like syncronous code!
 	    for (var hit = 0; hit < docs.hits.hits.length; hit++) {
 	        //console.log('\n+++++++++++'+docs.hits.hits[hit]._id);
+        	// Declare name here to be in scope for possible namelessText adjustments afterwards.
+			var name = docs.hits.hits[hit]._source.name;
+			
 	        for (var edition = 0; edition < docs.hits.hits[hit]._source.multiverseids.length; edition++ ) {
 		      	//console.log(docs.hits.hits[hit]._source.multiverseids[edition]);
 		      	var setName = docs.hits.hits[hit]._source.multiverseids[edition].setName; 
 				setName = checkForSetNameReplacement(setName); // Ensure the set name is TCGPlayer compatible.
 				// Have to change fuse/split card names to reflect both prices.
-				var name = docs.hits.hits[hit]._source.name;
 				if (docs.hits.hits[hit]._source.layout == "split") {
 					name = docs.hits.hits[hit]._source.names[0] + ' // ' + docs.hits.hits[hit]._source.names[1];
 				}
@@ -242,9 +256,9 @@ async function printDocs(){
 	    	//console.log("about to check chars")
 	    	//if (normalizeChars(docs.hits.hits[hit]._source.namelessText)) {
 	    	// Had an error in anonymizing, but only in names with commas, so check for that before spending ages fixing it.
-	    	//if (name.indexOf(",") !== -1) {
-	    	//	docs.hits.hits[hit]._source.namelessText = anonymizeRulesText(docs.hits.hits[hit]._source.name, docs.hits.hits[hit]._source.namelessText);
-	    	//}
+	    	if (_.includes(cardsThatMakeTokensWithTheirName, name)) {
+	    		docs.hits.hits[hit]._source.namelessText = anonymizeRulesText(docs.hits.hits[hit]._source.name, docs.hits.hits[hit]._source.namelessText);
+	    	}
 	    	//}
 	    	// Now send this modified data back to the ES server with an update push.
 	    	cardIndexer.updateSingleDocument(docs.hits.hits[hit]);

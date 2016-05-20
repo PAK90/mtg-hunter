@@ -4,6 +4,14 @@ let indexer = require("./indexer");
 let _ = require("lodash");
 var cardMultis = require('../src/multiIdName.json');
 
+var cardsThatMakeTokensWithTheirName = ["Thopter Spy Network", "Thopter Engineer", "Scion Summoner", "Zombie Infestation", "Zombie Master", "Zombie Apocalypse", 
+  "Squirrel Wrangler", "Squirrel Mob", "Squirrel Nest", "Squirrel Farm", "Goblin Rabblemaster", "Goblin Marshal", "Goblin Assault", "Goblin Scouts", "Goblin Offensive",
+  "Goblin Trenches", "Goblin Rally", "Caribou Range", "Saproling Infestation", "Saproling Burst", "Beast Within", "Beast Attack", "Centaur Glade", "Dragon Whisperer",
+  "Dragon Roost", "Dragon Broodmother", "Elemental Mastery", "Elemental Appeal", "Elephant Ambush", "Elephant Guide", "Elephant Resurgence", "Gargoyle Castle", 
+  "Hellion Eruption", "Hellion Crucible", "Griffin Guide", "Hydra Broodmaster", "Knight Watch", "Myr Battlesphere", "Myr Incubator", "Myr Matrix", "Myr Sire", 
+  "Myr Turbine", "Ooze Flux", "Ooze Garden", "Pegasus Refuge", "Pegasus Stampede", "Saproling Symbiosis", "Saproling Cluster", "Sliver Hive", "Sliver Queen", 
+  "Snake Basket", "Snake Pit", "Spider Spawning", "Spike Breeder", "Spirit Bonds", "Spirit Cairn", "Thopter Foundry", "Thopter Assembly", "Thopter Squadron", "Chicken Egg"];
+
 var cardArray = Object.keys(cardMultis).map(function(cardName) {
   return (cardMultis[cardName].cardName = cardName) && cardMultis[cardName];
 });
@@ -42,6 +50,9 @@ function anonymizeRulesText(name, text) {
   var forbiddenWords = ["Skulk","Madness","Investigate","Delirium","Flying","Warrior","Soldier","Wizard","The","Defender","Enchanted","Double","First","Flash","Enchanted","Indestructible","Enchanted","Prowess","Reach","Enchanted","Vigilance","Exile","Enchanted","Fight","Regenerate","Sacrifice","Absorb","Enchanted","Battle","Cascade","Champion","Changeling","Clash","Dash","Devour","Dredge","Echo","Epic","Evoke","Exalted","Flanking","Fortify","Frenzy","Enchanted","Graft","Gravestorm","Haunt","Infect","Living","Madness","Manifest","Miracle","Modular","Monstrosity","Offering","Overload","Persist","Poisonous","Populate","Provoke","Prowl","Rampage","Rebound","Recover","Reinforce","Renown","Replicate","Ripple","Scavenge","Shadow","Soulbond","Split","Storm","Sunburst","Suspend","Totem","Transfigure","Transmute","Transform","Undying","Unleash","Unearth","Vanishing","Wither","Battalion","Bloodrush","Channel","Domain","Fateful","Ferocious","Grandeour","Hellbent","Heroic","Join","Kinship","Morbid","Radiance","Raid","Sweep","Threshold","Bury","Fear","Intimidate","Protection","Shroud","Substance"]
   // First do a pass with the name as normal. Use regex so that it repeats beyond the first occurrence.
   text = text.replace(new RegExp(name, 'g'), '~');
+
+  // To avoid doing the 'Thopter token bug', exit here if it's one of the special name-within-a-token cards.
+  if (_.includes(cardsThatMakeTokensWithTheirName, name)) return;
   // Now with a first name. Since 'flying' occurs in names and is a keyword, don't do that. Duplicate for other keywords.
   let firstName = name.split(' ')[0];
   if (!_.includes(forbiddenWords, firstName) && name != "Erase (Not the Urza's Legacy One)") {

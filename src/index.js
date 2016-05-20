@@ -444,7 +444,7 @@ export class App extends React.Component<any, any> {
         <table className="sk-table sk-table-striped" style={{width: '100%', boxSizing: 'border-box'}}>
           <thead>
             <tr>
-              <th></th> <th>Name</th> <th>Mana cost</th> <th>Type</th> <th>Sets</th>
+              <th></th> <th>Name</th> <th>Mana cost</th> <th>Type</th> <th>Paper price</th> <th>Sets</th>
             </tr>
           </thead>
           <tbody>
@@ -456,25 +456,32 @@ export class App extends React.Component<any, any> {
               </td>
               <td>{hit._source.name}</td>
               <td>{generateTitleCostSymbols(hit._source.manaCost)}</td>
-              <td><div style={{display:"inline-flex"}} className={"subtitle typeLine"} >
-                      <TagFilterConfig field="supertypes.raw" id="supertypeField" title="Supertype" operator={this.state.supertypeOperator} searchkit={this.searchkit}/>
-                      {_.map(hit._source.supertypes,supertype => 
-                        <div key={supertype} style={{display:"inline-flex"}}>
-                          <TagFilter field="supertypes.raw" value={supertype} /><span>&nbsp;</span>
-                        </div>)}
-                      <TagFilterConfig field="types.raw" id="typeField" title="Type" operator={this.state.typeOperator} searchkit={this.searchkit}/>
-                      {_.map(hit._source.types,type => 
-                        <div key={type} style={{display:"inline-flex"}}>
-                          <TagFilter field="types.raw" value={type} /><span>&nbsp;</span>
-                        </div>)}
-                      {hit._source.subtypes ? <span>—&nbsp;</span> : <span/>}
-                      <TagFilterConfig field="subtypes.raw" id="subtypeField" title="Subtype" operator={this.state.subtypeOperator} searchkit={this.searchkit}/>
-                      {_.map(hit._source.subtypes,subtype => 
-                        <div key={subtype} style={{display:"inline-flex"}}>
-                          <TagFilter field="subtypes.raw" value={subtype} /><span>&nbsp;</span>
-                        </div>)}
-                    </div></td>
-              <td><div style={{display:'flex'}}>{getSetIcons(hit._source,this)}</div></td>
+              <td>
+                <div style={{display:"inline-flex"}} className={"subtitle typeLine"} >
+                  <TagFilterConfig field="supertypes.raw" id="supertypeField" title="Supertype" operator={this.state.supertypeOperator} searchkit={this.searchkit}/>
+                  {_.map(hit._source.supertypes,supertype => 
+                    <div key={supertype} style={{display:"inline-flex"}}>
+                      <TagFilter field="supertypes.raw" value={supertype} /><span>&nbsp;</span>
+                    </div>)}
+                  <TagFilterConfig field="types.raw" id="typeField" title="Type" operator={this.state.typeOperator} searchkit={this.searchkit}/>
+                  {_.map(hit._source.types,type => 
+                    <div key={type} style={{display:"inline-flex"}}>
+                      <TagFilter field="types.raw" value={type} /><span>&nbsp;</span>
+                    </div>)}
+                  {hit._source.subtypes ? <span>—&nbsp;</span> : <span/>}
+                  <TagFilterConfig field="subtypes.raw" id="subtypeField" title="Subtype" operator={this.state.subtypeOperator} searchkit={this.searchkit}/>
+                  {_.map(hit._source.subtypes,subtype => 
+                    <div key={subtype} style={{display:"inline-flex"}}>
+                      <TagFilter field="subtypes.raw" value={subtype} /><span>&nbsp;</span>
+                    </div>)}
+                </div>
+              </td>
+              <td>{hit._source.multiverseids[0].medPrice ? 
+                  "$" + parseFloat(hit._source.multiverseids[0].medPrice).toFixed(2) :
+                  "$" + parseFloat(hit._source.multiverseids[1].medPrice).toFixed(2)}</td>
+              <td style={{maxWidth:'160px'}}>
+                <div style={{textAlign:'center', maxHeight: '200px', overflow: 'auto', maxWidth:'130px', display:"inline-flex"}}>{getSetIcons(hit._source,this)}</div>
+              </td>
             </tr>
             ))}
           </tbody>
