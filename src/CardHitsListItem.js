@@ -110,7 +110,8 @@ var CardHitsListItem = React.createClass({
 	    }
     },
 
-    handleClick(source) {
+    // Deprecated in favour of universal click handler in the parent.
+    /*handleClick(source) {
 	    // If clicked on a different card, change the name.
 	    if (this.state.clickedCard != source.name)
 	    {
@@ -122,7 +123,7 @@ var CardHitsListItem = React.createClass({
 	    else {
 	      	this.setState({clickedCard: ''});
 	    }
-	},
+	},*/
 	
 	handleTabSelect(index, last) {
 		// Record which tab was clicked.
@@ -538,7 +539,7 @@ var CardHitsListItem = React.createClass({
         	</Tabs>)
 	    }
 	    else {
-	    	selectedInfo = <div/>
+	    	selectedInfo = <span style={{paddingBottom: '5px', color:'#ccc', fontVariant:'small-caps', cursor:'pointer'}}>Details ▼</span>
 	    }
 	    // In the style for the set icons, 'relative' enables cards like Forest to grow the div around them to fit all the symbols.
 	    // In the future, might want an 'open/close' <p> tag for that, since it's pretty useless seeing all those symbols anyway.

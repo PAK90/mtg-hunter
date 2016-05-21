@@ -256,9 +256,9 @@ async function printDocs(){
 	    	//console.log("about to check chars")
 	    	//if (normalizeChars(docs.hits.hits[hit]._source.namelessText)) {
 	    	// Had an error in anonymizing, but only in names with commas, so check for that before spending ages fixing it.
-	    	if (_.includes(cardsThatMakeTokensWithTheirName, name)) {
+	    	/*if (_.includes(cardsThatMakeTokensWithTheirName, name)) {
 	    		docs.hits.hits[hit]._source.namelessText = anonymizeRulesText(docs.hits.hits[hit]._source.name, docs.hits.hits[hit]._source.namelessText);
-	    	}
+	    	}*/
 	    	//}
 	    	// Now send this modified data back to the ES server with an update push.
 	    	cardIndexer.updateSingleDocument(docs.hits.hits[hit]);

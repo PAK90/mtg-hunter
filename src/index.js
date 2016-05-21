@@ -333,6 +333,7 @@ export class App extends React.Component<any, any> {
     // If clicked on a different card, change the name.
     if (this.state.clickedCard != source.name)
     {
+      ga('send','event','List details','open'); // Record this momentous occasion.
       this.setState({clickedCard: source.name});
     }
     // Else, we clicked on the same card, so shrink.

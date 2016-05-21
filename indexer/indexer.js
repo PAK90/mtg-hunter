@@ -138,6 +138,7 @@ module.exports = class Indexer {
           //console.log(resp.hits.hits);
           resolve(resp.hits.hits);
       }, function (err) {
+          //console.log(err.message);
           reject(err.message);
       });
     }.bind(this))
