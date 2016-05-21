@@ -114,16 +114,35 @@ var CardHitsListItem = React.createClass({
 	    // If clicked on a different card, change the name.
 	    if (this.state.clickedCard != source.name)
 	    {
-	      this.setState({clickedCard: source.name});
+	    	ga('send','event','List details','open'); // Record this momentous occasion.
+	      	this.setState({clickedCard: source.name});
 	    }
 	    // Else, we clicked on the same card, so shrink.
 	    // The enlarging/shrinking happens via a css style which turns on/off based on whether clickedCard matches current card name.
 	    else {
-	      this.setState({clickedCard: ''});
+	      	this.setState({clickedCard: ''});
 	    }
 	},
 	
 	handleTabSelect(index, last) {
+		// Record which tab was clicked.
+		switch(index) {
+			case 0:
+				ga('send','event','Tabs','details');
+				break;
+			case 1:
+				ga('send','event','Tabs','rulings');
+				break;
+			case 2:
+				ga('send','event','Tabs','languages');
+				break;
+			case 3:
+				ga('send','event','Tabs','10closest');
+				break;
+			case 4:
+				ga('send','event','Tabs','comments');
+				break;
+		}
 		this.setState({currentSelectedTab: index});
 	},
 
@@ -235,15 +254,16 @@ var CardHitsListItem = React.createClass({
 		evt.stopPropagation();
 	},
 
-	/*handleNewComment: function(comment) {
-		var newComment = comment.text.replace(/\[(.*?)\]/g, '<a href="http://mtg-hunter.com/?q=$1" target="_blank">$1</a>');
-		console.log(newComment);
-		disqus.request('posts/update', {post: comment.id, message: newComment}, function(data) {
-			if (data.error) {
-				console.log(error)
-			}
-		})
-	},*/
+	handleNewComment: function(comment) {
+		//var newComment = comment.text.replace(/\[(.*?)\]/g, '<a href="http://mtg-hunter.com/?q=$1" target="_blank">$1</a>');
+		//console.log(newComment);
+		//disqus.request('posts/update', {post: comment.id, message: newComment}, function(data) {
+		//	if (data.error) {
+		//		console.log(error)
+		//	}
+		ga('send','event','Comments','post');
+		//})
+	},
 
 	render: function() {
 	    var {bemBlocks, result} = this.props;
@@ -269,7 +289,7 @@ var CardHitsListItem = React.createClass({
 
 	    // Start with a separate div for all 4 potential prices.
 	    if (this.state.currentMedPrice) {
-	    	price = ( <a href={this.state.currentStoreLink} target="_blank" onClick={(evt) => this.suppressClick(evt)}>
+	    	price = ( <a href={this.state.currentStoreLink} target="_blank" onClick={(evt) => {this.suppressClick(evt); ga('send','event','Store','medPrice');}}>
 	    		<div className="priceContainer">
     				<span className={bemBlocks.item("subtitle") + " price"}>{'$'+this.state.currentMedPrice.toFixed(2)}</span>
     				<br/>
@@ -279,7 +299,7 @@ var CardHitsListItem = React.createClass({
 	    }
 	    else { price = <div/>}
 	    if (this.state.currentFoilPrice) {
-	    	foilPrice = ( <a href={this.state.currentStoreLink} target="_blank" onClick={(evt) => this.suppressClick(evt)}>
+	    	foilPrice = ( <a href={this.state.currentStoreLink} target="_blank" onClick={(evt) => {this.suppressClick(evt); ga('send','event','Store','foilPrice');}}>
     			<div className="priceContainer">
 					<span className={bemBlocks.item("subtitle") + " price"}>{'$'+this.state.currentFoilPrice.toFixed(2)}</span>
 					<br/>
@@ -289,7 +309,7 @@ var CardHitsListItem = React.createClass({
 	    }
 	    else { foilPrice = <div/>}
 	    if (this.state.currentMtgoPrice) {
-	    	mtgoPrice = ( <a href={this.state.currentMtgoStoreLink} target="_blank" onClick={(evt) => this.suppressClick(evt)}>
+	    	mtgoPrice = ( <a href={this.state.currentMtgoStoreLink} target="_blank" onClick={(evt) => {this.suppressClick(evt); ga('send','event','Store','mtgoPrice');}}>
     			<div className="priceContainer">
     				<span className={bemBlocks.item("subtitle") + " price"}>{this.state.currentMtgoPrice.toFixed(2)}</span><span> TIX</span>
     				<br/>
@@ -301,7 +321,7 @@ var CardHitsListItem = React.createClass({
 	    if (this.state.currentFoilMtgoPrice) {	
 	    	mtgoFoilPrice = ( <a href={this.state.currentMtgoStoreLink.replace(/\d+/, function(mtgoId) { // Increment the url id by 1 to get foil url.
     				return Number(mtgoId) + 1;
-    			})} target="_blank" onClick={(evt) => this.suppressClick(evt)}>
+    			})} target="_blank" onClick={(evt) => {this.suppressClick(evt); ga('send','event','Store','mtgoFoilPrice');}}>
     				<div className="priceContainer">
     				<span className={bemBlocks.item("subtitle") + " price"}>{this.state.currentFoilMtgoPrice.toFixed(2)}</span><span> TIX</span>
     				<br/>
@@ -529,7 +549,13 @@ var CardHitsListItem = React.createClass({
 						        
 		            	<Rating start={0} stop={5} initialRate={4} />*/
 
-		var commentCount = <span className="disqus-comment-count" onClick={function() {this.setState({currentSelectedTab: 4})}.bind(this)} 
+		var commentCount = <span className="disqus-comment-count" onClick={function() {
+				if (this.props.currentCard != source.name) {
+					ga('send','event','Comments','viewComment');
+				}
+				this.setState({currentSelectedTab: 4});
+			}.bind(this)
+			} 
 			data-disqus-identifier={(source.multiverseids[result._source.multiverseids.length - 1].multiverseid).toString()} 
 			style={{fontVariant:"small-caps", float:"right", cursor:"pointer", paddingRight:8, fontSize:"smaller"}}>0 Comments</span>
 

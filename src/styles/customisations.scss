@@ -253,6 +253,7 @@ body {
   /*margin-bottom: -8px; /* To counteract the tagFilter's larger line height. */
   /*color: #0092D6;*/
   cursor: hand;
+  border-bottom: 1px solid rgba(0,146,214,0.7);
 }
 .sk-tag-filter:hover {
   color: $backgroundColour;
