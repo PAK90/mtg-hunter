@@ -23,11 +23,11 @@ var cardArray = cardArray.filter(function(card) {
 
 function symbolize(manaCost) {
   var symbolArray = [];
-  var regEx = /{([^}(0-9)]+)}/g; // Match all curly braces without numbers in them.
+  var regEx = /{\d*?[a-zA-Z\/]+\d*?}/g; // Match all curly braces without numbers in them, including {2/W}.
   var symbol;
   // Iterate through the mana cost regex matches, put them in the array.
   while (symbol = regEx.exec(manaCost)) {
-    symbolArray.push(symbol[1].replace("/","")); // Remove / from R/W and others like it.
+    symbolArray.push(symbol[0].replace("/","").replace("{","").replace("}","")); // Remove / from R/W and others like it.
   }
   return symbolArray;
 }

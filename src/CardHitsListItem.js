@@ -129,19 +129,19 @@ var CardHitsListItem = React.createClass({
 		// Record which tab was clicked.
 		switch(index) {
 			case 0:
-				ga('send','event','Tabs','details');
+				ga('send','event','Tabs','details', this.props.currentCard);
 				break;
 			case 1:
-				ga('send','event','Tabs','rulings');
+				ga('send','event','Tabs','rulings', this.props.currentCard);
 				break;
 			case 2:
-				ga('send','event','Tabs','languages');
+				ga('send','event','Tabs','languages', this.props.currentCard);
 				break;
 			case 3:
-				ga('send','event','Tabs','10closest');
+				ga('send','event','Tabs','10closest', this.props.currentCard);
 				break;
 			case 4:
-				ga('send','event','Tabs','comments');
+				ga('send','event','Tabs','comments', this.props.currentCard);
 				break;
 		}
 		this.setState({currentSelectedTab: index});
@@ -262,7 +262,7 @@ var CardHitsListItem = React.createClass({
 		//	if (data.error) {
 		//		console.log(error)
 		//	}
-		ga('send','event','Comments','post');
+		ga('send','event','Comments','post', this.props.currentCard);
 		//})
 	},
 
@@ -290,7 +290,7 @@ var CardHitsListItem = React.createClass({
 
 	    // Start with a separate div for all 4 potential prices.
 	    if (this.state.currentMedPrice) {
-	    	price = ( <a href={this.state.currentStoreLink} target="_blank" onClick={(evt) => {this.suppressClick(evt); ga('send','event','Store','medPrice');}}>
+	    	price = ( <a href={this.state.currentStoreLink} target="_blank" onClick={(evt) => {this.suppressClick(evt); ga('send','event','Store','medPrice', source.name);}}>
 	    		<div className="priceContainer">
     				<span className={bemBlocks.item("subtitle") + " price"}>{'$'+this.state.currentMedPrice.toFixed(2)}</span>
     				<br/>
@@ -300,7 +300,7 @@ var CardHitsListItem = React.createClass({
 	    }
 	    else { price = <div/>}
 	    if (this.state.currentFoilPrice) {
-	    	foilPrice = ( <a href={this.state.currentStoreLink} target="_blank" onClick={(evt) => {this.suppressClick(evt); ga('send','event','Store','foilPrice');}}>
+	    	foilPrice = ( <a href={this.state.currentStoreLink} target="_blank" onClick={(evt) => {this.suppressClick(evt); ga('send','event','Store','foilPrice', source.name);}}>
     			<div className="priceContainer">
 					<span className={bemBlocks.item("subtitle") + " price"}>{'$'+this.state.currentFoilPrice.toFixed(2)}</span>
 					<br/>
@@ -310,7 +310,7 @@ var CardHitsListItem = React.createClass({
 	    }
 	    else { foilPrice = <div/>}
 	    if (this.state.currentMtgoPrice) {
-	    	mtgoPrice = ( <a href={this.state.currentMtgoStoreLink} target="_blank" onClick={(evt) => {this.suppressClick(evt); ga('send','event','Store','mtgoPrice');}}>
+	    	mtgoPrice = ( <a href={this.state.currentMtgoStoreLink} target="_blank" onClick={(evt) => {this.suppressClick(evt); ga('send','event','Store','mtgoPrice', source.name);}}>
     			<div className="priceContainer">
     				<span className={bemBlocks.item("subtitle") + " price"}>{this.state.currentMtgoPrice.toFixed(2)}</span><span> TIX</span>
     				<br/>
@@ -322,7 +322,7 @@ var CardHitsListItem = React.createClass({
 	    if (this.state.currentFoilMtgoPrice) {	
 	    	mtgoFoilPrice = ( <a href={this.state.currentMtgoStoreLink.replace(/\d+/, function(mtgoId) { // Increment the url id by 1 to get foil url.
     				return Number(mtgoId) + 1;
-    			})} target="_blank" onClick={(evt) => {this.suppressClick(evt); ga('send','event','Store','mtgoFoilPrice');}}>
+    			})} target="_blank" onClick={(evt) => {this.suppressClick(evt); ga('send','event','Store','mtgoFoilPrice', source.name);}}>
     				<div className="priceContainer">
     				<span className={bemBlocks.item("subtitle") + " price"}>{this.state.currentFoilMtgoPrice.toFixed(2)}</span><span> TIX</span>
     				<br/>
@@ -552,7 +552,7 @@ var CardHitsListItem = React.createClass({
 
 		var commentCount = <span className="disqus-comment-count" onClick={function() {
 				if (this.props.currentCard != source.name) {
-					ga('send','event','Comments','viewComment');
+					ga('send','event','Comments','viewComment', source.name);
 				}
 				this.setState({currentSelectedTab: 4});
 			}.bind(this)

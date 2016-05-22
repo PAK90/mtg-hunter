@@ -9,6 +9,7 @@ var fs = require('fs'),
 
 let cardIndexer = new Indexer(
   "http://mtg-hunter.com",  
+  //"localhost:9200",
   "cards", "card"
 );
 
