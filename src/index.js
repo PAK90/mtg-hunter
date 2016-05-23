@@ -480,8 +480,8 @@ export class App extends React.Component<any, any> {
                 </div>
               </td>
               <td>{hit._source.multiverseids[0].medPrice ? 
-                  "$" + parseFloat(hit._source.multiverseids[0].medPrice).toFixed(2) :
-                  "$" + parseFloat(hit._source.multiverseids[1].medPrice).toFixed(2)}</td>
+                  "$" + parseFloat(hit._source.multiverseids[0].medPrice).toFixed(2) : (hit._source.multiverseids[1] ? "$" + parseFloat(hit._source.multiverseids[1].medPrice).toFixed(2) : "")
+                  }</td>
               <td style={{maxWidth:'160px'}}>
                 <div style={{textAlign:'center', maxHeight: '200px', overflow: 'auto', maxWidth:'130px', display:"inline-flex"}}>{getSetIcons(hit._source,this)}</div>
               </td>

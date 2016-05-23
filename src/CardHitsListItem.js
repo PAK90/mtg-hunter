@@ -96,6 +96,13 @@ var CardHitsListItem = React.createClass({
     	if (typeof DISQUSWIDGETS !== 'undefined') {
     		DISQUSWIDGETS.getCount({reset:true});
     	}
+	    // test: listeners on comment text to display images.
+	    var commentDivs = document.getElementsByClassName('disqus-comment-count');
+	    for (var comment = 0; comment < commentDivs.length; comment++) {
+	    	if (commentDivs[comment].getAttribute('data-disqus-identifier') == this.state.currentMultiId) {
+	    		this.setState({commentCount:commentDivs[comment].innerHTML[0]})
+	    	}
+	    }
     },
 
     componentDidUpdate() {
@@ -103,11 +110,6 @@ var CardHitsListItem = React.createClass({
     		DISQUSWIDGETS.getCount({reset:true});
     	}
     	
-	    // test: listeners on comment text to display images.
-	    var commentDivs = document.getElementsByClassName('post-message');
-	    for (var comment = 0; comment < commentDivs.length; comment++) {
-	    	commentDivs[0].addEventListener("mouseover", function(e) {console.log(e)});
-	    }
     },
 
     // Deprecated in favour of universal click handler in the parent.
