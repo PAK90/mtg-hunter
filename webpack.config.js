@@ -1,9 +1,9 @@
-var path = require('path');
-var webpack = require('webpack');
-var autoprefixer = require('autoprefixer');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
+const path = require('path');
+const webpack = require('webpack');
+const autoprefixer = require('autoprefixer');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-module.exports = {
+const config = {
   devtool: 'eval',
   entry: [
     'webpack-dev-server/client?http://localhost:3333',
@@ -55,3 +55,5 @@ module.exports = {
   },
   postcss: [autoprefixer]
 };
+
+module.exports = config;
