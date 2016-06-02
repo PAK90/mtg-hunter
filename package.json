@@ -53,7 +53,7 @@
     "react-tabs": "^0.5.3",
     "react-toolbox": "^0.14.0",
     "request": "^2.65.0",
-    "searchkit": "^0.10.0-0",
+    "searchkit": "^0.10.0-5",
     "svg-loader": "0.0.2",
     "svg-react-loader": "^0.3.2",
     "underscore": "^1.8.3",

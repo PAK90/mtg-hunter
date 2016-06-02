@@ -149,6 +149,20 @@ class FilterGroupItemSet extends FilterGroupItem {
   }
 }
 
+class FilterGroupItemCycleSet extends FilterGroupItem {
+  render() {
+    const { bemBlocks, label, itemKey } = this.props
+
+    return (
+      <FastClick handler={this.removeFilter}>
+        <div className={bemBlocks.items("value") } data-key={itemKey}>
+          {generateCycleSetSymbols(label)}
+        </div>
+      </FastClick>
+    )
+  }
+}
+
 class FilterGroupImg extends FilterGroup {
   
   renderFilter(filter, bemBlocks) {
@@ -163,7 +177,8 @@ class FilterGroupImg extends FilterGroup {
                     label={translate(filter.value)}
                     removeFilter={removeFilter} />
       ) 
-    } else if (id == "manaCost") {
+    } 
+    else if (id == "manaCost") {
       return (
         <FilterGroupItemCost key={filter.value}
                     itemKey={filter.value}
@@ -172,7 +187,8 @@ class FilterGroupImg extends FilterGroup {
                     label={translate(filter.value)}
                     removeFilter={removeFilter} />
       ) 
-    } else if ((id == "setcodes") /*|| (id == "cycles")*/) {
+    } 
+    else if ((id == "setcodes")) {
       return (
         <FilterGroupItemSet key={filter.value}
                     itemKey={filter.value}
@@ -181,10 +197,33 @@ class FilterGroupImg extends FilterGroup {
                     label={translate(filter.value)}
                     removeFilter={removeFilter} />
       )
-    } else {
+    } 
+    else if ((id == "cycles")) {
+      return (
+        <FilterGroupItemCycleSet key={filter.value}
+                    itemKey={filter.value}
+                    bemBlocks={bemBlocks}
+                    filter={filter}
+                    label={translate(filter.value)}
+                    removeFilter={removeFilter} />
+      )
+    }
+    else {
       return super.renderFilter(filter, bemBlocks)
     }
   }
+}
+
+function generateCycleSetSymbols(source) {
+  var tagged;
+  if (source !== undefined) {
+    // Then generate the tags through setting the innerHtml. This is the only way to preserve the text around the img tags.
+    // Encode the source in html, to prevent XSS nastiness. Then replace the newlines with <br/>. Then insert the <img> tags.
+    tagged = <span dangerouslySetInnerHTML={{__html: source.replace(/\b[A-Z0-9]{2,3}\b/g, (fullMatch, firstMatch) =>
+        `<img src=./src/img/sets-codified/${fullMatch.toUpperCase()}-R.jpg /><span>${fullMatch}</span>`
+      )}}></span>
+  }
+  return tagged;
 }
 
 function generateTextCostSymbols(source) {
@@ -214,6 +253,25 @@ const SymbolRefineList = (props:FilterItemComponentProps)=> {
       <div className={className} data-qa="option">
         {showCheckbox ? <input type="checkbox" data-qa="checkbox" checked={active} readOnly className={block("checkbox").state({ active }) } ></input> : undefined}
         <img src = {imageFromColor(props.label)} className="refineListImage"/>
+        <div data-qa="count" className={block("count")}>{count}</div>
+      </div>
+    </FastClick>
+  )
+}
+
+const CycleRefineList = (props:FilterItemComponentProps)=> {
+  const showCheckbox = false
+  const {bemBlocks, onClick, translate, active, label, count} = props;
+  const block = bemBlocks.option;
+  const className = block()
+                    .state({active})
+                    .mix(bemBlocks.container("item"));
+  return (
+    <FastClick handler={onClick}>
+      <div className={className} data-qa="option">
+        {showCheckbox ? <input type="checkbox" data-qa="checkbox" checked={active} readOnly className={block("checkbox").state({ active }) } ></input> : undefined}
+        <img src = {generateCycleSetSymbols(props.label)} className="refineListImage"/>
+        <div data-qa="label" className={block("text")}>{label}</div>
         <div data-qa="count" className={block("count")}>{count}</div>
       </div>
     </FastClick>
@@ -260,6 +318,12 @@ const SetMultiSelect = <MultiSelect
     style={{padding: '0px'}}/>}
   optionRenderer={(option) => <span><img className='multiSetIcon' src={'./src/img/sets/' + option.value.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-R.jpg'} 
     style={{padding: '0px'}}/> {option.value} ({option.doc_count})</span>}
+   />
+
+const CycleMultiSelect = <MultiSelect 
+  valueRenderer={(option) => generateCycleSetSymbols(option.value)}
+  optionRenderer={(option) => <span style={{display:'inline-flex'}}>{generateCycleSetSymbols(option.value)}
+    ({option.doc_count})</span>}
    />
 
 const modalStyle = {
@@ -522,7 +586,10 @@ export class App extends React.Component<any, any> {
                                 <option value="AND">AND</option>
                                 <option value="OR">OR</option>
                               </select></span>
-                            )} collapsable={true} defaultCollapsed={true}/>}/>*/
+                            )} collapsable={true} defaultCollapsed={true}/>}/>
+
+ <DynamicRangeFilter rangeFormatter={(count) => count.toFixed(2)} field="multiverseids.mtgoPrice" id="mtgoPrice" title="MTGO Price"/>
+              */
 
   render() {
     return (
@@ -654,7 +721,7 @@ export class App extends React.Component<any, any> {
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
 
-              <RefinementListFilter id="cycles" title="Cycles" field="cycle.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.cyclesOperator}  
+              <RefinementListFilter id="cycles" title="Cycles" field="cycle.raw" showMore={false} listComponent={CycleMultiSelect} size={0} orderKey="_term" operator={this.state.cyclesOperator}  
                             containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.cyclesOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "cyclesOperator")}/>
                               </div>

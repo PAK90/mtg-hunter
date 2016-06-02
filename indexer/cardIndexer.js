@@ -174,7 +174,7 @@ function bulkLoop() {
         if (legalities.legality == "Legal") {
           if ((setCode == "FRF" || setCode == "KTK") && (legalities.format == "Standard")) {
             console.log("overriding faulty KTK and FRF standard info.");
-            return false;
+            return null;
           }
           return legalities.format;
         }
