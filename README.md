@@ -1,5 +1,6 @@
-MtG Hunter; a better Magic card database.
-==
+# MtG Hunter; a better Magic card database.
+
+### Installation
 First [get Node.js](https://nodejs.org/en/download). Node's package manager, npm, comes with the node installer. Then, in the project directory, install all the npm goodness.
 ```bash
 npm install
@@ -19,3 +20,12 @@ Start npm, and the application will load on http://localhost:3333.
 ```bash
 npm start
 ```
+
+### Card Prices
+This process takes a very long time (almost an hour), but allows extended functionality inside the app.
+
+To populate the database with card prices, make sure you first have the [Babel CLI](https://babeljs.io/docs/usage/cli/), or run `npm install -g babel-cli` to install it globally
+
+Open `getCardPrices.js` comment out line 11, and uncomment line 12.
+
+Then, `npm run prices`
