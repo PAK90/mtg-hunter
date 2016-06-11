@@ -108,13 +108,13 @@ let mapping = {
       flavor:stringWithRaw,
       setCode:stringWithRaw,
       setName:stringWithRaw,
-      lowPrice:{type:"float"},
-      medPrice:{type:"float"},
-      hiPrice:{type:"float"},
+      lowPrice:{type:"double"},
+      medPrice:{type:"double"},
+      hiPrice:{type:"double"},
       storeLink:{type:"string"},
       mtgoStoreLink:{type:"string"},
-      mtgoPrice:{type:"float"},
-      mtgoFoilPrice:{type:"float"}
+      mtgoPrice:{type:"double"},
+      mtgoFoilPrice:{type:"double"}
     }
   },
   cmc:{type:"integer"},
