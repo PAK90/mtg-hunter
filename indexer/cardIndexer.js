@@ -132,6 +132,7 @@ let mapping = {
   subtypes:stringWithRaw,
   text:{type:"string"},
   namelessText:stringWithRaw,
+  reminderlessText:stringWithRaw,
   toughness:stringWithRaw,
   type:stringWithRaw,
   supertypes:stringWithRaw,
@@ -161,6 +162,25 @@ function banCards(legalities) {
 let cardLength = cards.length;
 var i = 0;
 
+function identifyColour(name, identity) {
+  // Nalathni Dragon, Sewers of Estark, Windseeker Centaur, and Giant Badger are all missing colour identity info. Set it manually...
+  if (name == "Nalathni Dragon" || name == "Windseeker Centaur") {
+    return "R";
+  }
+  else if (name == "Sewers of Estark") {
+    return "B";
+  }
+  else if (name == "Giant Badger") {
+    return "G";
+  }
+  else if (!identity) { // If the card is colourless (truly colourless, no artifacts/lands with colours) then set identity to that.
+    return "Colourless";
+  }
+  else {
+    return identity;
+  }
+}
+
 function bulkLoop() {
   setTimeout(function() {
     console.log(i + ' to ' + (i + 999) + ' (' + cards.slice(i,i+1000).length + ')');
@@ -182,6 +202,8 @@ function bulkLoop() {
       //card.codeNames = _.map(card.multiverseids, "setName");
       card.colourCount = card.colors ? card.colors.length : 0; // If it doesn't have colours it won't exist so hopefully it's false-y and will go to 0.
       card.colors = card.colors || "Colourless";
+      
+      card.colorIdentity = identifyColour(card.name, card.colorIdentity);
       card.prettyCost = card.manaCost ? card.manaCost.replace(/[{}]/g, '') : null;
       card.symbols = _.uniq(symbolize(card.manaCost)); // Extract all symbols from {} that aren't numeric. Remove duplicates with _.uniq.
       //card.artists = _.uniq(_.map(card.multiverseids, "artist"));
@@ -190,6 +212,7 @@ function bulkLoop() {
       // Generate new rules text to search on that anonymizes names. Keep original intact for display purposes.
       // Tuktuk is a special case, because of 'Tuktuk the Reborn' appearing in the text.
       card.namelessText = card.name == "Tuktuk the Explorer" ? card.text.replace(card.name, '~') : anonymizeRulesText(card.name, card.text);
+      card.reminderlessText = card.namelessText ? card.namelessText.replace(/\((.*?)\)/g,'') : null;
       //card.colourCount = countColours(card.symbols); // Count unique colours. ['w','ug'] = 3, ['r','u','w'] = 3, ['c'] = 0 since colourless isn't a colour. Replaced by line 30.
       //card.rulings = card.rulings ? card.rulings.map(function(ruling) { return bracketRulings(ruling, card); }.bind(this)) : null;
       return card;
