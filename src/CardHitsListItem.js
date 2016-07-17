@@ -183,11 +183,14 @@ var CardHitsListItem = React.createClass({
 		this.setState({currentImageMultiId: this.state.currentMultiId});
 	},
 
-	onLayoutHover(source) {
+	onLayoutHover(source, tag) {
 		this.setState({currentImageLayout: source.layout});
-		if (source.layout == 'double-faced') {
+		if (source.layout == 'double-faced' || (source.layout == 'meld' && source.names.length == 2)) {
 			//var targetName = source.name == source.names[0] ? source.names[1] : source.names[0];
 			this.setState({currentImageMultiId: source.flipSideMultiId});
+		}
+		else if (source.layout == 'meld' && source.names.length == 3) {
+			this.setState({currentImageMultiId: source.flipSideMultiId[tag]});	
 		}
 	},
 
@@ -387,13 +390,31 @@ var CardHitsListItem = React.createClass({
 	    	)
 	    }
     	else { legalities = <div/> }
-    	if (source.layout == "flip" || source.layout == "double-faced" || source.layout == "split") {
+    	if (source.layout == "flip" || source.layout == "double-faced" || source.layout == "split" || (source.layout == "meld" && source.names.length == 2)) {
     		var otherSideName = source.name == source.names[0] ? source.names[1] : source.names[0];
     		otherSide = (
     			<span onMouseOver={this.onLayoutHover.bind(this, source)}
     				onMouseOut={this.onLayoutHoverOut}
     				className={bemBlocks.item("subtitle")}><b><a href={"http://mtg-hunter.com/?q="+otherSideName} 
-    															target="_blank" onClick={(evt) => this.suppressClick(evt)}>{otherSideName}</a></b></span>
+    															target="_blank" onClick={(evt) => this.suppressClick(evt)}>{otherSideName}</a></b>
+    			</span>
+    		)
+    	}
+    	else if ( source.layout == 'meld' && source.names.length == 3 ) { // If it's the resulting meld card, need to list both components.
+    		var otherSideName1 = source.names[0];
+    		var otherSideName2 = source.names[1];
+    		otherSide = (<div>
+    			<span onMouseOver={this.onLayoutHover.bind(this, source, 0)}
+    				onMouseOut={this.onLayoutHoverOut}
+    				className={bemBlocks.item("subtitle")}><b><a href={"http://mtg-hunter.com/?q="+otherSideName1} 
+    															target="_blank" onClick={(evt) => this.suppressClick(evt)}>{otherSideName1}</a></b>
+    			</span>
+    			<span className={bemBlocks.item("subtitle")}> melded with </span>
+    			<span onMouseOver={this.onLayoutHover.bind(this, source, 1)}
+    				onMouseOut={this.onLayoutHoverOut}
+    				className={bemBlocks.item("subtitle")}><b><a href={"http://mtg-hunter.com/?q="+otherSideName2} 
+    															target="_blank" onClick={(evt) => this.suppressClick(evt)}>{otherSideName2}</a></b>
+    			</span></div>
     		)
     	}
     	else {
