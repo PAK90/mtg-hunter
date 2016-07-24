@@ -279,6 +279,9 @@ body {
     &.double-faced {
       transform: rotateY(360deg);
     }
+    &.meld {
+      transform: rotateY(360deg);
+    }
   }
   &.split {
     transform: rotate(90deg);
@@ -288,6 +291,9 @@ body {
     transform: rotate(180deg);
   }
   &.double-faced {
+    transform: rotateY(360deg);
+  }
+  &.meld {
     transform: rotateY(360deg);
   }
 }
