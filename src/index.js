@@ -93,6 +93,44 @@ var Animations = {
     })
 };
 
+const assign = require("lodash/assign")
+
+export function QueryString(query, options:QueryStringOptions={}){
+  if(!query){
+    return
+  }
+  return {
+    "regexp":assign({"name":query})
+  }
+}
+
+export function QueryRulesString(query, options:QueryStringOptions={}){
+  if(!query){
+    return
+  }
+  return {
+    "regexp":assign({"reminderlessText":query})
+  }
+}
+
+export function QueryFlavourString(query, options:QueryStringOptions={}){
+  if(!query){
+    return
+  }
+  return {
+    "regexp":assign({"multiverseids.flavor":query})
+  }
+}
+
+export function QueryTypeString(query, options:QueryStringOptions={}){
+  if(!query){
+    return
+  }
+  return {
+    "regexp":assign({"type":query})
+  }
+}
+
 // Make a view switcher that accepts props.
 class NewViewSwitcher extends ViewSwitcherHits {
   componentWillReceiveProps(nextProps){
@@ -587,6 +625,8 @@ export class App extends React.Component<any, any> {
                                 <option value="OR">OR</option>
                               </select></span>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
+                
+
 
  <DynamicRangeFilter rangeFormatter={(count) => count.toFixed(2)} field="multiverseids.mtgoPrice" id="mtgoPrice" title="MTGO Price"/>
               */
@@ -627,11 +667,13 @@ export class App extends React.Component<any, any> {
               <SearchBox
                 translations={{"searchbox.placeholder": "search card names"}}
                 queryOptions={{"minimum_should_match": this.state.matchPercent}}
+                prefixQueryFields={["name"]}
                 autofocus={true}
                 searchOnChange={true}
                 searchThrottleTime={1000}
                 queryFields={["name"]}
-                prefixQueryFields={["name"]}/>
+                queryBuilder={QueryString}
+              />
             </div>
           </div>
 
@@ -641,9 +683,12 @@ export class App extends React.Component<any, any> {
               <RangeFilter id="cmc" min={0} max={16} title="Converted Cost" field="cmc" showHistogram={true}/>
               <RangeFilter id="paperPrice" min={0} max={10000} rangeComponent={RangeSliderInput} title="Paper Price" field="multiverseids.medPrice" showHistogram={true}/>
               <RangeFilter id="mtgoPrice" min={0} max={160} rangeComponent={RangeSliderInput} title="MTGO Price" field="multiverseids.mtgoPrice" showHistogram={true}/>
-              <InputFilter id="rulesText" searchThrottleTime={1000} title="Rules text" placeholder="Use ~ for cardname" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["reminderlessText"]} prefixQueryFields={["reminderlessText"]}/>
-              <InputFilter id="flavourText" searchThrottleTime={1000} title="Flavour text" placeholder="Search flavour text" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["multiverseids.flavor"]} prefixQueryFields={["multiverseids.flavor"]}/>
-              <InputFilter id="typeLine" searchThrottleTime={1000} title="Type text" placeholder="Search type text" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["type"]} prefixQueryFields={["type"]}/>              
+              <InputFilter 
+                queryBuilder={QueryRulesString} id="rulesText" searchThrottleTime={1000} title="Rules text" placeholder="Use ~ for cardname" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["reminderlessText"]} prefixQueryFields={["reminderlessText"]}/>
+              <InputFilter 
+                queryBuilder={QueryFlavourString} id="flavourText" searchThrottleTime={1000} title="Flavour text" placeholder="Search flavour text" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["multiverseids.flavor"]} prefixQueryFields={["multiverseids.flavor"]}/>
+              <InputFilter 
+                queryBuilder={QueryTypeString} id="typeLine" searchThrottleTime={1000} title="Type text" placeholder="Search type text" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["type"]} prefixQueryFields={["type"]}/>              
               <RefinementListFilter id="power" title="Power" field="power.raw" size={5} operator={this.state.powerOperator}  
                             containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.powerOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "powerOperator")}/>

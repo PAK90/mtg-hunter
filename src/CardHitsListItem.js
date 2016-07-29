@@ -633,6 +633,7 @@ var CardHitsListItem = React.createClass({
 						    </div>
 				        	<div style={{width: '150px', position: 'relative', right: '10px', display:'inline-block'}}>
 				          		<p style={{textAlign:'center', maxHeight: '200px', overflowY: 'scroll'}}>{this.getSetIcons(source)}</p>
+				          		<i className="ss ss-exp"/>
 				        	</div>	
 				        </div>
 	    				{/* The tab panel is by itself under block 3. */}
