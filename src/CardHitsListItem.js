@@ -290,9 +290,9 @@ var CardHitsListItem = React.createClass({
 	    var source = result._source;
 	    let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + this.state.currentMultiId;
 	    let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/' + this.state.currentImageMultiId + '.jpg';
-	    if (this.state.currentImageMultiId.indexOf('_') != -1) {
+	    /*if (this.state.currentImageMultiId.indexOf('_') != -1) { // UNCOMMENT FOR PROMO SUPPORT.
 	    	imgUrl = './src/img/promo/'+this.state.currentImageMultiId+'.jpg';
-	    }
+	    }*/
 	    // Generate the mana symbols in both cost and the card text.	    
 	    source.tagCost = this.generateTitleCostSymbols(source.manaCost);
 	    source.taggedText = this.generateTextCostSymbols(source.text);

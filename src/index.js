@@ -667,7 +667,7 @@ export class App extends React.Component<any, any> {
                 </div>
               </Modal>
               <SearchBox
-                translations={{"searchbox.placeholder": "search card names"}}
+                translations={{"searchbox.placeholder": "Search card names. Use regex e.g. \"fire|water|ice\""}}
                 queryOptions={{"minimum_should_match": this.state.matchPercent}}
                 prefixQueryFields={["name"]}
                 autofocus={true}
@@ -688,9 +688,9 @@ export class App extends React.Component<any, any> {
               <InputFilter 
                 queryBuilder={QueryRulesString} id="rulesText" searchThrottleTime={1000} title="Rules text" placeholder="Use ~ for cardname" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["reminderlessText"]} prefixQueryFields={["reminderlessText"]}/>
               <InputFilter 
-                queryBuilder={QueryFlavourString} id="flavourText" searchThrottleTime={1000} title="Flavour text" placeholder="Search flavour text" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["multiverseids.flavor"]} prefixQueryFields={["multiverseids.flavor"]}/>
+                queryBuilder={QueryFlavourString} id="flavourText" searchThrottleTime={1000} title="Flavour text" placeholder="Regex supported" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["multiverseids.flavor"]} prefixQueryFields={["multiverseids.flavor"]}/>
               <InputFilter 
-                queryBuilder={QueryTypeString} id="typeLine" searchThrottleTime={1000} title="Type text" placeholder="Search type text" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["type"]} prefixQueryFields={["type"]}/>              
+                queryBuilder={QueryTypeString} id="typeLine" searchThrottleTime={1000} title="Type text" placeholder="Regex supported" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["type"]} prefixQueryFields={["type"]}/>              
               <RefinementListFilter id="power" title="Power" field="power.raw" size={5} operator={this.state.powerOperator}  
                             containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.powerOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "powerOperator")}/>
