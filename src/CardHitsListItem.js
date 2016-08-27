@@ -200,16 +200,30 @@ var CardHitsListItem = React.createClass({
 
     getSetIcons: function(source) {
     	// Loop through all multiverseIds, which have their own set code and rarity.
-    	var setImages = source.multiverseids.map(function(multis, i) {
+    	var setIcons = source.multiverseids.map(function(multis, i) {
       		let rarity = multis.rarity.charAt(0) == "B" ? "C" : multis.rarity.charAt(0); // Replace 'basic' rarity with common.
-      		let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + multis.multiverseid;
+      		/*let rarity = multis.rarity.toLowerCase();
+      		if (rarity == "basic") {
+      			rarity = "common";
+      		}
+      		else if (rarity == "special") {
+      			rarity = "rare";
+      		}*/
       		return (
             	<img key={i} className={(this.state.currentMultiId == multis.multiverseid ? "clicked " : "") + "setIcon " + rarity } src={'./src/img/sets/' + multis.setName.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-' + rarity + '.jpg'} 
 	                title={multis.setName}
 	                onClick={(evt) => this.handleSetIconClick(evt, multis)}/>
 	            )
+				          		
 	    	}.bind(this))
-    	return setImages;
+	    	/*return (
+	    		<span className={"ss setIcon ss-"+multis.setCode.toLowerCase()+" ss-"+rarity+" ss-2x ss-grad"} 
+	    			title={multis.setName}
+	                onClick={(evt) => this.handleSetIconClick(evt, multis)}/>
+	                <i className="ss ss-pFNM ss-2x ss-mythic ss-grad"/>
+	    		)
+	    }.bind(this));*/
+    	return setIcons;
   	},
 
   	generateTitleCostSymbols: function(source) {
@@ -633,7 +647,6 @@ var CardHitsListItem = React.createClass({
 						    </div>
 				        	<div style={{width: '150px', position: 'relative', right: '10px', display:'inline-block'}}>
 				          		<p style={{textAlign:'center', maxHeight: '200px', overflowY: 'scroll'}}>{this.getSetIcons(source)}</p>
-				          		<i className="ss ss-exp"/>
 				        	</div>	
 				        </div>
 	    				{/* The tab panel is by itself under block 3. */}

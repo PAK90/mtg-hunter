@@ -3,6 +3,8 @@ import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import "searchkit/theming/theme.scss";
 import "./styles/customisations.scss";
+//import "./styles/keyrune.css";
+import Webcam from "react-user-media";
 var VelocityTransitionGroup = require('velocity-react/velocity-transition-group.js');
 var VelocityComponent = require('velocity-react/velocity-component.js');
 var VelocityHelpers = require('velocity-react/velocity-helpers.js');
@@ -787,6 +789,8 @@ export class App extends React.Component<any, any> {
                     {label:"Colour (descending)", field:"colors", order:"desc"},
                     {label:"CMC (ascending)", field:"cmc", order:"asc"},
                     {label:"CMC (descending)", field:"cmc", order:"desc"},
+                    {label:"Card number (ascending)", field:"multiverseids.number", order:"asc"},
+                    {label:"Card number (descending)", field:"multiverseids.number", order:"desc"},
                     {label:"Paper Price (ascending)", field:"multiverseids.medPrice", order:"asc"},
                     {label:"Paper Price (descending)", field:"multiverseids.medPrice", order:"desc"},
                     {label:"MTGO Price (ascending)",  field:"multiverseids.mtgoPrice", order:"asc"},

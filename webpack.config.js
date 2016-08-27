@@ -43,7 +43,7 @@ const config = {
         loaders: ['react-hot', 'babel'],
         include: path.join(__dirname, 'src')
       },
-      { test: /\.png$/, loader: "url-loader?limit=100000" },
+      { test: /.(png|woff(2)?|eot|ttf|svg)(\?[a-z0-9=\.]+)?$/, loader: 'url-loader?limit=100000' },
       { test: /\.jpg$/, loader: "file-loader" },
       {
         test: /(\.scss|\.css)$/,
