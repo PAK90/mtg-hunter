@@ -16,6 +16,7 @@ const nl2br = require('react-nl2br');
 const omit = require("lodash/omit");
 const map = require("lodash/map");
 import Modal from 'react-overlays/lib/Modal';
+//var ReactSurvey = require('survey-react/dist/survey.react');
 
 import {
   SearchBox,
@@ -397,6 +398,28 @@ const dialogStyle = function() {
   };
 };
 
+function sendDataToServer(survey) {
+  //You should get the Guid for storing survey data in dxSurvey.com
+  survey.sendResult('6924c3bc-2804-4fd6-81dc-5befd1503fc0');
+};
+
+  var surveyJSON = { title: "Tell us, what technologies do you use?", pages: [
+    { name:"page1", questions: [ 
+        { type: "radiogroup", choices: [ "Yes", "No" ], isRequired: true, name: "frameworkUsing",title: "Do you use any front-end framework like Bootstrap?" },
+        { type: "checkbox", choices: ["Bootstrap","Foundation"], hasOther: true, isRequired: true, name: "framework", title: "What front-end framework do you use?", visible: false }
+     ]},
+    { name: "page2", questions: [
+      { type: "radiogroup", choices: ["Yes","No"],isRequired: true, name: "mvvmUsing", title: "Do you use any MVVM framework?" },
+      { type: "checkbox", choices: [ "AngularJS", "KnockoutJS", "React" ], hasOther: true, isRequired: true, name: "mvvm", title: "What MVVM framework do you use?", visible: false } ] },
+    { name: "page3",questions: [
+      { type: "comment", name: "about", title: "Please tell us about your main requirements for Survey library" } ] }
+   ],
+   triggers: [
+    { type: "visible", operator: "equal", value: "Yes", name: "frameworkUsing", questions: ["framework"]},
+    { type: "visible", operator: "equal", value: "Yes", name: "mvvmUsing", questions: ["mvvm"]}
+   ]
+  }
+
 export class App extends React.Component<any, any> {
 
   constructor() {
@@ -629,6 +652,7 @@ export class App extends React.Component<any, any> {
                             )} collapsable={true} defaultCollapsed={true}/>}/>
                 
 
+      <ReactSurvey json={surveyJSON} onComplete={sendDataToServer}/>  
 
  <DynamicRangeFilter rangeFormatter={(count) => count.toFixed(2)} field="multiverseids.mtgoPrice" id="mtgoPrice" title="MTGO Price"/>
               */
@@ -636,6 +660,7 @@ export class App extends React.Component<any, any> {
   render() {
     return (
       <div>
+
       <SearchkitProvider searchkit={this.searchkit}>
       <div>
         <div className="sk-layout sk-layout__size-l">
@@ -827,6 +852,7 @@ export class App extends React.Component<any, any> {
         position: 'absolute',
         maxWidth: 630,
         right: 60}}>Wizards of the Coast, Magic: The Gathering, and their logos are trademarks of Wizards of the Coast LLC. © 1995-2016 Wizards. All rights reserved. MtG:Hunter is not affiliated with Wizards of the Coast LLC.</p>
+
       </div>
     )}
 }

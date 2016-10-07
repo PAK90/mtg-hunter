@@ -53,7 +53,7 @@ const config = {
       { test: /\.svg$/, loader: 'svg-loader?pngScale=2' }
     ]
   },
-  postcss: [autoprefixer]
+  postcss: [autoprefixer],
 };
 
 module.exports = config;
