@@ -52,7 +52,7 @@ function anonymizeRulesText(name, text) {
   text = text.replace(new RegExp(name, 'g'), '~');
 
   // To avoid doing the 'Thopter token bug', exit here if it's one of the special name-within-a-token cards.
-  if (_.includes(cardsThatMakeTokensWithTheirName, name)) return;
+  if (_.includes(cardsThatMakeTokensWithTheirName, name)) return text;
   // Now with a first name. Since 'flying' occurs in names and is a keyword, don't do that. Duplicate for other keywords.
   let firstName = name.split(' ')[0];
   if (!_.includes(forbiddenWords, firstName) && name != "Erase (Not the Urza's Legacy One)") {
@@ -213,7 +213,7 @@ function bulkLoop() {
       // Tuktuk is a special case, because of 'Tuktuk the Reborn' appearing in the text.
       card.namelessText = card.name == "Tuktuk the Explorer" ? card.text.replace(card.name, '~') : anonymizeRulesText(card.name, card.text);
       // Remove everything from reminder () brackets for reminderless text.
-      card.reminderlessText = card.namelessText ? card.namelessText.replace(/\((.*?)\)/g,'') : null;
+      card.reminderlessText = card.text ? card.text.replace(/\((.*?)\)/g,'') : null;
       //card.colourCount = countColours(card.symbols); // Count unique colours. ['w','ug'] = 3, ['r','u','w'] = 3, ['c'] = 0 since colourless isn't a colour. Replaced by line 30.
       //card.rulings = card.rulings ? card.rulings.map(function(ruling) { return bracketRulings(ruling, card); }.bind(this)) : null;
       return card;
