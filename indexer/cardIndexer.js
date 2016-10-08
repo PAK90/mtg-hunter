@@ -213,7 +213,7 @@ function bulkLoop() {
       // Tuktuk is a special case, because of 'Tuktuk the Reborn' appearing in the text.
       card.namelessText = card.name == "Tuktuk the Explorer" ? card.text.replace(card.name, '~') : anonymizeRulesText(card.name, card.text);
       // Remove everything from reminder () brackets for reminderless text.
-      card.reminderlessText = card.text ? card.text.replace(/\((.*?)\)/g,'') : null;
+      card.reminderlessText = card.namelessText ? card.namelessText.replace(/\((.*?)\)/g,'') : null;
       //card.colourCount = countColours(card.symbols); // Count unique colours. ['w','ug'] = 3, ['r','u','w'] = 3, ['c'] = 0 since colourless isn't a colour. Replaced by line 30.
       //card.rulings = card.rulings ? card.rulings.map(function(ruling) { return bracketRulings(ruling, card); }.bind(this)) : null;
       return card;
