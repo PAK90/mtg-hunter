@@ -16,7 +16,6 @@ const nl2br = require('react-nl2br');
 const omit = require("lodash/omit");
 const map = require("lodash/map");
 import Modal from 'react-overlays/lib/Modal';
-//var ReactSurvey = require('survey-react/dist/survey.react');
 
 import {
   SearchBox,
@@ -60,7 +59,7 @@ import {MultiSelect} from './MultiSelect';
 import {TogglePanel} from './TogglePanel';
 //console.log("multiselect is " + MultiSelect);
 
-String.prototype.replaceAll = function(s,r){return this.split(s).join(r)};
+String.prototype.replaceAll = function(s,r){return this.split(s).join(r);};
 
 // Register animations here so that 'stagger' property can be used with them.
 var Animations = {
@@ -96,11 +95,11 @@ var Animations = {
     })
 };
 
-const assign = require("lodash/assign")
+const assign = require("lodash/assign");
 
 export function QueryString(query, options:QueryStringOptions={}){
   if(!query){
-    return
+    return;
   }
   return {
     "regexp":assign({"name":query})
@@ -127,11 +126,11 @@ export function QueryFlavourString(query, options:QueryStringOptions={}){
 
 export function QueryTypeString(query, options:QueryStringOptions={}){
   if(!query){
-    return
+    return;
   }
   return {
     "regexp":assign({"type":query})
-  }
+  };
 }
 
 // Make a view switcher that accepts props.
@@ -142,15 +141,15 @@ class NewViewSwitcher extends ViewSwitcherHits {
 }
 
 function imageFromColor(color){
-  color = color.toLowerCase()
+  color = color.toLowerCase();
   if (color == "blue") color = "u";
   else if (color.length > 2) color = color[0]; // Keep 2-letter keys (hw, gw, etc.)
-  return './src/img/' + color + '.png'
+  return './src/img/' + color + '.png';
 }
 
 class FilterGroupItemImg extends FilterGroupItem {
   render() {
-    const { bemBlocks, label, itemKey } = this.props
+    const { bemBlocks, label, itemKey } = this.props;
 
     return (
       <FastClick handler={this.removeFilter}>
@@ -182,7 +181,7 @@ class FilterGroupItemSet extends FilterGroupItem {
     return (
       <FastClick handler={this.removeFilter}>
         <div className={bemBlocks.items("value") } data-key={itemKey}>
-          <img className='multiSetIcon' src={'./src/img/sets/' + label.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-R.jpg'} 
+          <img className='multiSetIcon' src={'./src/img/sets/' + label.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-R.jpg'}
     style={{padding: '0px'}}/> {label}
         </div>
       </FastClick>
@@ -205,7 +204,7 @@ class FilterGroupItemCycleSet extends FilterGroupItem {
 }
 
 class FilterGroupImg extends FilterGroup {
-  
+
   renderFilter(filter, bemBlocks) {
     const { translate, removeFilter, title } = this.props
     const id = filter.id
@@ -217,8 +216,8 @@ class FilterGroupImg extends FilterGroup {
                     filter={filter}
                     label={translate(filter.value)}
                     removeFilter={removeFilter} />
-      ) 
-    } 
+      )
+    }
     else if (id == "manaCost") {
       return (
         <FilterGroupItemCost key={filter.value}
@@ -227,8 +226,8 @@ class FilterGroupImg extends FilterGroup {
                     filter={filter}
                     label={translate(filter.value)}
                     removeFilter={removeFilter} />
-      ) 
-    } 
+      )
+    }
     else if ((id == "setcodes")) {
       return (
         <FilterGroupItemSet key={filter.value}
@@ -238,7 +237,7 @@ class FilterGroupImg extends FilterGroup {
                     label={translate(filter.value)}
                     removeFilter={removeFilter} />
       )
-    } 
+    }
     else if ((id == "cycles")) {
       return (
         <FilterGroupItemCycleSet key={filter.value}
@@ -349,19 +348,19 @@ const InitialLoaderComponent = (props) => {
   </div>
 }
 
-const CostMultiSelect = <MultiSelect 
+const CostMultiSelect = <MultiSelect
   valueRenderer={(option) => <CostSymbols cost={option.value} />}
   optionRenderer={(option) => <span><CostSymbols cost={option.value} /> ({option.doc_count})</span>}
    />
 
-const SetMultiSelect = <MultiSelect 
-  valueRenderer={(option) => <img className='multiSetIcon' src={'./src/img/sets/' + option.value.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-R.jpg'} 
+const SetMultiSelect = <MultiSelect
+  valueRenderer={(option) => <img className='multiSetIcon' src={'./src/img/sets/' + option.value.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-R.jpg'}
     style={{padding: '0px'}}/>}
-  optionRenderer={(option) => <span><img className='multiSetIcon' src={'./src/img/sets/' + option.value.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-R.jpg'} 
+  optionRenderer={(option) => <span><img className='multiSetIcon' src={'./src/img/sets/' + option.value.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-R.jpg'}
     style={{padding: '0px'}}/> {option.value} ({option.doc_count})</span>}
    />
 
-const CycleMultiSelect = <MultiSelect 
+const CycleMultiSelect = <MultiSelect
   valueRenderer={(option) => generateCycleSetSymbols(option.value)}
   optionRenderer={(option) => <span style={{display:'inline-flex'}}>{generateCycleSetSymbols(option.value)}
     ({option.doc_count})</span>}
@@ -397,28 +396,6 @@ const dialogStyle = function() {
     padding: 20
   };
 };
-
-function sendDataToServer(survey) {
-  //You should get the Guid for storing survey data in dxSurvey.com
-  survey.sendResult('6924c3bc-2804-4fd6-81dc-5befd1503fc0');
-};
-
-  var surveyJSON = { title: "Tell us, what technologies do you use?", pages: [
-    { name:"page1", questions: [ 
-        { type: "radiogroup", choices: [ "Yes", "No" ], isRequired: true, name: "frameworkUsing",title: "Do you use any front-end framework like Bootstrap?" },
-        { type: "checkbox", choices: ["Bootstrap","Foundation"], hasOther: true, isRequired: true, name: "framework", title: "What front-end framework do you use?", visible: false }
-     ]},
-    { name: "page2", questions: [
-      { type: "radiogroup", choices: ["Yes","No"],isRequired: true, name: "mvvmUsing", title: "Do you use any MVVM framework?" },
-      { type: "checkbox", choices: [ "AngularJS", "KnockoutJS", "React" ], hasOther: true, isRequired: true, name: "mvvm", title: "What MVVM framework do you use?", visible: false } ] },
-    { name: "page3",questions: [
-      { type: "comment", name: "about", title: "Please tell us about your main requirements for Survey library" } ] }
-   ],
-   triggers: [
-    { type: "visible", operator: "equal", value: "Yes", name: "frameworkUsing", questions: ["framework"]},
-    { type: "visible", operator: "equal", value: "Yes", name: "mvvmUsing", questions: ["mvvm"]}
-   ]
-  }
 
 export class App extends React.Component<any, any> {
 
@@ -520,9 +497,9 @@ export class App extends React.Component<any, any> {
     return (
       <div className={bemBlocks.item().mix(bemBlocks.container("item"))}>
         <a href={"http://mtg-hunter.com/?q="+source.name+"&sort=_score_desc"}>
-          <img className='gridImg' 
-            style={{height: 311}} 
-            src={imgUrl} 
+          <img className='gridImg'
+            style={{height: 311}}
+            src={imgUrl}
             onClick={this.handleClick.bind(this, source)}
             onMouseOver={this.handleHoverIn.bind(this, source)}
             onMouseOut={this.handleHoverOut.bind(this, source)}/>
@@ -531,7 +508,7 @@ export class App extends React.Component<any, any> {
     )
   }
 
-  CardHitsTable = (props)=> {  
+  CardHitsTable = (props)=> {
     const { hits } = props;
 
     function getSetIcons(source, scope) {
@@ -542,7 +519,7 @@ export class App extends React.Component<any, any> {
         return (<div>
                 <TagFilterConfig field="multiverseids.setName.raw" id="setNameIconTag" title="Set icon" operator={scope.state.setcodesOperator} searchkit={scope.searchkit}/>
                 <TagFilter field="multiverseids.setName.raw" value={multis.setName}>
-                <img className='setIcon' src={'./src/img/sets/' + multis.setName.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-' + rarity + '.jpg'} 
+                <img className='setIcon' src={'./src/img/sets/' + multis.setName.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-' + rarity + '.jpg'}
                   title={multis.setName}
                   style={{padding: '2px'}}
                   />
@@ -589,24 +566,24 @@ export class App extends React.Component<any, any> {
               <td>
                 <div style={{display:"inline-flex"}} className={"subtitle typeLine"} >
                   <TagFilterConfig field="supertypes.raw" id="supertypeField" title="Supertype" operator={this.state.supertypeOperator} searchkit={this.searchkit}/>
-                  {_.map(hit._source.supertypes,supertype => 
+                  {_.map(hit._source.supertypes,supertype =>
                     <div key={supertype} style={{display:"inline-flex"}}>
                       <TagFilter field="supertypes.raw" value={supertype} /><span>&nbsp;</span>
                     </div>)}
                   <TagFilterConfig field="types.raw" id="typeField" title="Type" operator={this.state.typeOperator} searchkit={this.searchkit}/>
-                  {_.map(hit._source.types,type => 
+                  {_.map(hit._source.types,type =>
                     <div key={type} style={{display:"inline-flex"}}>
                       <TagFilter field="types.raw" value={type} /><span>&nbsp;</span>
                     </div>)}
                   {hit._source.subtypes ? <span>—&nbsp;</span> : <span/>}
                   <TagFilterConfig field="subtypes.raw" id="subtypeField" title="Subtype" operator={this.state.subtypeOperator} searchkit={this.searchkit}/>
-                  {_.map(hit._source.subtypes,subtype => 
+                  {_.map(hit._source.subtypes,subtype =>
                     <div key={subtype} style={{display:"inline-flex"}}>
                       <TagFilter field="subtypes.raw" value={subtype} /><span>&nbsp;</span>
                     </div>)}
                 </div>
               </td>
-              <td>{hit._source.multiverseids[0].medPrice ? 
+              <td>{hit._source.multiverseids[0].medPrice ?
                   "$" + parseFloat(hit._source.multiverseids[0].medPrice).toFixed(2) : (hit._source.multiverseids[1] ? "$" + parseFloat(hit._source.multiverseids[1].medPrice).toFixed(2) : "")
                   }</td>
               <td style={{maxWidth:'160px'}}>
@@ -617,7 +594,7 @@ export class App extends React.Component<any, any> {
           </tbody>
         </table>
       </div>
-    )  
+    )
   }
 
   suppressClick(evt) {
@@ -640,9 +617,9 @@ export class App extends React.Component<any, any> {
                                 <option value="AND">AND</option>
                                 <option value="OR">OR</option>
                               </select>
-                            )}*/ 
+                            )}*/
 
-              /*<OnlyRefinementListFilter id="colourIdentity" title="Colour Identity" field="colorIdentity" size={6} operator={this.state.operator} only={this.state.only} 
+              /*<OnlyRefinementListFilter id="colourIdentity" title="Colour Identity" field="colorIdentity" size={6} operator={this.state.operator} only={this.state.only}
                             itemComponent={SymbolRefineList} containerComponent={<TogglePanel rightComponent={(<span>
                               <input type="checkbox" className="onlyCheckbox" label="Only" value={this.state.only} onChange={this.handleOnlyChange.bind(this)} onClick={(evt) => this.suppressClick(evt)}/>
                               <select value={this.state.operator} onChange={this.handleOperatorChange.bind(this)} onClick={(evt) => this.suppressClick(evt)} >
@@ -650,9 +627,6 @@ export class App extends React.Component<any, any> {
                                 <option value="OR">OR</option>
                               </select></span>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
-                
-
-      <ReactSurvey json={surveyJSON} onComplete={sendDataToServer}/>  
 
  <DynamicRangeFilter rangeFormatter={(count) => count.toFixed(2)} field="multiverseids.mtgoPrice" id="mtgoPrice" title="MTGO Price"/>
               */
@@ -670,7 +644,7 @@ export class App extends React.Component<any, any> {
               <div className="my-logo"><a style={{color:'white', textDecoration:'none'}} href="http://mtg-hunter.com"><span>MtG:Hunter</span></a><br/>
               <a href="http://searchkit.co/" style={{textDecoration:"none"}}>
               <span className="my-logo-small">Made with Searchkit</span></a></div>
-              <div className="my-logo"><button style={{backgroundColor: 'transparent', border: '0px', font: "inherit", color: "#eee", cursor:"pointer"}} 
+              <div className="my-logo"><button style={{backgroundColor: 'transparent', border: '0px', font: "inherit", color: "#eee", cursor:"pointer"}}
                 onClick={this.open.bind(this)}>About</button><br/></div>
               <Modal
                 aria-labelledby='modal-label'
@@ -680,7 +654,7 @@ export class App extends React.Component<any, any> {
                 onHide={this.close.bind(this)}
               >
                 <div style={dialogStyle()} >
-                  <p>MtG:Hunter is made with <a href="https://facebook.github.io/react/tips/introduction.html"style={{textDecoration:"none"}}>ReactJS</a>, 
+                  <p>MtG:Hunter is made with <a href="https://facebook.github.io/react/tips/introduction.html"style={{textDecoration:"none"}}>ReactJS</a>,
                     <a href="http://searchkit.co/" style={{textDecoration:"none"}}> Searchkit</a> and a veritable smorgasbord of webpack doing unholy things with CSS files.</p>
                   <p>To report a bug or request a feature, send a message to <a href="mailto:admin@mtg-hunter.com" style={{textDecoration:"none"}}>admin@mtg-hunter.com</a></p>
                   <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
@@ -707,44 +681,30 @@ export class App extends React.Component<any, any> {
           <div className="sk-layout__body">
 
             <div className="sk-layout__filters">
-              <RangeFilter id="cmc" min={0} max={16} title="Converted Cost" field="cmc" showHistogram={true}/>
-              <RangeFilter id="paperPrice" min={0} max={10000} rangeComponent={RangeSliderInput} title="Paper Price" field="multiverseids.medPrice" showHistogram={true}/>
-              <RangeFilter id="mtgoPrice" min={0} max={160} rangeComponent={RangeSliderInput} title="MTGO Price" field="multiverseids.mtgoPrice" showHistogram={true}/>
-              <InputFilter 
-                queryBuilder={QueryRulesString} id="rulesText" searchThrottleTime={1000} title="Rules text" placeholder="Use ~ for cardname" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["reminderlessText"]} prefixQueryFields={["reminderlessText"]}/>
-              <InputFilter 
-                queryBuilder={QueryFlavourString} id="flavourText" searchThrottleTime={1000} title="Flavour text" placeholder="Regex supported" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["multiverseids.flavor"]} prefixQueryFields={["multiverseids.flavor"]}/>
-              <InputFilter 
-                queryBuilder={QueryTypeString} id="typeLine" searchThrottleTime={1000} title="Type text" placeholder="Regex supported" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["type"]} prefixQueryFields={["type"]}/>              
-              <RefinementListFilter id="power" title="Power" field="power.raw" size={5} operator={this.state.powerOperator}  
-                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
-                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.powerOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "powerOperator")}/>
-                              </div>
-                            )} collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="toughness" title="Toughness" field="toughness.raw" size={5} operator={this.state.toughnessOperator}  
-                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
-                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.toughnessOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "toughnessOperator")}/>
-                              </div>
-                            )} collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="symbols" title="Symbols" field="symbols" size={6} operator={this.state.symbolsOperator} itemComponent={SymbolRefineList}  
-                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
-                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.symbolsOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "symbolsOperator")}/>
-                              </div>
-                            )} collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="manaCost" title="Mana Cost" field="prettyCost.raw" showMore={false} listComponent={CostMultiSelect} size={0} operator={this.state.manaCostOperator} 
-                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
-                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.manaCostOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "manaCostOperator")}/>
-                              </div>
-                            )} collapsable={true} defaultCollapsed={true}/>}/>
+              <RangeFilter id="cmc" min={0} max={16} title="Converted Cost" field="cmc" showHistogram={true}
+              containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
+              <RangeFilter id="paperPrice" min={0} max={10000} rangeComponent={RangeSliderInput} title="Paper Price" field="multiverseids.medPrice" showHistogram={true}
+              containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
+              <RangeFilter id="mtgoPrice" min={0} max={160} rangeComponent={RangeSliderInput} title="MTGO Price" field="multiverseids.mtgoPrice" showHistogram={true}
+              containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
+              <InputFilter
+                queryBuilder={QueryRulesString} id="rulesText" searchThrottleTime={1000} title="Rules text" placeholder="Use ~ for cardname" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["reminderlessText"]} prefixQueryFields={["reminderlessText"]}
+                containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
+              <InputFilter
+                queryBuilder={QueryFlavourString} id="flavourText" searchThrottleTime={1000} title="Flavour text" placeholder="Regex supported" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["multiverseids.flavor"]} prefixQueryFields={["multiverseids.flavor"]}
+                containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
+              <InputFilter
+                queryBuilder={QueryTypeString} id="typeLine" searchThrottleTime={1000} title="Type text" placeholder="Regex supported" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["type"]} prefixQueryFields={["type"]}
+                containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
 
-              <OnlyRefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator={this.state.coloursOperator} only={this.state.coloursOnly} 
+              <OnlyRefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator={this.state.coloursOperator} only={this.state.coloursOnly}
                             itemComponent={SymbolRefineList} containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                                 <input onClick={(evt) => this.suppressClick(evt)} type="checkbox" id="onlyColourBox" className="onlyCheckbox" value={this.state.coloursOnly} onChange={this.handleColourOnlyChange.bind(this)} />
                                 <label onClick={(evt) => this.suppressClick(evt)} htmlFor="onlyColourBox">Only</label>
                                 <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.coloursOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "coloursOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
-              <OnlyRefinementListFilter id="colourIdentity" title="Colour Identity" field="colorIdentity" size={6} operator={this.state.colourIdentityOperator} only={this.state.colourIdentityOnly} 
+              <OnlyRefinementListFilter id="colourIdentity" title="Colour Identity" field="colorIdentity" size={6} operator={this.state.colourIdentityOperator} only={this.state.colourIdentityOnly}
                             itemComponent={SymbolRefineList} containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                                 <input onClick={(evt) => this.suppressClick(evt)} type="checkbox" id="onlyIdentityBox" className="onlyCheckbox" value={this.state.colourIdentityOnly} onChange={this.handleIdentityOnlyChange.bind(this)} />
                                 <label onClick={(evt) => this.suppressClick(evt)} htmlFor="onlyIdentityBox">Only</label>
@@ -752,50 +712,74 @@ export class App extends React.Component<any, any> {
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
 
-              <RefinementListFilter id="colorCount" title="Colour Count" field="colourCount" size={6} operator={this.state.colourCountOperator} orderKey="_term"  
+              <RefinementListFilter id="power" title="Power" field="power.raw" size={5} operator={this.state.powerOperator}
                             containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
-                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.colourCountOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "colourCountOperator")}/>
+                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.powerOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "powerOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="rarity" title="Rarity" field="multiverseids.rarity.raw" size={5} operator={this.state.rarityOperator}  
+              <RefinementListFilter id="toughness" title="Toughness" field="toughness.raw" size={5} operator={this.state.toughnessOperator}
+                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
+                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.toughnessOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "toughnessOperator")}/>
+                              </div>
+                            )} collapsable={true} defaultCollapsed={true}/>}/>
+                            
+              <RefinementListFilter id="rarity" title="Rarity" field="multiverseids.rarity.raw" size={5} operator={this.state.rarityOperator}
                             containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.rarityOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "rarityOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="supertype" title="Supertype" field="supertypes.raw" size={5} operator={this.state.supertypeOperator}  
-                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
-                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.supertypeOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "supertypeOperator")}/>
-                              </div>
-                            )} collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="type" title="Type" field="types.raw" size={5} operator={this.state.typeOperator}  
-                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
-                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.typeOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "typeOperator")}/>
-                              </div>
-                            )} collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="subtype" title="Subtype" field="subtypes.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.subtypeOperator}  
-                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
-                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.subtypeOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "subtypeOperator")}/>
-                              </div>
-                            )} collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="artists" title="Artist name" field="multiverseids.artist.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.artistsOperator}  
-                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
-                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.artistsOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "artistsOperator")}/>
-                              </div>
-                            )} collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="setcodes" title="Set" field="multiverseids.setName.raw" showMore={false} listComponent={SetMultiSelect} size={0} orderKey="_term" operator={this.state.setcodesOperator}  
+
+              <RefinementListFilter id="setcodes" title="Set" field="multiverseids.setName.raw" showMore={false} listComponent={SetMultiSelect} size={0} orderKey="_term" operator={this.state.setcodesOperator}
                             containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.setcodesOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "setcodesOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="formats" title="Formats" field="formats.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.formatsOperator}  
+              <RefinementListFilter id="formats" title="Formats" field="formats.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.formatsOperator}
                             containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.formatsOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "formatsOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
-
-              <RefinementListFilter id="cycles" title="Cycles" field="cycle.raw" showMore={false} listComponent={CycleMultiSelect} size={0} orderKey="_term" operator={this.state.cyclesOperator}  
+              <RefinementListFilter id="cycles" title="Cycles" field="cycle.raw" showMore={false} listComponent={CycleMultiSelect} size={0} orderKey="_term" operator={this.state.cyclesOperator}
                             containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.cyclesOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "cyclesOperator")}/>
+                              </div>
+                            )} collapsable={true} defaultCollapsed={true}/>}/>
+
+              <RefinementListFilter id="supertype" title="Supertype" field="supertypes.raw" size={5} operator={this.state.supertypeOperator}
+                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
+                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.supertypeOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "supertypeOperator")}/>
+                              </div>
+                            )} collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="type" title="Type" field="types.raw" size={5} operator={this.state.typeOperator}
+                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
+                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.typeOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "typeOperator")}/>
+                              </div>
+                            )} collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="subtype" title="Subtype" field="subtypes.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.subtypeOperator}
+                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
+                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.subtypeOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "subtypeOperator")}/>
+                              </div>
+                            )} collapsable={true} defaultCollapsed={true}/>}/>
+
+              <RefinementListFilter id="symbols" title="Symbols" field="symbols" size={6} operator={this.state.symbolsOperator} itemComponent={SymbolRefineList}
+                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
+                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.symbolsOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "symbolsOperator")}/>
+                              </div>
+                            )} collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="manaCost" title="Mana Cost" field="prettyCost.raw" showMore={false} listComponent={CostMultiSelect} size={0} operator={this.state.manaCostOperator}
+                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
+                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.manaCostOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "manaCostOperator")}/>
+                              </div>
+                            )} collapsable={true} defaultCollapsed={true}/>}/>
+
+              <RefinementListFilter id="colorCount" title="Colour Count" field="colourCount" size={6} operator={this.state.colourCountOperator} orderKey="_term"
+                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
+                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.colourCountOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "colourCountOperator")}/>
+                              </div>
+                            )} collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="artists" title="Artist name" field="multiverseids.artist.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.artistsOperator}
+                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
+                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.artistsOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "artistsOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
             </div>
