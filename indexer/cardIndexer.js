@@ -45,7 +45,7 @@ function countColours(symbols) {
   return count;
 }
 
-function anonymizeRulesText(name, text) {
+function anonymizeRulesText(name, text, subtypes) {
   if (!text) return;
   var forbiddenWords = ["Skulk","Madness","Investigate","Delirium","Flying","Warrior","Soldier","Wizard","The","Defender","Enchanted","Double","First","Flash","Enchanted","Indestructible","Enchanted","Prowess","Reach","Enchanted","Vigilance","Exile","Enchanted","Fight","Regenerate","Sacrifice","Absorb","Enchanted","Battle","Cascade","Champion","Changeling","Clash","Dash","Devour","Dredge","Echo","Epic","Evoke","Exalted","Flanking","Fortify","Frenzy","Enchanted","Graft","Gravestorm","Haunt","Infect","Living","Madness","Manifest","Miracle","Modular","Monstrosity","Offering","Overload","Persist","Poisonous","Populate","Provoke","Prowl","Rampage","Rebound","Recover","Reinforce","Renown","Replicate","Ripple","Scavenge","Shadow","Soulbond","Split","Storm","Sunburst","Suspend","Totem","Transfigure","Transmute","Transform","Undying","Unleash","Unearth","Vanishing","Wither","Battalion","Bloodrush","Channel","Domain","Fateful","Ferocious","Grandeour","Hellbent","Heroic","Join","Kinship","Morbid","Radiance","Raid","Sweep","Threshold","Bury","Fear","Intimidate","Protection","Shroud","Substance"]
   // First do a pass with the name as normal. Use regex so that it repeats beyond the first occurrence.
@@ -54,8 +54,9 @@ function anonymizeRulesText(name, text) {
   // To avoid doing the 'Thopter token bug', exit here if it's one of the special name-within-a-token cards.
   if (_.includes(cardsThatMakeTokensWithTheirName, name)) return text;
   // Now with a first name. Since 'flying' occurs in names and is a keyword, don't do that. Duplicate for other keywords.
+  // Also check that the first name doesn't match any of its subtypes (e.g. Goblin lords like Goblin Piledriver affect each other Goblin.)
   let firstName = name.split(' ')[0];
-  if (!_.includes(forbiddenWords, firstName) && name != "Erase (Not the Urza's Legacy One)") {
+  if (!_.includes(forbiddenWords, firstName) && name != "Erase (Not the Urza's Legacy One)" && !_.includes(subtypes, firstName)) {
     //console.log('Finding and replacing '+firstName);
     text = text.replace(new RegExp(firstName, 'g'), '~');
   }
@@ -132,7 +133,13 @@ let mapping = {
   subtypes:stringWithRaw,
   text:{type:"string"},
   namelessText:stringWithRaw,
-  reminderlessText:stringWithRaw,
+  reminderlessText: {
+    type:"string",
+    fields:{
+      "raw":{type:"string", index:"not_analyzed"}
+    },
+    "null_value":"Vanilla"
+  },
   toughness:stringWithRaw,
   type:stringWithRaw,
   supertypes:stringWithRaw,
@@ -211,7 +218,7 @@ function bulkLoop() {
       //card.rarities = _.uniq(_.map(card.multiverseids, "rarity"));
       // Generate new rules text to search on that anonymizes names. Keep original intact for display purposes.
       // Tuktuk is a special case, because of 'Tuktuk the Reborn' appearing in the text.
-      card.namelessText = card.name == "Tuktuk the Explorer" ? card.text.replace(card.name, '~') : anonymizeRulesText(card.name, card.text);
+      card.namelessText = card.name == "Tuktuk the Explorer" ? card.text.replace(card.name, '~') : anonymizeRulesText(card.name, card.text, card.subtypes);
       // Remove everything from reminder () brackets for reminderless text.
       card.reminderlessText = card.namelessText ? card.namelessText.replace(/\((.*?)\)/g,'') : null;
       //card.colourCount = countColours(card.symbols); // Count unique colours. ['w','ug'] = 3, ['r','u','w'] = 3, ['c'] = 0 since colourless isn't a colour. Replaced by line 30.

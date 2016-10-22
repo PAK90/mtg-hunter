@@ -57,7 +57,8 @@ module.exports = class Indexer {
             "type_table": [
               "/ => ALPHANUM",
               "+ => ALPHANUM",
-              "- => ALPHANUM"
+              "- => ALPHANUM",
+              "~ => ALPHANUM"
             ]
           }
         },

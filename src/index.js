@@ -102,7 +102,7 @@ export function QueryString(query, options:QueryStringOptions={}){
     return;
   }
   return {
-    "regexp":assign({"name":query})
+    "queryString":assign({"fields":["name"],"query":query,"defaultOperator":"OR"})
   }
 }
 
@@ -111,7 +111,7 @@ export function QueryRulesString(query, options:QueryStringOptions={}){
     return
   }
   return {
-    "regexp":assign({"reminderlessText":query})
+    "queryString":assign({"fields":["reminderlessText"],"query":query, "defaultOperator":"OR"})
   }
 }
 
@@ -120,7 +120,7 @@ export function QueryFlavourString(query, options:QueryStringOptions={}){
     return
   }
   return {
-    "regexp":assign({"multiverseids.flavor":query})
+    "queryString":assign({"fields":["multiverseids.flavor"],"query":query, "defaultOperator":"OR"})
   }
 }
 
@@ -129,7 +129,7 @@ export function QueryTypeString(query, options:QueryStringOptions={}){
     return;
   }
   return {
-    "regexp":assign({"type":query})
+    "queryString":assign({"fields":["type"],"query":query, "defaultOperator":"OR"})
   };
 }
 
@@ -423,6 +423,7 @@ export class App extends React.Component<any, any> {
       setcodesOperator: "AND",
       formatsOperator: "AND",
       cyclesOperator: "AND",
+      rulesTextOperator: "OR",
       coloursOnly: false,
       colourIdentityOnly: false};
     // Bind the prop function to this scope.
@@ -688,13 +689,17 @@ export class App extends React.Component<any, any> {
               <RangeFilter id="mtgoPrice" min={0} max={160} rangeComponent={RangeSliderInput} title="MTGO Price" field="multiverseids.mtgoPrice" showHistogram={true}
               containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
               <InputFilter
-                queryBuilder={QueryRulesString} id="rulesText" searchThrottleTime={1000} title="Rules text" placeholder="Use ~ for cardname" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["reminderlessText"]} prefixQueryFields={["reminderlessText"]}
+                queryBuilder={QueryRulesString} id="rulesText" searchThrottleTime={1000} title="Rules text" placeholder="Use ~ for cardname" searchOnChange={true} 
+                queryOptions={{"minimum_should_match": this.state.matchPercent, "defaultOperator":this.state.rulesTextOperator}} queryFields={["reminderlessText"]} prefixQueryFields={["reminderlessText"]}
+                containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}
+              />
+              <InputFilter
+                queryBuilder={QueryFlavourString} id="flavourText" searchThrottleTime={1000} title="Flavour text" placeholder="Regex supported" searchOnChange={true} 
+                queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["multiverseids.flavor"]} prefixQueryFields={["multiverseids.flavor"]}
                 containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
               <InputFilter
-                queryBuilder={QueryFlavourString} id="flavourText" searchThrottleTime={1000} title="Flavour text" placeholder="Regex supported" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["multiverseids.flavor"]} prefixQueryFields={["multiverseids.flavor"]}
-                containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
-              <InputFilter
-                queryBuilder={QueryTypeString} id="typeLine" searchThrottleTime={1000} title="Type text" placeholder="Regex supported" searchOnChange={true} queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["type"]} prefixQueryFields={["type"]}
+                queryBuilder={QueryTypeString} id="typeLine" searchThrottleTime={1000} title="Type text" placeholder="Regex supported" searchOnChange={true} 
+                queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["type"]} prefixQueryFields={["type"]}
                 containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
 
               <OnlyRefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator={this.state.coloursOperator} only={this.state.coloursOnly}
@@ -805,7 +810,7 @@ export class App extends React.Component<any, any> {
                     {label:"MTGO Price (ascending)",  field:"multiverseids.mtgoPrice", order:"asc"},
                     {label:"MTGO Price (descending)",  field:"multiverseids.mtgoPrice", order:"desc", defaultOption:true}
                   ]} />
-                  <PageSizeSelector options={[4,12,24]} listComponent={Toggle}/>
+                  <PageSizeSelector options={[12,24, 48, 96]} listComponent={Toggle}/>
                 </div>
 
                 <div className="sk-action-bar__filters">
