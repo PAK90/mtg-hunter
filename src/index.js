@@ -102,7 +102,7 @@ export function QueryString(query, options:QueryStringOptions={}){
     return;
   }
   return {
-    "queryString":assign({"fields":["name"],"query":query,"defaultOperator":"OR"})
+    "queryString":assign({"fields":["name"],"query":query,"defaultOperator":"AND"})
   }
 }
 
@@ -645,29 +645,32 @@ export class App extends React.Component<any, any> {
               <div className="my-logo"><a style={{color:'white', textDecoration:'none'}} href="http://mtg-hunter.com"><span>MtG:Hunter</span></a><br/>
               <a href="http://searchkit.co/" style={{textDecoration:"none"}}>
               <span className="my-logo-small">Made with Searchkit</span></a></div>
+              <div className="my-logo">
+                <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+                  <input type="hidden" name="cmd" value="_s-xclick"/>
+                  <input type="hidden" name="hosted_button_id" value="QGRS3ZY2ZBAFW"/>
+                  <button style={{backgroundColor: 'transparent', border: '0px', font: "inherit", color: "#eee", cursor:"pointer"}}>
+                    Donate
+                  </button>
+                </form>
+              </div>
               <div className="my-logo"><button style={{backgroundColor: 'transparent', border: '0px', font: "inherit", color: "#eee", cursor:"pointer"}}
                 onClick={this.open.bind(this)}>About</button><br/></div>
-              <Modal
-                aria-labelledby='modal-label'
-                style={modalStyle}
-                backdropStyle={backdropStyle}
-                show={this.state.showModal}
-                onHide={this.close.bind(this)}
-              >
-                <div style={dialogStyle()} >
-                  <p>MtG:Hunter is made with <a href="https://facebook.github.io/react/tips/introduction.html"style={{textDecoration:"none"}}>ReactJS</a>,
-                    <a href="http://searchkit.co/" style={{textDecoration:"none"}}> Searchkit</a> and a veritable smorgasbord of webpack doing unholy things with CSS files.</p>
-                  <p>To report a bug or request a feature, send a message to <a href="mailto:admin@mtg-hunter.com" style={{textDecoration:"none"}}>admin@mtg-hunter.com</a></p>
-                  <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-                    <input type="hidden" name="cmd" value="_s-xclick"/>
-                    <input type="hidden" name="hosted_button_id" value="QGRS3ZY2ZBAFW"/>
-                    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!"/>
-                    <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1"/>
-                  </form>
-                </div>
-              </Modal>
+                <Modal
+                  aria-labelledby='modal-label'
+                  style={modalStyle}
+                  backdropStyle={backdropStyle}
+                  show={this.state.showModal}
+                  onHide={this.close.bind(this)}
+                >
+                  <div style={dialogStyle()} >
+                    <p>MtG:Hunter is made with <a href="https://facebook.github.io/react/tips/introduction.html"style={{textDecoration:"none"}}>ReactJS</a>,
+                      <a href="http://searchkit.co/" style={{textDecoration:"none"}}> Searchkit</a> and a veritable smorgasbord of webpack doing unholy things with CSS files.</p>
+                    <p>To report a bug or request a feature, send a message to <a href="mailto:admin@mtg-hunter.com" style={{textDecoration:"none"}}>admin@mtg-hunter.com</a></p>
+                  </div>
+                </Modal>
               <SearchBox
-                translations={{"searchbox.placeholder": "Search card names. Use regex e.g. \"fire|water|ice\""}}
+                translations={{"searchbox.placeholder": "Search card names. Use AND, OR and NOT e.g. (fire OR ice) AND a* NOT \"sword of\""}}
                 queryOptions={{"minimum_should_match": this.state.matchPercent}}
                 prefixQueryFields={["name"]}
                 autofocus={true}
@@ -694,11 +697,11 @@ export class App extends React.Component<any, any> {
                 containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}
               />
               <InputFilter
-                queryBuilder={QueryFlavourString} id="flavourText" searchThrottleTime={1000} title="Flavour text" placeholder="Regex supported" searchOnChange={true} 
+                queryBuilder={QueryFlavourString} id="flavourText" searchThrottleTime={1000} title="Flavour text" placeholder="Search flavour text" searchOnChange={true} 
                 queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["multiverseids.flavor"]} prefixQueryFields={["multiverseids.flavor"]}
                 containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
               <InputFilter
-                queryBuilder={QueryTypeString} id="typeLine" searchThrottleTime={1000} title="Type text" placeholder="Regex supported" searchOnChange={true} 
+                queryBuilder={QueryTypeString} id="typeLine" searchThrottleTime={1000} title="Type text" placeholder="e.g. Elf AND (spirit OR ally)" searchOnChange={true} 
                 queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["type"]} prefixQueryFields={["type"]}
                 containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
 
