@@ -138,7 +138,7 @@ let mapping = {
     fields:{
       "raw":{type:"string", index:"not_analyzed"}
     },
-    "null_value":"Vanilla"
+    "null_value":"none"
   },
   toughness:stringWithRaw,
   type:stringWithRaw,
