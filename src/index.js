@@ -701,7 +701,7 @@ export class App extends React.Component<any, any> {
                 queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["multiverseids.flavor"]} prefixQueryFields={["multiverseids.flavor"]}
                 containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
               <InputFilter
-                queryBuilder={QueryTypeString} id="typeLine" searchThrottleTime={1000} title="Type text" placeholder="e.g. Elf AND (spirit OR ally)" searchOnChange={true} 
+                queryBuilder={QueryTypeString} id="typeLine" searchThrottleTime={1000} title="Type text" placeholder="E.g. Elf AND (spirit OR ally)" searchOnChange={true} 
                 queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["type"]} prefixQueryFields={["type"]}
                 containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
 
