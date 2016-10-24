@@ -17,6 +17,7 @@ const omit = require("lodash/omit");
 const map = require("lodash/map");
 import Modal from 'react-overlays/lib/Modal';
 
+//   InputFilter,
 import {
   SearchBox,
   Hits,
@@ -38,7 +39,6 @@ import {
   Panel,
   NoHits,
   TagFilter,
-  InputFilter,
   PageSizeSelector,
   Select, Toggle,
   RangeFilter,
@@ -47,9 +47,11 @@ import {
   ViewSwitcherHits,
   ViewSwitcherToggle,
   DynamicRangeFilter,
+  InputFilter,
   FilterGroup, FilterGroupItem,
   TagFilterConfig, TagFilterList
 } from "searchkit";
+//import InputFilter from './modInputFilter.js';
 import {RefinementListFilter, OnlyRefinementListFilter} from './modRefineListFilter.js';
 import CardDetailPanel from './CardDetailPanel';
 import CardHitsListItem from './CardHitsListItem';
@@ -101,6 +103,8 @@ export function QueryString(query, options:QueryStringOptions={}){
   if(!query){
     return;
   }
+  // Add escapes to the query's +, - and / chars.
+  query = query.replace(/\//g, "\\/").replace(/\+/g, "\\+").replace(/\-/g, "\\-");
   return {
     "queryString":assign({"fields":["name"],"query":query,"defaultOperator":"AND"})
   }
@@ -110,6 +114,8 @@ export function QueryRulesString(query, options:QueryStringOptions={}){
   if(!query){
     return
   }
+  // Add escapes to the query's +, - and / chars.
+  query = query.replace(/\//g, "\\/").replace(/\+/g, "\\+").replace(/\-/g, "\\-");
   return {
     "queryString":assign({"fields":["reminderlessText"],"query":query, "defaultOperator":"OR"})
   }
@@ -119,6 +125,8 @@ export function QueryFlavourString(query, options:QueryStringOptions={}){
   if(!query){
     return
   }
+  // Add escapes to the query's +, - and / chars.
+  query = query.replace(/\//g, "\\/").replace(/\+/g, "\\+").replace(/\-/g, "\\-");
   return {
     "queryString":assign({"fields":["multiverseids.flavor"],"query":query, "defaultOperator":"OR"})
   }
@@ -128,6 +136,8 @@ export function QueryTypeString(query, options:QueryStringOptions={}){
   if(!query){
     return;
   }
+  // Add escapes to the query's +, - and / chars.
+  query = query.replace(/\//g, "\\/").replace(/\+/g, "\\+").replace(/\-/g, "\\-");
   return {
     "queryString":assign({"fields":["type"],"query":query, "defaultOperator":"OR"})
   };
