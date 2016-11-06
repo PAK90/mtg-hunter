@@ -68,25 +68,34 @@ var CardHitsListItem = React.createClass({
 	getInitialState: function() {  	
 	    var {bemBlocks, result} = this.props;
 	    var source = result._source;
+	    if (result.inner_hits) {
+    		var multiverses = result.inner_hits.multiverseids.hits.hits.map(function(multis, i) {
+    			return multis._source;
+    		})
+    	}
+    	else {
+    		var multiverses = result._source.multiverseids;
+    	}
+    	//multiverses[multiverses.length-1]
 	    // At some point, have all multiverse-specific stuff (id, flavour text, original text) as states.
 	    // Then, when you click the symbol, all we have to do is load that multi's data into the states which are already in the renderer.
         return {
             clickedCard: '',
-            currentMultiId: source.multiverseids[result._source.multiverseids.length - 1].multiverseid,
-            currentImageMultiId: source.multiverseids[result._source.multiverseids.length - 1].multiverseid,
-            currentArtist: source.multiverseids[result._source.multiverseids.length - 1].artist,
-            currentFlavor: source.multiverseids[result._source.multiverseids.length - 1].flavor,
-            currentOriginalText: source.multiverseids[result._source.multiverseids.length - 1].originalText,
-            currentSetName: source.multiverseids[result._source.multiverseids.length - 1].setName,
-            currentNumber: source.multiverseids[result._source.multiverseids.length - 1].number,
-            currentLowPrice: source.multiverseids[result._source.multiverseids.length - 1].lowPrice,
-            currentMedPrice: source.multiverseids[result._source.multiverseids.length - 1].medPrice,
-            currentHiPrice: source.multiverseids[result._source.multiverseids.length - 1].hiPrice,
-            currentFoilPrice: source.multiverseids[result._source.multiverseids.length - 1].foilPrice,
-            currentStoreLink: source.multiverseids[result._source.multiverseids.length - 1].storeLink,
-            currentMtgoPrice: source.multiverseids[result._source.multiverseids.length - 1].mtgoPrice,
-            currentFoilMtgoPrice: source.multiverseids[result._source.multiverseids.length - 1].mtgoFoilPrice,
-            currentMtgoStoreLink: source.multiverseids[result._source.multiverseids.length - 1].mtgoStoreLink,
+            currentMultiId: multiverses[multiverses.length-1].multiverseid,
+            currentImageMultiId: multiverses[multiverses.length-1].multiverseid,
+            currentArtist: multiverses[multiverses.length-1].artist,
+            currentFlavor: multiverses[multiverses.length-1].flavor,
+            currentOriginalText: multiverses[multiverses.length-1].originalText,
+            currentSetName: multiverses[multiverses.length-1].setName,
+            currentNumber: multiverses[multiverses.length-1].number,
+            currentLowPrice: multiverses[multiverses.length-1].lowPrice,
+            currentMedPrice: multiverses[multiverses.length-1].medPrice,
+            currentHiPrice: multiverses[multiverses.length-1].hiPrice,
+            currentFoilPrice: multiverses[multiverses.length-1].foilPrice,
+            currentStoreLink: multiverses[multiverses.length-1].storeLink,
+            currentMtgoPrice: multiverses[multiverses.length-1].mtgoPrice,
+            currentFoilMtgoPrice: multiverses[multiverses.length-1].mtgoFoilPrice,
+            currentMtgoStoreLink: multiverses[multiverses.length-1].mtgoStoreLink,
             currentSelectedTab: 0,
             currentImageLayout: ''
         };
@@ -198,9 +207,17 @@ var CardHitsListItem = React.createClass({
 		this.setState({currentImageLayout: '', currentImageMultiId: this.state.currentMultiId});
 	},
 
-    getSetIcons: function(source) {
+    getSetIcons: function(result) {
+    	/*if (result.inner_hits) {
+    		var multiverses = result.inner_hits.multiverseids.hits.hits.map(function(multis, i) {
+    			return multis._source;
+    		})
+    	}
+    	else {*/
+    		var multiverses = result._source.multiverseids;
+    	//}
     	// Loop through all multiverseIds, which have their own set code and rarity.
-    	var setIcons = source.multiverseids.map(function(multis, i) {
+    	var setIcons = multiverses.map(function(multis, i) {
       		let rarity = multis.rarity.charAt(0) == "B" ? "C" : multis.rarity.charAt(0); // Replace 'basic' rarity with common.
       		/*let rarity = multis.rarity.toLowerCase();
       		if (rarity == "basic") {
@@ -210,7 +227,8 @@ var CardHitsListItem = React.createClass({
       			rarity = "rare";
       		}*/
       		return (
-            	<img key={i} className={(this.state.currentMultiId == multis.multiverseid ? "clicked " : "") + "setIcon " + rarity } src={'./src/img/sets/' + multis.setName.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-' + rarity + '.jpg'} 
+            	<img key={i} className={(this.state.currentMultiId == multis.multiverseid ? "clicked " : "") + "setIcon " + rarity } 
+            		src={'./src/img/sets/' + multis.setName.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-' + rarity + '.jpg'} 
 	                title={multis.setName}
 	                onClick={(evt) => this.handleSetIconClick(evt, multis)}/>
 	            )
@@ -296,6 +314,8 @@ var CardHitsListItem = React.createClass({
 	    // Generate the mana symbols in both cost and the card text.	    
 	    source.tagCost = this.generateTitleCostSymbols(source.manaCost);
 	    source.taggedText = this.generateTextCostSymbols(source.text);
+
+	    // inner_hits live in: results.inner_hits.multiverseids.hits.hits[]._source
 
 	    // Listener for the tooltip position calculator.
 	    document.addEventListener('mousemove', function(e) {
@@ -646,7 +666,7 @@ var CardHitsListItem = React.createClass({
 						    	{price}{foilPrice}{mtgoPrice}{mtgoFoilPrice}
 						    </div>
 				        	<div style={{width: '150px', position: 'relative', right: '10px', display:'inline-block'}}>
-				          		<p style={{textAlign:'center', maxHeight: '200px', overflowY: 'scroll'}}>{this.getSetIcons(source)}</p>
+				          		<p style={{textAlign:'center', maxHeight: '200px', overflowY: 'scroll'}}>{this.getSetIcons(result)}</p>
 				        	</div>	
 				        </div>
 	    				{/* The tab panel is by itself under block 3. */}

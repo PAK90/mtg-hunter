@@ -32,6 +32,7 @@ import {
   RangeSliderHistogramInput,
   RangeSliderInput,
   SortingSelector,
+  Tabs,
   SearchkitComponent,
   SearchkitProvider,
   SearchkitManager,
@@ -42,6 +43,7 @@ import {
   PageSizeSelector,
   Select, Toggle,
   RangeFilter,
+  ItemList,
   ItemHistogramList,
   InitialLoader,
   ViewSwitcherHits,
@@ -100,9 +102,14 @@ var Animations = {
 const assign = require("lodash/assign");
 
 export function QueryString(query, options:QueryStringOptions={}){
-  if(!query){
+  if(!query){ 
     return;
   }
+  /*if (query.match(/"/g)) { // If there's odd number of ", don't send.
+    if (query.match(/"/g).length % 2) {
+      return;
+    }
+  }*/
   // Add escapes to the query's +, - and / chars.
   query = query.replace(/\//g, "\\/").replace(/\+/g, "\\+").replace(/\-/g, "\\-");
   return {
@@ -128,7 +135,23 @@ export function QueryFlavourString(query, options:QueryStringOptions={}){
   // Add escapes to the query's +, - and / chars.
   query = query.replace(/\//g, "\\/").replace(/\+/g, "\\+").replace(/\-/g, "\\-");
   return {
-    "queryString":assign({"fields":["multiverseids.flavor"],"query":query, "defaultOperator":"OR"})
+        "nested" : {
+            "path" : "multiverseids",
+            "query" : {
+                "bool" : {
+                    "must" : [
+                    { 
+                        "multi_match" : 
+                        {"fields": [
+                           "multiverseids.flavor"
+                        ], "query" : query, "type":"phrase_prefix"} }
+                    ]
+                }
+            },
+            "inner_hits": {
+                "size":100
+            }
+        }
   }
 }
 
@@ -411,7 +434,7 @@ export class App extends React.Component<any, any> {
 
   constructor() {
     super();
-    const host = "http://localhost:9200/cards/card";
+    const host = "http://localhost:9200/testcards/card";
     this.searchkit = new SearchkitManager(host);
     this.state = {hoveredId: '',
       showModal: false,
@@ -639,10 +662,21 @@ export class App extends React.Component<any, any> {
                               </select></span>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
 
+                            prefixQueryFields={["multiverseids.flavor"]}
+
  <DynamicRangeFilter rangeFormatter={(count) => count.toFixed(2)} field="multiverseids.mtgoPrice" id="mtgoPrice" title="MTGO Price"/>
               */
 
   render() {
+    this.searchkit.setQueryProcessor((plainQueryObject)=> {
+      var rarityaggs = plainQueryObject.aggs[Object.keys(plainQueryObject.aggs)[7]];
+      console.log(rarityaggs);
+      rarityaggs.aggs.inner.aggs["multiverseids.rarity.raw"].aggs = {}//.outer.reverse_nested = {}//({"reverse_nested":{}});
+      rarityaggs.aggs.inner.aggs["multiverseids.rarity.raw"].aggs.outer = {}
+      rarityaggs.aggs.inner.aggs["multiverseids.rarity.raw"].aggs.outer.reverse_nested = {}//({"reverse_nested":{}});
+      console.log(rarityaggs);
+      return plainQueryObject;
+    })
     return (
       <div>
 
@@ -708,7 +742,7 @@ export class App extends React.Component<any, any> {
               />
               <InputFilter
                 queryBuilder={QueryFlavourString} id="flavourText" searchThrottleTime={1000} title="Flavour text" placeholder="Search flavour text" searchOnChange={true} 
-                queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["multiverseids.flavor"]} prefixQueryFields={["multiverseids.flavor"]}
+                queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["multiverseids.flavor"]} 
                 containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
               <InputFilter
                 queryBuilder={QueryTypeString} id="typeLine" searchThrottleTime={1000} title="Type text" placeholder="E.g. Elf AND (spirit OR ally)" searchOnChange={true} 
@@ -741,13 +775,15 @@ export class App extends React.Component<any, any> {
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
                             
-              <RefinementListFilter id="rarity" title="Rarity" field="multiverseids.rarity.raw" size={5} operator={this.state.rarityOperator}
+              <RefinementListFilter id="rarity" title="Rarity" field="multiverseids.rarity.raw" size={6} operator={this.state.rarityOperator} 
+                            fieldOptions={{"type":"nested","options":{"path":"multiverseids","inner_hits":{"size":100}}}}
                             containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.rarityOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "rarityOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
 
               <RefinementListFilter id="setcodes" title="Set" field="multiverseids.setName.raw" showMore={false} listComponent={SetMultiSelect} size={0} orderKey="_term" operator={this.state.setcodesOperator}
+                            fieldOptions={{"type":"nested","options":{"path":"multiverseids","inner_hits":{"size":100}}}}
                             containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.setcodesOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "setcodesOperator")}/>
                               </div>
@@ -795,7 +831,9 @@ export class App extends React.Component<any, any> {
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.colourCountOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "colourCountOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="artists" title="Artist name" field="multiverseids.artist.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.artistsOperator}
+              <RefinementListFilter id="artists" title="Artist name" field="multiverseids.artist.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" 
+                            operator={this.state.artistsOperator}
+                            fieldOptions={{"type":"nested","options":{"path":"multiverseids","inner_hits":{"size":100}}}}
                             containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.artistsOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "artistsOperator")}/>
                               </div>

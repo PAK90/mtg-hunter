@@ -103,12 +103,14 @@ let stringWithRaw = {
 
 let mapping = {
   multiverseids: {
+    type: "nested",
     properties: {
       artist:stringWithRaw,
       rarity:stringWithRaw,
       flavor:stringWithRaw,
       setCode:stringWithRaw,
       setName:stringWithRaw,
+      multiverseid:{type:"integer"},
       lowPrice:{type:"double"},
       medPrice:{type:"double"},
       hiPrice:{type:"double"},
@@ -144,6 +146,12 @@ let mapping = {
   type:stringWithRaw,
   supertypes:stringWithRaw,
   types:stringWithRaw,
+  legalities: {
+    properties: {
+      format:stringWithRaw,
+      legality: stringWithRaw
+    }
+  },  
   formats:stringWithRaw,
   cycle:stringWithRaw
 };
