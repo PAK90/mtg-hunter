@@ -269,7 +269,7 @@ var CardHitsListItem = React.createClass({
 		    source = source.replace(/(\/)(?=\w\})/g,'');
 		    // Then generate the tags through setting the innerHtml. This is the only way to preserve the text around the img tags.
 		    // Encode the source in html, to prevent XSS nastiness. Then replace the newlines with <br/>. Then insert the <img> tags.
-		    tagged = <div dangerouslySetInnerHTML={{__html: ent.encode(source).replace(/&#10;/g, '<br/>').replace(/\{([0-z,½,∞]+)\}/g, (fullMatch, firstMatch) =>
+		    tagged = <div dangerouslySetInnerHTML={{__html: ent.encode(source).replace(/&#10;/g, '<br/>').replace(/\{([0-z,&#189;,&#8734;]+)\}/g, (fullMatch, firstMatch) =>
 		        `<img src=./src/img/${firstMatch.toLowerCase()}.png height=12px/>`
 		    )}}></div>
 		}

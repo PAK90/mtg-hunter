@@ -153,7 +153,11 @@ let mapping = {
     }
   },  
   formats:stringWithRaw,
-  cycle:stringWithRaw
+  cycles: {
+    properties: {
+      cycleName: stringWithRaw
+    }
+  }
 };
 
 let cardIndexer = new indexer(

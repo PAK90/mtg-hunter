@@ -134,7 +134,7 @@ export function QueryFlavourString(query, options:QueryStringOptions={}){
   }
   // Add escapes to the query's +, - and / chars.
   query = query.replace(/\//g, "\\/").replace(/\+/g, "\\+").replace(/\-/g, "\\-");
-  return {
+  /*return {
         "nested" : {
             "path" : "multiverseids",
             "query" : {
@@ -152,6 +152,9 @@ export function QueryFlavourString(query, options:QueryStringOptions={}){
                 "size":100
             }
         }
+  }*/
+  return {
+    "queryString":assign({"fields":["multiverseids.flavor"],"query":query, "defaultOperator":"OR"})
   }
 }
 
@@ -406,7 +409,8 @@ const modalStyle = {
 };
 
 const backdropStyle = {
-  ...modalStyle,
+  position: 'fixed',
+  top: 0, bottom: 0, left: 0, right: 0,
   zIndex: 'auto',
   backgroundColor: '#000',
   opacity: 0.5
@@ -455,6 +459,7 @@ export class App extends React.Component<any, any> {
       artistsOperator: "AND",
       setcodesOperator: "AND",
       formatsOperator: "AND",
+      functiontagsOperator: "AND",
       cyclesOperator: "AND",
       rulesTextOperator: "OR",
       coloursOnly: false,
@@ -664,17 +669,21 @@ export class App extends React.Component<any, any> {
 
                             prefixQueryFields={["multiverseids.flavor"]}
 
+                            fieldOptions={{"type":"nested","options":{"path":"multiverseids","inner_hits":{"size":100}}}}
+fieldOptions={{"type":"nested","options":{"path":"multiverseids","inner_hits":{"size":100}}}}
+fieldOptions={{"type":"nested","options":{"path":"multiverseids","inner_hits":{"size":100}}}}
+
  <DynamicRangeFilter rangeFormatter={(count) => count.toFixed(2)} field="multiverseids.mtgoPrice" id="mtgoPrice" title="MTGO Price"/>
               */
 
   render() {
     this.searchkit.setQueryProcessor((plainQueryObject)=> {
-      var rarityaggs = plainQueryObject.aggs[Object.keys(plainQueryObject.aggs)[7]];
+      /*var rarityaggs = plainQueryObject.aggs[Object.keys(plainQueryObject.aggs)[7]];
       console.log(rarityaggs);
       rarityaggs.aggs.inner.aggs["multiverseids.rarity.raw"].aggs = {}//.outer.reverse_nested = {}//({"reverse_nested":{}});
       rarityaggs.aggs.inner.aggs["multiverseids.rarity.raw"].aggs.outer = {}
       rarityaggs.aggs.inner.aggs["multiverseids.rarity.raw"].aggs.outer.reverse_nested = {}//({"reverse_nested":{}});
-      console.log(rarityaggs);
+      console.log(rarityaggs);*/
       return plainQueryObject;
     })
     return (
@@ -776,14 +785,14 @@ export class App extends React.Component<any, any> {
                             )} collapsable={true} defaultCollapsed={true}/>}/>
                             
               <RefinementListFilter id="rarity" title="Rarity" field="multiverseids.rarity.raw" size={6} operator={this.state.rarityOperator} 
-                            fieldOptions={{"type":"nested","options":{"path":"multiverseids","inner_hits":{"size":100}}}}
+                            
                             containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.rarityOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "rarityOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
 
               <RefinementListFilter id="setcodes" title="Set" field="multiverseids.setName.raw" showMore={false} listComponent={SetMultiSelect} size={0} orderKey="_term" operator={this.state.setcodesOperator}
-                            fieldOptions={{"type":"nested","options":{"path":"multiverseids","inner_hits":{"size":100}}}}
+                            
                             containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.setcodesOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "setcodesOperator")}/>
                               </div>
@@ -793,7 +802,12 @@ export class App extends React.Component<any, any> {
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.formatsOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "formatsOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="cycles" title="Cycles" field="cycle.raw" showMore={false} listComponent={CycleMultiSelect} size={0} orderKey="_term" operator={this.state.cyclesOperator}
+              <RefinementListFilter id="functiontags" title="Functionality tags" field="functionTags.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.functiontagsOperator}
+                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
+                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.functiontagsOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "functiontagsOperator")}/>
+                              </div>
+                            )} collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="cycles" title="Cycles" field="cycles.cycleName.raw" showMore={false} listComponent={CycleMultiSelect} size={0} orderKey="_term" operator={this.state.cyclesOperator}
                             containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.cyclesOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "cyclesOperator")}/>
                               </div>
@@ -833,7 +847,7 @@ export class App extends React.Component<any, any> {
                             )} collapsable={true} defaultCollapsed={true}/>}/>
               <RefinementListFilter id="artists" title="Artist name" field="multiverseids.artist.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" 
                             operator={this.state.artistsOperator}
-                            fieldOptions={{"type":"nested","options":{"path":"multiverseids","inner_hits":{"size":100}}}}
+                            
                             containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.artistsOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "artistsOperator")}/>
                               </div>
@@ -846,7 +860,7 @@ export class App extends React.Component<any, any> {
                   <HitsStats />
                   <ViewSwitcherToggle/>
                   <SortingSelector options={[
-                    {label:"Name (ascending)", field: "name.raw", order: "asc"},
+                    {label:"Name (ascending)", field: "name.raw", order: "asc", defaultOption:true},
                     {label:"Name (descending)", field: "name.raw", order: "desc"},
                     {label:"Relevance (ascending)", field:"_score", order:"asc"},
                     {label:"Relevance (descending)", field:"_score", order:"desc"},
@@ -859,7 +873,7 @@ export class App extends React.Component<any, any> {
                     {label:"Paper Price (ascending)", field:"multiverseids.medPrice", order:"asc"},
                     {label:"Paper Price (descending)", field:"multiverseids.medPrice", order:"desc"},
                     {label:"MTGO Price (ascending)",  field:"multiverseids.mtgoPrice", order:"asc"},
-                    {label:"MTGO Price (descending)",  field:"multiverseids.mtgoPrice", order:"desc", defaultOption:true}
+                    {label:"MTGO Price (descending)",  field:"multiverseids.mtgoPrice", order:"desc"}
                   ]} />
                   <PageSizeSelector options={[12,24, 48, 96]} listComponent={Toggle}/>
                 </div>
