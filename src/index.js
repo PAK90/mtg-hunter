@@ -533,8 +533,11 @@ export class App extends React.Component<any, any> {
     let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid;
     let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/' + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid + '.jpg';
     //let imgUrl = '../cropped2/crops' + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid + '.jpg';
+    // upgrades: let the span with counter badge have a circle around it showing rarity proportions.
+    // also have it on click activate a display of all the set symbols.
     return (
       <div className={bemBlocks.item().mix(bemBlocks.container("item"))}>
+        <span className='counterBadge'>{result._source.multiverseids.length}</span>
         <a href={"http://mtg-hunter.com/?q="+source.name+"&sort=_score_desc"}>
           <img className='gridImg'
             style={{height: 311}}
@@ -887,7 +890,7 @@ fieldOptions={{"type":"nested","options":{"path":"multiverseids","inner_hits":{"
                 <NewViewSwitcher
                     hitsPerPage={12}
                     hitComponents = {[
-                      {key:"grid", title:"Grid", itemComponent:this.CardHitsGridItem},
+                      {key:"grid", title:"Grid", itemComponent:<CardHitsGridItem/>},
                       {key:"list", title:"List", itemComponent:<CardHitsListItem updateCardName={this.handleClick} currentCard={this.state.clickedCard}/>, defaultOption:true},
                       {key:"table", title:"Table", listComponent:this.CardHitsTable}
                     ]}
