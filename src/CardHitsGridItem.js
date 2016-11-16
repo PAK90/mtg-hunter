@@ -94,10 +94,48 @@ var CardHitsGridItem = React.createClass({
     	return setIcons;
   	},
 
+  	getEditionCircle: function(result) {
+  		var canvas = document.getElementById("can");
+  		if (canvas) {
+			var ctx = canvas.getContext("2d");
+			var lastend = 0;
+			var data = [1,1,2,1];
+			var myTotal = 0;
+			var myColor = ['#4e4e4e','#d5d5d5','#EAC66B', '#ed8f2a'];
+
+			for(var e = 0; e < data.length; e++)
+			{
+			  	myTotal += data[e];
+			}
+
+			for (var i = 0; i < data.length; i++) {
+				ctx.fillStyle = myColor[i];
+				ctx.beginPath();
+				ctx.moveTo(canvas.width/2,canvas.height/2);
+				ctx.arc(canvas.width/2,canvas.height/2,canvas.height/2,lastend,lastend+(Math.PI*2*(data[i]/myTotal)),false);
+				ctx.lineTo(canvas.width/2,canvas.height/2);
+				ctx.fill();
+				lastend += Math.PI*2*(data[i]/myTotal);
+			}
+
+			ctx.fillStyle = 'rgba(255,255,255,0.80)';
+			ctx.beginPath();
+			//ctx.moveTo(canvas.width/2, canvas.height/2);
+			ctx.arc(canvas.width/2, canvas.height/2, 15, 0, 360, false);
+			ctx.fill();
+			//ctx.stroke();
+			ctx.fillStyle = '#333'
+			ctx.font = "20px sans-serif";
+			ctx.textAlign="center"; 
+			ctx.textBaseline = "middle";
+			ctx.fillText(myTotal, canvas.width/2, canvas.height/2+2, canvas.width-11);
+		}
+  	},
+
   	/* Area to paste test code.
 
-		        <span className='counterBadge'>{result._source.multiverseids.length}</span>
-
+		        <div style={{textAlign:'center', maxHeight: '200px', overflow: 'auto', maxWidth:'210px', display:"inline-flex"}}>{this.getSetIcons(result)}</div>
+		        <canvas id="can" width="37" height="37">{this.getEditionCircle(result)}</canvas>
   	*/
 
 	render: function() {
@@ -105,10 +143,12 @@ var CardHitsGridItem = React.createClass({
 	    var source = result._source;
 	    let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid;
 	    let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/' + this.state.currentImageMultiId + '.jpg';
+	    //var circle = <canvas id="can" width="37" height="37" /> 
+	    //this.getEditionCircle(result);
 
 	    return (
 		     <div className={bemBlocks.item().mix(bemBlocks.container("item"))}>
-		        <div style={{textAlign:'center', maxHeight: '200px', overflow: 'auto', maxWidth:'210px', display:"inline-flex"}}>{this.getSetIcons(result)}</div>
+		        <span className='counterBadge'>{result._source.multiverseids.length}</span>
 		        <a href={"http://mtg-hunter.com/?q="+source.name+"&sort=_score_desc"}>
 		          	<img className='gridImg'
 			            style={{height: 311}}
