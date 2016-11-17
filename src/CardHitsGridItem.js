@@ -85,7 +85,7 @@ var CardHitsGridItem = React.createClass({
 				          		
 	    	}.bind(this))*/
 	    	return (<div>
-	    		<i className={"ss setIcon ss-"+multis.setCode.toLowerCase()+" ss-"+rarity+" ss-grad"} 
+	    		<i className={"ss setIcon ss-"+multis.setCode.toLowerCase()+" ss-"+rarity+" ss-grad ss-fw ss-no-border"} 
 	    			title={multis.setName}
 	                onClick={(evt) => this.handleSetIconClick(evt, multis)}/>
 	                </div>
@@ -94,8 +94,7 @@ var CardHitsGridItem = React.createClass({
     	return setIcons;
   	},
 
-  	getEditionCircle: function(result) {
-  		var canvas = document.getElementById("can");
+  	getEditionCircle: function(canvas) {
   		if (canvas) {
 			var ctx = canvas.getContext("2d");
 			var lastend = 0;
@@ -134,8 +133,8 @@ var CardHitsGridItem = React.createClass({
 
   	/* Area to paste test code.
 
-		        <div style={{textAlign:'center', maxHeight: '200px', overflow: 'auto', maxWidth:'210px', display:"inline-flex"}}>{this.getSetIcons(result)}</div>
 		        <canvas id="can" width="37" height="37">{this.getEditionCircle(result)}</canvas>
+		        <span className='counterBadge'>{result._source.multiverseids.length}</span>
   	*/
 
 	render: function() {
@@ -148,7 +147,8 @@ var CardHitsGridItem = React.createClass({
 
 	    return (
 		     <div className={bemBlocks.item().mix(bemBlocks.container("item"))}>
-		        <span className='counterBadge'>{result._source.multiverseids.length}</span>
+		        <div style={{textAlign:'center', maxHeight: '200px', overflow: 'auto', maxWidth:'210px', display:"inline-flex"}}>{this.getSetIcons(result)}</div>
+		        <canvas width="37" height="37" ref={this.getEditionCircle()}/>
 		        <a href={"http://mtg-hunter.com/?q="+source.name+"&sort=_score_desc"}>
 		          	<img className='gridImg'
 			            style={{height: 311}}

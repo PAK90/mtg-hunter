@@ -368,6 +368,10 @@ body {
   height: 310px;
 }
 
+.ss:not(.ss-common, .ss-rare, .ss-mythic-rare) {
+  text-shadow: -1px 0 white, 1px 0 white, 0 1px white, 0 -1px white
+}
+
 /* The set symbols in list view. */
 .setIcon {
   padding: 4px;
