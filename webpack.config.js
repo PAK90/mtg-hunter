@@ -6,13 +6,13 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const config = {
   devtool: 'eval',
   entry: [
-    'webpack-dev-server/client?http://localhost:3333',
+    'webpack-dev-server/client?http://0.0.0.0:3333',
     'webpack/hot/only-dev-server',
-    './src/index'
+    './src/index2'
   ],
   output: {
     path: path.join(__dirname, 'dist'),
-    filename: 'index.js',
+    filename: 'index2.js',
     publicPath: '/static/'
   },
   resolve: {

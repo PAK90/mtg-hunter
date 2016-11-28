@@ -73,8 +73,13 @@ var CardHitsGridItem = React.createClass({
       			rarity = "common";
       		}
       		else if (rarity == "special") {
-      			rarity = "rare";
+      			rarity = "mythic rare";
       		}
+      		// Some set codes are different in Keyrune.
+      		if (multis.setCode == "MPS") {multis.setCode = "mp1";}
+      		if (multis.setCode == "DD3_EVG") {multis.setCode = "evg";}
+      		if (multis.setCode == "DD3_GVL") {multis.setCode = "ddd";}
+      		if (multis.setCode == "DD3_JVC") {multis.setCode = "dd2";}
       		/*return (<div style={{"height":"39px"}}>
             	<img key={i} className={(this.state.currentMultiId == multis.multiverseid ? "clicked " : "") + "setIcon " + rarity } 
             		src={'./src/img/sets/' + multis.setName.replace(/\s+/g,'').replace(":","").replace('"','').replace('"','').toLowerCase() + '-' + rarity + '.jpg'} 
@@ -85,7 +90,7 @@ var CardHitsGridItem = React.createClass({
 				          		
 	    	}.bind(this))*/
 	    	return (<div>
-	    		<i className={"ss setIcon ss-"+multis.setCode.toLowerCase()+" ss-"+rarity+" ss-grad ss-fw ss-no-border"} 
+	    		<i className={"ss setIcon ss-"+multis.setCode.toLowerCase()+" ss-"+rarity+" ss-2x ss-grad ss-fw ss-no-border"} 
 	    			title={multis.setName}
 	                onClick={(evt) => this.handleSetIconClick(evt, multis)}/>
 	                </div>
@@ -94,27 +99,34 @@ var CardHitsGridItem = React.createClass({
     	return setIcons;
   	},
 
+  	countRarity: function(rarity) {
+  		var {bemBlocks, result} = this.props;
+  		var source = result._source;
+  		var count = source.multiverseids.reduce(function(n, card) { 
+  			return n + (card.rarity == rarity)
+  		},0);
+  		return count;
+  	},
+
   	getEditionCircle: function(canvas) {
+  		var {bemBlocks, result} = this.props;
+  		var source = result._source;
   		if (canvas) {
 			var ctx = canvas.getContext("2d");
 			var lastend = 0;
-			var data = [1,1,2,1];
-			var myTotal = 0;
+			var data = [this.countRarity("Common") + this.countRarity("Basic Land"), this.countRarity("Uncommon"), this.countRarity("Rare"), this.countRarity("Mythic Rare") + this.countRarity("Special")];
+			var total = source.printingCount;
+			//var total = source.multiverseids.length;
 			var myColor = ['#4e4e4e','#d5d5d5','#EAC66B', '#ed8f2a'];
-
-			for(var e = 0; e < data.length; e++)
-			{
-			  	myTotal += data[e];
-			}
 
 			for (var i = 0; i < data.length; i++) {
 				ctx.fillStyle = myColor[i];
 				ctx.beginPath();
 				ctx.moveTo(canvas.width/2,canvas.height/2);
-				ctx.arc(canvas.width/2,canvas.height/2,canvas.height/2,lastend,lastend+(Math.PI*2*(data[i]/myTotal)),false);
+				ctx.arc(canvas.width/2,canvas.height/2,canvas.height/2,lastend,lastend+(Math.PI*2*(data[i]/total)),false);
 				ctx.lineTo(canvas.width/2,canvas.height/2);
 				ctx.fill();
-				lastend += Math.PI*2*(data[i]/myTotal);
+				lastend += Math.PI*2*(data[i]/total);
 			}
 
 			ctx.fillStyle = 'rgba(255,255,255,0.80)';
@@ -127,7 +139,7 @@ var CardHitsGridItem = React.createClass({
 			ctx.font = "20px sans-serif";
 			ctx.textAlign="center"; 
 			ctx.textBaseline = "middle";
-			ctx.fillText(myTotal, canvas.width/2, canvas.height/2+2, canvas.width-11);
+			ctx.fillText(total, canvas.width/2, canvas.height/2, canvas.width-11);
 		}
   	},
 
@@ -148,7 +160,7 @@ var CardHitsGridItem = React.createClass({
 	    return (
 		     <div className={bemBlocks.item().mix(bemBlocks.container("item"))}>
 		        <div style={{textAlign:'center', maxHeight: '200px', overflow: 'auto', maxWidth:'210px', display:"inline-flex"}}>{this.getSetIcons(result)}</div>
-		        <canvas width="37" height="37" ref={this.getEditionCircle()}/>
+		        <canvas style={{position: "relative", top: "17px", right: "110px", marginTop: "-35px"}} width="37" height="37" ref={this.getEditionCircle}/>
 		        <a href={"http://mtg-hunter.com/?q="+source.name+"&sort=_score_desc"}>
 		          	<img className='gridImg'
 			            style={{height: 311}}

@@ -3,8 +3,7 @@ import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import "searchkit/theming/theme.scss";
 import "./styles/customisations.scss";
-//import "./styles/keyrune.css";
-import Webcam from "react-user-media";
+import "./styles/keyrune.css";
 var VelocityTransitionGroup = require('velocity-react/velocity-transition-group.js');
 var VelocityComponent = require('velocity-react/velocity-component.js');
 var VelocityHelpers = require('velocity-react/velocity-helpers.js');
@@ -16,6 +15,8 @@ const nl2br = require('react-nl2br');
 const omit = require("lodash/omit");
 const map = require("lodash/map");
 import Modal from 'react-overlays/lib/Modal';
+var firebase = require('firebase');
+var firebaseui = require('firebaseui');
 
 //   InputFilter,
 import {
@@ -49,11 +50,10 @@ import {
   ViewSwitcherHits,
   ViewSwitcherToggle,
   DynamicRangeFilter,
-  InputFilter,
   FilterGroup, FilterGroupItem,
   TagFilterConfig, TagFilterList
 } from "searchkit";
-//import InputFilter from './modInputFilter.js';
+import {InputFilter} from './modInputFilter.js';
 import {RefinementListFilter, OnlyRefinementListFilter} from './modRefineListFilter.js';
 import CardDetailPanel from './CardDetailPanel';
 import CardHitsListItem from './CardHitsListItem';
@@ -123,8 +123,11 @@ export function QueryRulesString(query, options:QueryStringOptions={}){
   }
   // Add escapes to the query's +, - and / chars.
   query = query.replace(/\//g, "\\/").replace(/\+/g, "\\+").replace(/\-/g, "\\-");
-  return {
+  /*return {
     "queryString":assign({"fields":["reminderlessText"],"query":query, "defaultOperator":"OR"})
+  }*/
+  return {
+    "queryString":assign({"fields":["reminderlessText"],"query":query, "defaultOperator":options.defaultOperator})
   }
 }
 
@@ -438,7 +441,7 @@ export class App extends React.Component<any, any> {
 
   constructor() {
     super();
-    const host = "http://localhost:9200/testcards/card";
+    const host = "http://192.168.1.119:9200/testcards/card";
     this.searchkit = new SearchkitManager(host);
     this.state = {hoveredId: '',
       showModal: false,
@@ -461,7 +464,7 @@ export class App extends React.Component<any, any> {
       formatsOperator: "AND",
       functiontagsOperator: "AND",
       cyclesOperator: "AND",
-      rulesTextOperator: "OR",
+      rulesTextOperator: "AND",
       coloursOnly: false,
       colourIdentityOnly: false};
     // Bind the prop function to this scope.
@@ -526,6 +529,9 @@ export class App extends React.Component<any, any> {
     this.setState({ showModal: true });
   }
 
+  openLogin(){
+    this.setState({ showModal: true });
+  }
 
   CardHitsGridItem = (props)=> {
     const {bemBlocks, result} = props;
@@ -676,6 +682,23 @@ export class App extends React.Component<any, any> {
 fieldOptions={{"type":"nested","options":{"path":"multiverseids","inner_hits":{"size":100}}}}
 fieldOptions={{"type":"nested","options":{"path":"multiverseids","inner_hits":{"size":100}}}}
 
+<InputFilter
+                queryBuilder={QueryRulesString} id="rulesText" searchThrottleTime={1000} title="Rules text" placeholder="Use ~ for cardname" searchOnChange={true} 
+                queryOptions={{"minimum_should_match": this.state.matchPercent, "defaultOperator":this.state.rulesTextOperator}} queryFields={["reminderlessText"]} prefixQueryFields={["reminderlessText"]}
+                containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
+                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.rulesTextOperator} 
+                              toggleItem={this.handleToggleOperatorChange.bind(this, "rulesTextOperator")}/>
+                              </div>
+                            )} collapsable={true} defaultCollapsed={true}/>}
+              />
+
+
+              <InputFilter
+                queryBuilder={QueryRulesString} id="rulesText" searchThrottleTime={1000} title="Rules text" placeholder="Use ~ for cardname" searchOnChange={true} 
+                queryOptions={{"minimum_should_match": this.state.matchPercent, "defaultOperator":this.state.rulesTextOperator}} queryFields={["reminderlessText"]} prefixQueryFields={["reminderlessText"]}
+                containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}
+              />
+
  <DynamicRangeFilter rangeFormatter={(count) => count.toFixed(2)} field="multiverseids.mtgoPrice" id="mtgoPrice" title="MTGO Price"/>
               */
 
@@ -689,9 +712,35 @@ fieldOptions={{"type":"nested","options":{"path":"multiverseids","inner_hits":{"
       console.log(rarityaggs);*/
       return plainQueryObject;
     })
+
+    var config = {
+      apiKey: "AIzaSyDd_EVNjL7-FnSW5XsYbUtVSWWh93DJBw4",
+      authDomain: "mtg-hunter.firebaseapp.com",
+      databaseURL: "https://mtg-hunter.firebaseio.com",
+      storageBucket: "mtg-hunter.appspot.com",
+      messagingSenderId: "699608148386"
+    };
+    firebase.initializeApp(config);
+
+    // Initialize the FirebaseUI Widget using Firebase.
+    var ui = new firebaseui.auth.AuthUI(firebase.auth());
+
+    var uiConfig = {
+      'signInSuccessUrl': 'mtg-hunter.com',
+      'signInOptions': [
+        // Leave the lines as is for the providers you want to offer your users.
+        firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+        firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+        firebase.auth.TwitterAuthProvider.PROVIDER_ID,
+        firebase.auth.GithubAuthProvider.PROVIDER_ID,
+        firebase.auth.EmailAuthProvider.PROVIDER_ID
+      ],
+      'signInFlow': 'popup'
+    };
+    ui.start('#firebaseui-auth-container', uiConfig)
+
     return (
       <div>
-
       <SearchkitProvider searchkit={this.searchkit}>
       <div>
         <div className="sk-layout sk-layout__size-l">
@@ -725,6 +774,18 @@ fieldOptions={{"type":"nested","options":{"path":"multiverseids","inner_hits":{"
                     <p>To report a bug or request a feature, send a message to <a href="mailto:admin@mtg-hunter.com" style={{textDecoration:"none"}}>admin@mtg-hunter.com</a></p>
                   </div>
                 </Modal>
+
+              <div className="my-logo"><button style={{backgroundColor: 'transparent', border: '0px', font: "inherit", color: "#eee", cursor:"pointer"}}
+                onClick={this.open.bind(this)}>Login</button><br/></div>
+                <Modal
+                  aria-labelledby='modal-label'
+                  style={modalStyle}
+                  backdropStyle={backdropStyle}
+                  show={this.state.showModal}
+                  onHide={this.close.bind(this)}
+                >
+                  <div id="firebaseui-auth-container" style={dialogStyle()} />
+                </Modal>  
               <SearchBox
                 translations={{"searchbox.placeholder": "Search card names. Use AND, OR and NOT e.g. (fire OR ice) AND a* NOT \"sword of\""}}
                 queryOptions={{"minimum_should_match": this.state.matchPercent}}
@@ -737,29 +798,44 @@ fieldOptions={{"type":"nested","options":{"path":"multiverseids","inner_hits":{"
               />
             </div>
           </div>
-
           <div className="sk-layout__body">
 
             <div className="sk-layout__filters">
-              <RangeFilter id="cmc" min={0} max={16} title="Converted Cost" field="cmc" showHistogram={true}
-              containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
+              <RangeFilter id="cmc" min={0} max={16} title="Converted cost" field="cmc" showHistogram={true}
+                containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
               <RangeFilter id="paperPrice" min={0} max={10000} rangeComponent={RangeSliderInput} title="Paper Price" field="multiverseids.medPrice" showHistogram={true}
-              containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
+                containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
               <RangeFilter id="mtgoPrice" min={0} max={160} rangeComponent={RangeSliderInput} title="MTGO Price" field="multiverseids.mtgoPrice" showHistogram={true}
-              containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
+                containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
+
               <InputFilter
                 queryBuilder={QueryRulesString} id="rulesText" searchThrottleTime={1000} title="Rules text" placeholder="Use ~ for cardname" searchOnChange={true} 
                 queryOptions={{"minimum_should_match": this.state.matchPercent, "defaultOperator":this.state.rulesTextOperator}} queryFields={["reminderlessText"]} prefixQueryFields={["reminderlessText"]}
-                containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}
+                containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
+                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.rulesTextOperator} 
+                              toggleItem={this.handleToggleOperatorChange.bind(this, "rulesTextOperator")}/>
+                              </div>
+                            )} collapsable={true} defaultCollapsed={true}/>}
               />
               <InputFilter
                 queryBuilder={QueryFlavourString} id="flavourText" searchThrottleTime={1000} title="Flavour text" placeholder="Search flavour text" searchOnChange={true} 
                 queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["multiverseids.flavor"]} 
-                containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
+                containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}
+              />
               <InputFilter
                 queryBuilder={QueryTypeString} id="typeLine" searchThrottleTime={1000} title="Type text" placeholder="E.g. Elf AND (spirit OR ally)" searchOnChange={true} 
                 queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["type"]} prefixQueryFields={["type"]}
-                containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
+                containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}
+              />
+              <InputFilter
+                id="commentText" searchThrottleTime={1000} title="Comments" placeholder="Search comment text" searchOnChange={true} 
+                queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["multiverseids.comments.comment"]} prefixQueryFields={["multiverseids.comments.comment"]}
+                containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}
+              />
+
+              <DynamicRangeFilter field="reminderlessWordCount" id="wordCount" title="Word count" containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
+
+              <DynamicRangeFilter field="printingCount" id="printingCount" title="Printing count" containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
 
               <OnlyRefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator={this.state.coloursOperator} only={this.state.coloursOnly}
                             itemComponent={SymbolRefineList} containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
@@ -768,7 +844,7 @@ fieldOptions={{"type":"nested","options":{"path":"multiverseids","inner_hits":{"
                                 <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.coloursOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "coloursOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
-              <OnlyRefinementListFilter id="colourIdentity" title="Colour Identity" field="colorIdentity" size={6} operator={this.state.colourIdentityOperator} only={this.state.colourIdentityOnly}
+              <OnlyRefinementListFilter id="colourIdentity" title="Colour identity" field="colorIdentity" size={6} operator={this.state.colourIdentityOperator} only={this.state.colourIdentityOnly}
                             itemComponent={SymbolRefineList} containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                                 <input onClick={(evt) => this.suppressClick(evt)} type="checkbox" id="onlyIdentityBox" className="onlyCheckbox" value={this.state.colourIdentityOnly} onChange={this.handleIdentityOnlyChange.bind(this)} />
                                 <label onClick={(evt) => this.suppressClick(evt)} htmlFor="onlyIdentityBox">Only</label>
@@ -837,13 +913,13 @@ fieldOptions={{"type":"nested","options":{"path":"multiverseids","inner_hits":{"
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.symbolsOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "symbolsOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="manaCost" title="Mana Cost" field="prettyCost.raw" showMore={false} listComponent={CostMultiSelect} size={0} operator={this.state.manaCostOperator}
+              <RefinementListFilter id="manaCost" title="Mana cost" field="manaCost.raw" showMore={false} listComponent={CostMultiSelect} size={0} operator={this.state.manaCostOperator}
                             containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.manaCostOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "manaCostOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
 
-              <RefinementListFilter id="colorCount" title="Colour Count" field="colourCount" size={6} operator={this.state.colourCountOperator} orderKey="_term"
+              <RefinementListFilter id="colorCount" title="Colour count" field="colourCount" size={6} operator={this.state.colourCountOperator} orderKey="_term"
                             containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.colourCountOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "colourCountOperator")}/>
                               </div>
@@ -873,10 +949,16 @@ fieldOptions={{"type":"nested","options":{"path":"multiverseids","inner_hits":{"
                     {label:"CMC (descending)", field:"cmc", order:"desc"},
                     {label:"Card number (ascending)", field:"multiverseids.number", order:"asc"},
                     {label:"Card number (descending)", field:"multiverseids.number", order:"desc"},
-                    {label:"Paper Price (ascending)", field:"multiverseids.medPrice", order:"asc"},
-                    {label:"Paper Price (descending)", field:"multiverseids.medPrice", order:"desc"},
-                    {label:"MTGO Price (ascending)",  field:"multiverseids.mtgoPrice", order:"asc"},
-                    {label:"MTGO Price (descending)",  field:"multiverseids.mtgoPrice", order:"desc"}
+                    {label:"Paper price (ascending)", field:"multiverseids.medPrice", order:"asc"},
+                    {label:"Paper price (descending)", field:"multiverseids.medPrice", order:"desc"},
+                    {label:"MTGO price (ascending)",  field:"multiverseids.mtgoPrice", order:"asc"},
+                    {label:"MTGO price (descending)",  field:"multiverseids.mtgoPrice", order:"desc"},
+                    {label:"Word count (ascending)",  field:"reminderlessWordCount", order:"asc"},
+                    {label:"Word count (descending)",  field:"reminderlessWordCount", order:"desc"},
+                    {label:"Release date (ascending)",  field:"releaseDate", order:"asc"},
+                    {label:"Release date (descending)",  field:"releaseDate", order:"desc"},
+                    {label:"# of printings (ascending)",  field:"printingCount", order:"asc"},
+                    {label:"# of printings (descending)",  field:"printingCount", order:"desc"}
                   ]} />
                   <PageSizeSelector options={[12,24, 48, 96]} listComponent={Toggle}/>
                 </div>
@@ -909,7 +991,6 @@ fieldOptions={{"type":"nested","options":{"path":"multiverseids","inner_hits":{"
         position: 'absolute',
         maxWidth: 630,
         right: 60}}>Wizards of the Coast, Magic: The Gathering, and their logos are trademarks of Wizards of the Coast LLC. © 1995-2016 Wizards. All rights reserved. MtG:Hunter is not affiliated with Wizards of the Coast LLC.</p>
-
       </div>
     )}
 }
