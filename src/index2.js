@@ -4,6 +4,7 @@ import * as _ from "lodash";
 import "searchkit/theming/theme.scss";
 const omit = require("lodash/omit");
 const map = require("lodash/map");
+import Sidebar from 'react-sidebar';
 //import "./styles/customisations.scss";
 
 var firebase = require('firebase');
@@ -43,6 +44,7 @@ import {
   FilterGroup, FilterGroupItem,
   TagFilterConfig, TagFilterList
 } from "searchkit";
+import {TogglePanel} from './TogglePanel';
 
 
 class FilterGroupImg extends FilterGroup {
@@ -159,7 +161,7 @@ export class App extends React.Component<any, any> {
         <table className="sk-table sk-table-striped" style={{width: '100%', boxSizing: 'border-box'}}>
           <thead>
             <tr>
-              <th></th> <th>Name</th> <th>Mana cost</th> <th>Type</th> <th>Paper price</th> <th>Sets</th>
+              <th></th> <th>Name</th> <th>Mana cost</th> <th>Type</th> <th>Sets</th>
             </tr>
           </thead>
           <tbody>
@@ -191,9 +193,6 @@ export class App extends React.Component<any, any> {
                     </div>)}
                 </div>
               </td>
-              <td>{hit._source.multiverseids[0].medPrice ?
-                  "$" + parseFloat(hit._source.multiverseids[0].medPrice).toFixed(2) : (hit._source.multiverseids[1] ? "$" + parseFloat(hit._source.multiverseids[1].medPrice).toFixed(2) : "")
-                  }</td>
               <td style={{maxWidth:'160px'}}>
                 <div style={{textAlign:'center', maxHeight: '200px', overflow: 'auto', maxWidth:'130px', display:"inline-flex"}}>{getSetIcons(hit._source,this)}</div>
               </td>
@@ -232,10 +231,38 @@ export class App extends React.Component<any, any> {
 		    cyclesOperator: "AND",
 		    rulesTextOperator: "AND",
 		    coloursOnly: false,
-		    colourIdentityOnly: false};
+		    colourIdentityOnly: false,
+		sidebarOpen: false, sidebarDocked: false};
 	    // Bind the prop function to this scope.
 	    //this.handleClick = this.handleClick.bind(this);
 	}
+
+	onSetSidebarOpen(open) {
+	    this.setState({sidebarOpen: open});
+	  }
+
+	  componentWillMount() {
+	    var mql = window.matchMedia(`(min-width: 768px)`);
+	    mql.addListener(this.mediaQueryChanged.bind(this));
+	    this.setState({smql: mql, sidebarDocked: mql.matches});
+	  }
+
+	  componentWillUnmount() {
+	    this.state.mql.removeListener(this.mediaQueryChanged);
+	  }
+
+	  mediaQueryChanged() {
+	  	var thing = this.state.smql.matches;
+	    this.setState({sidebarDocked: thing});
+	  }
+
+	  toggleOpen(ev) {
+    this.setState({sidebarOpen: !this.state.sidebarOpen});
+
+    if (ev) {
+      ev.preventDefault();
+    }
+  }
 
 	render() {
 		/*var config = {
@@ -294,14 +321,34 @@ export class App extends React.Component<any, any> {
 	        }
 	    }, function(error) {
 	        console.log(error);
-	    });*/
+	    });
+
+		
+	      <Col md={3} xsHidden smHidden style={{}}><p><b>Hello filter container column!</b></p></Col>
+	    */
+	    var sidebarContent = <div style={{"backgroundColor":"white"}}><p><b>Here is filter placeholder stuff!</b></p>
+	    <div className="sk-layout__filters">
+              <RangeFilter id="cmc" min={0} max={16} title="Converted cost" field="cmc" showHistogram={true}
+                containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/></div></div>;
+
+	    var sidebarToggle = !this.state.sidebarDocked ? 
+	    	<div onClick={this.toggleOpen.bind(this)}>Open</div>
+	    	 : null;
 
 	    return (
 
       <SearchkitProvider searchkit={this.searchkit}>
-      	<div>
               
-	    	<Navbar collapseOnSelect={true}>
+
+		  <Sidebar sidebar={sidebarContent}
+               open={this.state.sidebarOpen}
+               docked={this.state.sidebarDocked}
+               onSetOpen={this.onSetSidebarOpen.bind(this)}>
+
+	    	<Navbar collapseOnSelect>
+		    <Navbar.Brand>
+		      {sidebarToggle}
+		    </Navbar.Brand>
 		    <Navbar.Header>
 		      <Navbar.Brand>
 		        <a href="#">MtG-Hunter</a>
@@ -335,10 +382,8 @@ export class App extends React.Component<any, any> {
 		    </Navbar.Collapse>
 		  </Navbar>
 
-
       <Grid>
 	    <Row className="show-grid">
-	      <Col md={3} xsHidden smHidden style={{}}><p><b>Hello filter container column!</b></p></Col>
 	      <Col md={9}><div className="sk-layout__body">
 				<div className="sk-layout__result sk-results-list">
 	              <div className="sk-results-list__action-bar sk-action-bar">
@@ -390,8 +435,9 @@ export class App extends React.Component<any, any> {
 	          </div></Col>
 	    </Row>
 	  </Grid>
+      </Sidebar>
 
-          </div>
+
 		  </SearchkitProvider>
 	    );
 	}
