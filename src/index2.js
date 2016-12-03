@@ -1,10 +1,12 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import { Router, Route, hashHistory, Link } from 'react-router'
 import * as _ from "lodash";
 import "searchkit/theming/theme.scss";
 const omit = require("lodash/omit");
 const map = require("lodash/map");
 import Sidebar from 'react-sidebar';
+import Card from './Card.js'
 //import "./styles/customisations.scss";
 
 var firebase = require('firebase');
@@ -323,7 +325,7 @@ export class App extends React.Component<any, any> {
 	        console.log(error);
 	    });
 
-		
+
 	      <Col md={3} xsHidden smHidden style={{}}><p><b>Hello filter container column!</b></p></Col>
 	    */
 	    var sidebarContent = <div style={{"backgroundColor":"white"}}><p><b>Here is filter placeholder stuff!</b></p>
@@ -331,14 +333,14 @@ export class App extends React.Component<any, any> {
               <RangeFilter id="cmc" min={0} max={16} title="Converted cost" field="cmc" showHistogram={true}
                 containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/></div></div>;
 
-	    var sidebarToggle = !this.state.sidebarDocked ? 
+	    var sidebarToggle = !this.state.sidebarDocked ?
 	    	<div onClick={this.toggleOpen.bind(this)}>Open</div>
 	    	 : null;
 
 	    return (
 
       <SearchkitProvider searchkit={this.searchkit}>
-              
+
 
 		  <Sidebar sidebar={sidebarContent}
                open={this.state.sidebarOpen}
@@ -381,6 +383,8 @@ export class App extends React.Component<any, any> {
 		      </Nav>
 		    </Navbar.Collapse>
 		  </Navbar>
+
+      <Link to="/card/Bollox/BigOne">Bollox</Link>
 
       <Grid>
 	    <Row className="show-grid">
@@ -443,4 +447,9 @@ export class App extends React.Component<any, any> {
 	}
 }
 
-ReactDOM.render(<App />, document.getElementById('app'));
+ReactDOM.render((
+  <Router history={hashHistory}>
+    <Route path="/" component={App}/>
+    <Route path="/card/:cardName/:setName" component={Card}/>
+  </Router>
+), document.getElementById('app'));
