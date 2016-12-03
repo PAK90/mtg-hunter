@@ -11,7 +11,7 @@
   },
   "private": true,
   "scripts": {
-    "start": "node server.js",
+    "start": "node server.js --history-api-fallback",
     "lint": "eslint src",
     "index": "node --harmony indexer/cardIndexer",
     "prices": "babel-node indexer/getCardPrices",

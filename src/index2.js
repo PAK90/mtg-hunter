@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { Router, Route, hashHistory, Link } from 'react-router'
+import { Router, Route, hashHistory, browserHistory, Link } from 'react-router';
 import * as _ from "lodash";
 import "searchkit/theming/theme.scss";
 const omit = require("lodash/omit");
@@ -170,10 +170,11 @@ export class App extends React.Component<any, any> {
           {map(hits, hit=> (
             <tr key={hit._id}>
               <td style={{margin: 0, padding: 0, width: 40}}>
-                <img data-qa="poster" src={
+                <Link to={"/card/"+hit._source.name+"/"+hit._source.multiverseids[hit._source.multiverseids.length - 1].setName} params={{hits:hit}} ><img data-qa="poster" src={
     'https://image.deckbrew.com/mtg/multiverseid/' + hit._source.multiverseids[hit._source.multiverseids.length - 1].multiverseid + '.jpg'} style={{width: 40}}/>
+    			</Link>
               </td>
-              <td>{hit._source.name}</td>
+              <Link to={"/card/"+hit._source.name+"/"+hit._source.multiverseids[hit._source.multiverseids.length - 1].setName} params={{hits:hit}}><td>{hit._source.name}</td></Link>
               <td>{generateTitleCostSymbols(hit._source.manaCost)}</td>
               <td>
                 <div style={{display:"inline-flex"}} className={"subtitle typeLine"} >
@@ -250,7 +251,7 @@ export class App extends React.Component<any, any> {
 	  }
 
 	  componentWillUnmount() {
-	    this.state.mql.removeListener(this.mediaQueryChanged);
+	    this.state.smql.removeListener(this.mediaQueryChanged);
 	  }
 
 	  mediaQueryChanged() {
@@ -384,8 +385,6 @@ export class App extends React.Component<any, any> {
 		    </Navbar.Collapse>
 		  </Navbar>
 
-      <Link to="/card/Bollox/BigOne">Bollox</Link>
-
       <Grid>
 	    <Row className="show-grid">
 	      <Col md={9}><div className="sk-layout__body">
@@ -448,8 +447,8 @@ export class App extends React.Component<any, any> {
 }
 
 ReactDOM.render((
-  <Router history={hashHistory}>
+  <Router history={browserHistory}>
     <Route path="/" component={App}/>
-    <Route path="/card/:cardName/:setName" component={Card}/>
+    <Route path="/card/:cardName/:setName" hits={"hits!"} component={Card}/>
   </Router>
 ), document.getElementById('app'));
