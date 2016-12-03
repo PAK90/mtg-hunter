@@ -170,11 +170,11 @@ export class App extends React.Component<any, any> {
           {map(hits, hit=> (
             <tr key={hit._id}>
               <td style={{margin: 0, padding: 0, width: 40}}>
-                <Link to={"/card/"+hit._source.name+"/"+hit._source.multiverseids[hit._source.multiverseids.length - 1].setName} params={{hits:hit}} ><img data-qa="poster" src={
+                <Link to={{pathname: "/card/"+hit._source.name+"/"+hit._source.multiverseids[hit._source.multiverseids.length - 1].setName}} ><img data-qa="poster" src={
     'https://image.deckbrew.com/mtg/multiverseid/' + hit._source.multiverseids[hit._source.multiverseids.length - 1].multiverseid + '.jpg'} style={{width: 40}}/>
     			</Link>
               </td>
-              <Link to={"/card/"+hit._source.name+"/"+hit._source.multiverseids[hit._source.multiverseids.length - 1].setName} params={{hits:hit}}><td>{hit._source.name}</td></Link>
+              <Link to={{pathname: "/card/"+hit._source.name+"/"+hit._source.multiverseids[hit._source.multiverseids.length - 1].setName}}><td>{hit._source.name}</td></Link>
               <td>{generateTitleCostSymbols(hit._source.manaCost)}</td>
               <td>
                 <div style={{display:"inline-flex"}} className={"subtitle typeLine"} >
@@ -449,6 +449,6 @@ export class App extends React.Component<any, any> {
 ReactDOM.render((
   <Router history={browserHistory}>
     <Route path="/" component={App}/>
-    <Route path="/card/:cardName/:setName" hits={"hits!"} component={Card}/>
+    <Route path="/card/:cardName/:setName" component={Card}/>
   </Router>
 ), document.getElementById('app'));

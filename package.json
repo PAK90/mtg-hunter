@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "bem-cn": "^1.2.2",
+    "elasticsearch": "^12.1.0",
     "firebase": "^3.4.1",
     "firebaseui": "^1.0.0",
     "lodash": "4.13.1",
