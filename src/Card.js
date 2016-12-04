@@ -11,7 +11,7 @@ export default React.createClass({
 
 	componentWillMount() {
 		this.client = new elasticsearch.Client({
-	 	    host:"http://localhost:9200"
+	 	    host:"http://192.168.1.119:9200"
 	    })
 	    this.index = "testcards";
 	    this.type = "card";
@@ -20,8 +20,6 @@ export default React.createClass({
 	    	type: this.type,
 	    	id: this.props.params.cardName
 	    }, function(error, response) {
-	    	console.log(response);
-	    	console.log(error);
 	    	if (response.found) {
 	    		this.setState({cardInfo: response._source});
 	    	}

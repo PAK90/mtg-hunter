@@ -713,7 +713,7 @@ fieldOptions={{"type":"nested","options":{"path":"multiverseids","inner_hits":{"
       return plainQueryObject;
     })
 
-    var config = {
+    /*var config = {
       apiKey: "AIzaSyDd_EVNjL7-FnSW5XsYbUtVSWWh93DJBw4",
       authDomain: "mtg-hunter.firebaseapp.com",
       databaseURL: "https://mtg-hunter.firebaseio.com",
@@ -737,7 +737,7 @@ fieldOptions={{"type":"nested","options":{"path":"multiverseids","inner_hits":{"
       ],
       'signInFlow': 'popup'
     };
-    ui.start('#firebaseui-auth-container', uiConfig)
+    ui.start('#firebaseui-auth-container', uiConfig)*/
 
     return (
       <div>
@@ -789,11 +789,11 @@ fieldOptions={{"type":"nested","options":{"path":"multiverseids","inner_hits":{"
               <SearchBox
                 translations={{"searchbox.placeholder": "Search card names. Use AND, OR and NOT e.g. (fire OR ice) AND a* NOT \"sword of\""}}
                 queryOptions={{"minimum_should_match": this.state.matchPercent}}
-                prefixQueryFields={["name"]}
+                prefixQueryFields={["name","reminderlessText","multiverseids.flavor","multiverseids.artist.raw","multiverseids.setName.raw"]}
                 autofocus={true}
                 searchOnChange={true}
                 searchThrottleTime={1000}
-                queryFields={["name"]}
+                queryFields={["name","reminderlessText","multiverseids.flavor","multiverseids.artist.raw","multiverseids.setName.raw"]}
                 queryBuilder={QueryString}
               />
             </div>

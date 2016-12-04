@@ -11,7 +11,6 @@ var Tab = ReactTabs.Tab;
 var Tabs = require("./Tabs");
 var TabList = ReactTabs.TabList;
 var TabPanel = ReactTabs.TabPanel;
-var Rating = require('react-rating');
 var ReactDisqusThread = require('react-disqus-thread');
 /*var Disqus = require('disqus');
 
