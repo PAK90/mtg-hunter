@@ -3,6 +3,7 @@ import * as ReactDOM from "react-dom";
 import { Router, Route, hashHistory, browserHistory, Link } from 'react-router';
 import * as _ from "lodash";
 import "searchkit/theming/theme.scss";
+const elasticsearch = require("elasticsearch");
 const omit = require("lodash/omit");
 const map = require("lodash/map");
 import Sidebar from 'react-sidebar';
@@ -209,6 +210,13 @@ export class App extends React.Component<any, any> {
 
   	constructor() {
 	    super();
+	    // ES init
+	    this.client = new elasticsearch.Client({
+	 	    host:"http://192.168.1.119:9200"
+	    })
+	    this.index = "testcards";
+	    this.type = "card";
+
 	    const host = "http://192.168.1.119:9200/testcards/card";
 	    this.searchkit = new SearchkitManager(host);
 	    this.state = {hoveredId: '',
@@ -257,6 +265,24 @@ export class App extends React.Component<any, any> {
 	  mediaQueryChanged() {
 	  	var thing = this.state.smql.matches;
 	    this.setState({sidebarDocked: thing});
+	  }
+
+	  testSearch() {
+	  	console.log("test!");
+	  	this.client.search({
+		  index: this.index,
+		  size: 50,
+		  body: {
+		    query: {
+		      "query_string": {
+            "fields":["reminderlessText"],
+          "query":"life "
+        }
+		    }
+		  }
+		}, function (error, response) {
+		  console.log(response);
+		});
 	  }
 
 	  toggleOpen(ev) {
@@ -326,6 +352,16 @@ export class App extends React.Component<any, any> {
 	        console.log(error);
 	    });
 
+	    <SearchBox
+                translations={{"searchbox.placeholder": "Search card names. Use AND, OR and NOT e.g. (fire OR ice) AND a* NOT \"sword of\""}}
+                queryOptions={{"minimum_should_match": 100}}
+                prefixQueryFields={["name"]}
+                autofocus={true}
+                searchOnChange={true}
+                searchThrottleTime={1000}
+                queryFields={["name"]}
+              />
+
 
 	      <Col md={3} xsHidden smHidden style={{}}><p><b>Hello filter container column!</b></p></Col>
 	    */
@@ -361,15 +397,8 @@ export class App extends React.Component<any, any> {
 		    <Navbar.Collapse>
 		      <Nav>
 		      <li style={{"padding":"13px"}}>
-		    <SearchBox
-                translations={{"searchbox.placeholder": "Search card names. Use AND, OR and NOT e.g. (fire OR ice) AND a* NOT \"sword of\""}}
-                queryOptions={{"minimum_should_match": 100}}
-                prefixQueryFields={["name"]}
-                autofocus={true}
-                searchOnChange={true}
-                searchThrottleTime={1000}
-                queryFields={["name"]}
-              /></li>
+		      <button onClick={this.testSearch.bind(this)}>Click to test search!</button>
+		    </li>
 		        <NavItem eventKey={1} href="#">Link</NavItem>
 		        <NavItem eventKey={2} href="#">Link</NavItem>
 		      </Nav>
