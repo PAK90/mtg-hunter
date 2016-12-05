@@ -6,7 +6,7 @@ import "searchkit/theming/theme.scss";
 const omit = require("lodash/omit");
 const map = require("lodash/map");
 import Sidebar from 'react-sidebar';
-import Card from './Card.js'
+import Card from './Card.js';
 //import "./styles/customisations.scss";
 
 var firebase = require('firebase');
