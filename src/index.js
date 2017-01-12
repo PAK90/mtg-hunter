@@ -713,7 +713,7 @@ fieldOptions={{"type":"nested","options":{"path":"multiverseids","inner_hits":{"
       return plainQueryObject;
     })
 
-    /*var config = {
+    var config = {
       apiKey: "AIzaSyDd_EVNjL7-FnSW5XsYbUtVSWWh93DJBw4",
       authDomain: "mtg-hunter.firebaseapp.com",
       databaseURL: "https://mtg-hunter.firebaseio.com",
@@ -721,9 +721,11 @@ fieldOptions={{"type":"nested","options":{"path":"multiverseids","inner_hits":{"
       messagingSenderId: "699608148386"
     };
     firebase.initializeApp(config);
+    var storage = firebase.storage();
+    var storageRef = storage.ref("");
 
     // Initialize the FirebaseUI Widget using Firebase.
-    var ui = new firebaseui.auth.AuthUI(firebase.auth());
+    /*var ui = new firebaseui.auth.AuthUI(firebase.auth());
 
     var uiConfig = {
       'signInSuccessUrl': 'mtg-hunter.com',
@@ -973,7 +975,7 @@ fieldOptions={{"type":"nested","options":{"path":"multiverseids","inner_hits":{"
                     hitsPerPage={12}
                     hitComponents = {[
                       {key:"grid", title:"Grid", itemComponent:<CardHitsGridItem/>},
-                      {key:"list", title:"List", itemComponent:<CardHitsListItem updateCardName={this.handleClick} currentCard={this.state.clickedCard}/>, defaultOption:true},
+                      {key:"list", title:"List", itemComponent:<CardHitsListItem updateCardName={this.handleClick} currentCard={this.state.clickedCard} storage={storageRef}/>, defaultOption:true},
                       {key:"table", title:"Table", listComponent:this.CardHitsTable}
                     ]}
                     scrollTo="body"

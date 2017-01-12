@@ -8,11 +8,11 @@ const config = {
   entry: [
     'webpack-dev-server/client?http://0.0.0.0:3333',
     'webpack/hot/only-dev-server',
-    './src/index2'
+    './src/index'
   ],
   output: {
     path: path.join(__dirname, 'dist'),
-    filename: 'index2.js',
+    filename: 'index.js',
     publicPath: '/static/'
   },
   resolve: {

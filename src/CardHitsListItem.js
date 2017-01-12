@@ -12,6 +12,7 @@ var Tabs = require("./Tabs");
 var TabList = ReactTabs.TabList;
 var TabPanel = ReactTabs.TabPanel;
 var ReactDisqusThread = require('react-disqus-thread');
+var firebase = require('firebase');
 /*var Disqus = require('disqus');
 
 var disqus = new Disqus({
@@ -96,7 +97,8 @@ var CardHitsListItem = React.createClass({
             currentFoilMtgoPrice: multiverses[multiverses.length-1].mtgoFoilPrice,
             currentMtgoStoreLink: multiverses[multiverses.length-1].mtgoStoreLink,
             currentSelectedTab: 0,
-            currentImageLayout: ''
+            currentImageLayout: '',
+			testImg: ""
         };
     },
 
@@ -302,11 +304,20 @@ var CardHitsListItem = React.createClass({
 		//})
 	},
 
+	returnImageUrl: function() {
+		this.props.storage.child('Island.jpg').getDownloadURL().then(function(url) {
+			return url;
+	    })
+	},
+
 	render: function() {
 	    var {bemBlocks, result} = this.props;
 	    var source = result._source;
 	    let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + this.state.currentMultiId;
 	    let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/' + this.state.currentImageMultiId + '.jpg';
+
+	    
+
 	    /*if (this.state.currentImageMultiId.indexOf('_') != -1) { // UNCOMMENT FOR PROMO SUPPORT.
 	    	imgUrl = './src/img/promo/'+this.state.currentImageMultiId+'.jpg';
 	    }*/
@@ -628,8 +639,8 @@ var CardHitsListItem = React.createClass({
 	    		<div style={{display: 'flex'}}>
 	    			{/* Block 1; the card image. */}
 		    		<div className={"listImgDiv "} >
-		          		<img className={(this.props.currentCard == source.name ? "clicked " : "") + "listImg "+ this.state.currentImageLayout }
-		            		src={imgUrl} 
+		          		<img id={"imageGoesHere"+this.state.currentImageMultiId} className={(this.props.currentCard == source.name ? "clicked " : "") + "listImg "+ this.state.currentImageLayout }
+		            		src={this.returnImageUrl()}
 		            		style={{borderRadius: this.props.currentCard == source.name ? "10" : "6", cursor:"pointer"}} 
 		            		width="100"
 		            		/>
