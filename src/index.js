@@ -4,7 +4,6 @@ import * as _ from "lodash";
 import "searchkit/theming/theme.scss";
 import "./styles/customisations.scss";
 //import "./styles/keyrune.css";
-import Webcam from "react-user-media";
 var VelocityTransitionGroup = require('velocity-react/velocity-transition-group.js');
 var VelocityComponent = require('velocity-react/velocity-component.js');
 var VelocityHelpers = require('velocity-react/velocity-helpers.js');
@@ -16,6 +15,9 @@ const nl2br = require('react-nl2br');
 const omit = require("lodash/omit");
 const map = require("lodash/map");
 import Modal from 'react-overlays/lib/Modal';
+import ReactStars from 'react-stars';
+var Firebase = require('firebase');
+var fbconfig = require('./fbConfig.js');
 
 //   InputFilter,
 import {
@@ -47,11 +49,11 @@ import {
   ViewSwitcherHits,
   ViewSwitcherToggle,
   DynamicRangeFilter,
-  InputFilter,
+  //InputFilter,
   FilterGroup, FilterGroupItem,
   TagFilterConfig, TagFilterList
 } from "searchkit";
-//import InputFilter from './modInputFilter.js';
+import {InputFilter} from './modInputFilter.js';
 import {RefinementListFilter, OnlyRefinementListFilter} from './modRefineListFilter.js';
 import CardDetailPanel from './CardDetailPanel';
 import CardHitsListItem from './CardHitsListItem';
@@ -116,8 +118,11 @@ export function QueryRulesString(query, options:QueryStringOptions={}){
   }
   // Add escapes to the query's +, - and / chars.
   query = query.replace(/\//g, "\\/").replace(/\+/g, "\\+").replace(/\-/g, "\\-");
-  return {
+  /*return {
     "queryString":assign({"fields":["reminderlessText"],"query":query, "defaultOperator":"OR"})
+  }*/
+  return {
+    "queryString":assign({"fields":["reminderlessText"],"query":query, "defaultOperator":options.defaultOperator})
   }
 }
 
@@ -127,9 +132,12 @@ export function QueryFlavourString(query, options:QueryStringOptions={}){
   }
   // Add escapes to the query's +, - and / chars.
   query = query.replace(/\//g, "\\/").replace(/\+/g, "\\+").replace(/\-/g, "\\-");
-  return {
+  /*return {
     "queryString":assign({"fields":["multiverseids.flavor"],"query":query, "defaultOperator":"OR"})
-  }
+  }*/
+  return {
+    "queryString":assign({"fields":["multiverseids.flavor"],"query":query, "defaultOperator":options.defaultOperator})
+  };
 }
 
 export function QueryTypeString(query, options:QueryStringOptions={}){
@@ -138,8 +146,11 @@ export function QueryTypeString(query, options:QueryStringOptions={}){
   }
   // Add escapes to the query's +, - and / chars.
   query = query.replace(/\//g, "\\/").replace(/\+/g, "\\+").replace(/\-/g, "\\-");
-  return {
+  /*return {
     "queryString":assign({"fields":["type"],"query":query, "defaultOperator":"OR"})
+  };*/
+  return {
+    "queryString":assign({"fields":["type"],"query":query, "defaultOperator":options.defaultOperator})
   };
 }
 
@@ -411,7 +422,7 @@ export class App extends React.Component<any, any> {
 
   constructor() {
     super();
-    const host = "http://localhost:9200/cards/card";
+    const host = "http://localhost:9200/testcards/card";
     this.searchkit = new SearchkitManager(host);
     this.state = {hoveredId: '',
       showModal: false,
@@ -425,6 +436,7 @@ export class App extends React.Component<any, any> {
       coloursOperator: "AND",
       colourIdentityOperator: "AND",
       colourCountOperator: "AND",
+      artistCountOperator: "AND",
       rarityOperator: "AND",
       supertypeOperator: "AND",
       typeOperator: "AND",
@@ -432,12 +444,17 @@ export class App extends React.Component<any, any> {
       artistsOperator: "AND",
       setcodesOperator: "AND",
       formatsOperator: "AND",
+      bannedRestrictedOperator: "AND",
       cyclesOperator: "AND",
-      rulesTextOperator: "OR",
+      rulesTextOperator: "AND",
+      flavourTextOperator: "AND",
+      typeLineOperator: "AND",
       coloursOnly: false,
       colourIdentityOnly: false};
     // Bind the prop function to this scope.
     this.handleClick = this.handleClick.bind(this)
+    
+    Firebase.initializeApp(fbconfig[0]);
   }
 
   hide() {
@@ -498,13 +515,48 @@ export class App extends React.Component<any, any> {
     this.setState({ showModal: true });
   }
 
-
   CardHitsGridItem = (props)=> {
     const {bemBlocks, result} = props;
     const source = result._source;
-    let url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid;
+    const ratingSettings = {
+      size: 18,
+      value: source.rating,
+      //edit: false
+      onChange: newValue => {
+        var valorous = Firebase.database().ref(source.name);
+        valorous.once('value').then(function(snapshot) {
+          var data = snapshot.val()
+          console.log(data);
+          console.log('edition votes + rating: ' + data.multiverseids[data.multiverseids.length-1].rating + ' (' + data.multiverseids[data.multiverseids.length-1].votes + ')');
+          console.log('overall votes + rating: ' + data.rating + ' (' + data.votes + ')');
+          console.log('new vote: ' + newValue);
+          // write new votes. Since this is grid view, it always writes to the last mID.
+          var editionVotes = Firebase.database().ref(source.name+'/multiverseids/'+(data.multiverseids.length-1)+'/votes');
+          editionVotes.transaction(function(votes) {
+            return votes + 1;
+          });
+
+          var editionRating = Firebase.database().ref(source.name+'/multiverseids/'+(data.multiverseids.length-1)+'/rating');
+          editionRating.transaction(function(rating) {
+            // ((oldRating * oldVotes) + newRating)/newVotes. Treat old votes*rating as one solid block, add new rating to it, then divide again.
+            return ((data.multiverseids[data.multiverseids.length-1].rating * data.multiverseids[data.multiverseids.length-1].votes) + newValue)/(data.multiverseids[data.multiverseids.length-1].votes+1)
+          }.bind(this));
+
+          var totalVotes = Firebase.database().ref(source.name+'/votes');
+          totalVotes.transaction(function(votes) {
+            return votes + 1;
+          });
+
+          var totalRating = Firebase.database().ref(source.name+'/rating');
+          totalRating.transaction(function(rating) {
+            // ((oldRating * oldVotes) + newRating)/newVotes. Treat old votes*rating as one solid block, add new rating to it, then divide again.
+            return ((data.rating * data.votes) + newValue)/(data.votes+1)
+          }.bind(this));
+
+        }.bind(this));
+      }
+    }
     let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/' + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid + '.jpg';
-    //let imgUrl = '../cropped2/crops' + result._source.multiverseids[result._source.multiverseids.length - 1].multiverseid + '.jpg';
     return (
       <div className={bemBlocks.item().mix(bemBlocks.container("item"))}>
         <a href={"http://mtg-hunter.com/?q="+source.name+"&sort=_score_desc"}>
@@ -514,7 +566,10 @@ export class App extends React.Component<any, any> {
             onClick={this.handleClick.bind(this, source)}
             onMouseOver={this.handleHoverIn.bind(this, source)}
             onMouseOut={this.handleHoverOut.bind(this, source)}/>
+
         </a>
+        <div style={{'margin':'0 auto', 'display':'table'}}><ReactStars {...ratingSettings}/></div>
+        <div style={{'textAlign':'center'}}className={bemBlocks.item("subtitle")}>{source.rating.toFixed(2)} ({source.votes})</div>  
       </div>
     )
   }
@@ -704,15 +759,36 @@ export class App extends React.Component<any, any> {
               <InputFilter
                 queryBuilder={QueryRulesString} id="rulesText" searchThrottleTime={1000} title="Rules text" placeholder="Use ~ for cardname" searchOnChange={true} 
                 queryOptions={{"minimum_should_match": this.state.matchPercent, "defaultOperator":this.state.rulesTextOperator}} queryFields={["reminderlessText"]} prefixQueryFields={["reminderlessText"]}
-                containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}
+                containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
+                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.rulesTextOperator} 
+                              toggleItem={this.handleToggleOperatorChange.bind(this, "rulesTextOperator")}/>
+                              </div>
+                            )} collapsable={true} defaultCollapsed={true}/>}
               />
               <InputFilter
                 queryBuilder={QueryFlavourString} id="flavourText" searchThrottleTime={1000} title="Flavour text" placeholder="Search flavour text" searchOnChange={true} 
-                queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["multiverseids.flavor"]} prefixQueryFields={["multiverseids.flavor"]}
-                containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
+                queryOptions={{"minimum_should_match": this.state.matchPercent, "defaultOperator":this.state.flavourTextOperator}} queryFields={["multiverseids.flavor"]} prefixQueryFields={["multiverseids.flavor"]}
+                containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
+                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.flavourTextOperator} 
+                              toggleItem={this.handleToggleOperatorChange.bind(this, "flavourTextOperator")}/>
+                              </div>
+                            )} collapsable={true} defaultCollapsed={true}/>}
+              />
               <InputFilter
                 queryBuilder={QueryTypeString} id="typeLine" searchThrottleTime={1000} title="Type text" placeholder="E.g. Elf AND (spirit OR ally)" searchOnChange={true} 
-                queryOptions={{"minimum_should_match": this.state.matchPercent}} queryFields={["type"]} prefixQueryFields={["type"]}
+                queryOptions={{"minimum_should_match": this.state.matchPercent, "defaultOperator":this.state.typeLineOperator}} queryFields={["type"]} prefixQueryFields={["type"]}
+                containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
+                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.typeLineOperator} 
+                              toggleItem={this.handleToggleOperatorChange.bind(this, "typeLineOperator")}/>
+                              </div>
+                            )} collapsable={true} defaultCollapsed={true}/>}
+              />
+
+              <DynamicRangeFilter field="reminderlessWordCount" id="wordCount" title="Word count" containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
+
+              <DynamicRangeFilter field="printingCount" id="printingCount" title="Printing count" containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
+
+              <RangeFilter field="rating" id="rating" title="Gatherer rating" showHistogram={true} min={0} max={5}
                 containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
 
               <OnlyRefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator={this.state.coloursOperator} only={this.state.coloursOnly}
@@ -757,7 +833,12 @@ export class App extends React.Component<any, any> {
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.formatsOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "formatsOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
-              <RefinementListFilter id="cycles" title="Cycles" field="cycle.raw" showMore={false} listComponent={CycleMultiSelect} size={0} orderKey="_term" operator={this.state.cyclesOperator}
+              <RefinementListFilter id="bannedRestricted" title="Banned/restricted" field="bannedRestricted.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.bannedRestrictedOperator}
+                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
+                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.bannedRestrictedOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "bannedRestrictedOperator")}/>
+                              </div>
+                            )} collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="cycles" title="Cycles" field="cycles.cycleName.raw" showMore={false} listComponent={CycleMultiSelect} size={0} orderKey="_term" operator={this.state.cyclesOperator}
                             containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.cyclesOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "cyclesOperator")}/>
                               </div>
@@ -790,7 +871,7 @@ export class App extends React.Component<any, any> {
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
 
-              <RefinementListFilter id="colorCount" title="Colour Count" field="colourCount" size={6} operator={this.state.colourCountOperator} orderKey="_term"
+              <RefinementListFilter id="colorCount" title="Colour count" field="colourCount" size={6} operator={this.state.colourCountOperator} orderKey="_term"
                             containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.colourCountOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "colourCountOperator")}/>
                               </div>
@@ -798,6 +879,11 @@ export class App extends React.Component<any, any> {
               <RefinementListFilter id="artists" title="Artist name" field="multiverseids.artist.raw" showMore={false} listComponent={MultiSelect} size={0} orderKey="_term" operator={this.state.artistsOperator}
                             containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
                               <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.artistsOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "artistsOperator")}/>
+                              </div>
+                            )} collapsable={true} defaultCollapsed={true}/>}/>
+              <RefinementListFilter id="artistCount" title="Artist count" field="artistCount" size={6} operator={this.state.artistCountOperator} orderKey="_term"
+                            containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
+                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.artistCountOperator} toggleItem={this.handleToggleOperatorChange.bind(this, "artistCountOperator")}/>
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}/>
             </div>
@@ -812,6 +898,8 @@ export class App extends React.Component<any, any> {
                     {label:"Name (descending)", field: "name.raw", order: "desc"},
                     {label:"Relevance (ascending)", field:"_score", order:"asc"},
                     {label:"Relevance (descending)", field:"_score", order:"desc"},
+                    {label:"Gatherer rating (ascending)", field:"rating", order:"asc"},
+                    {label:"Gatherer rating (descending)", field:"rating", order:"desc"},
                     {label:"Colour (ascending)", field:"colors", order:"asc"},
                     {label:"Colour (descending)", field:"colors", order:"desc"},
                     {label:"CMC (ascending)", field:"cmc", order:"asc"},

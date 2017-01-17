@@ -12,6 +12,7 @@ var Tabs = require("./Tabs");
 var TabList = ReactTabs.TabList;
 var TabPanel = ReactTabs.TabPanel;
 var Rating = require('react-rating');
+import ReactStars from 'react-stars';
 var ReactDisqusThread = require('react-disqus-thread');
 /*var Disqus = require('disqus');
 
@@ -285,6 +286,21 @@ var CardHitsListItem = React.createClass({
 		//})
 	},
 
+	addCardTags: function(comment) {
+		var re = new RegExp(/\[\[(.*?)\|(.*?)\]\]/g); // the two question marks make both matches lazy, ensuring it doesn't match between ALL [[ ]].
+		var matches = re.exec(comment);
+		// matches[1] is the card name, matches[2] is the mID.
+
+		/*return comment.replace(re, function(m1, m2, m3) {
+			return (<b>{m2}</b>)
+		});*/
+		//return comment;
+		return <div dangerouslySetInnerHTML={{__html: ent.encode(comment).replace(/&#10;/g, '<br/>').replace(re, (fullMatch, m1, m2) =>
+			`<span class="tooltipLink2" ><span>${m1}</span>
+	        <img src='https://image.deckbrew.com/mtg/multiverseid/${m2}.jpg' /></span>`
+	    )}}></div>
+	},
+
 	render: function() {
 	    var {bemBlocks, result} = this.props;
 	    var source = result._source;
@@ -308,7 +324,7 @@ var CardHitsListItem = React.createClass({
 	    },false);
 
 	    // Define 'details' tab information here.
-	    var extraInfo, flavour, pt, legalities, otherSide, price, foilPrice, mtgoPrice, mtgoFoilPrice, cycleInfo;
+	    var extraInfo, flavour, pt, legalities, otherSide, price, foilPrice, mtgoPrice, mtgoFoilPrice, cycleInfo, allCycles, oldComments;
 
 	    // Start with a separate div for all 4 potential prices.
 	    if (this.state.currentMedPrice) {
@@ -480,31 +496,43 @@ var CardHitsListItem = React.createClass({
     	else {
     		languages = <div><span className={bemBlocks.item("subtitle")}>No other languages!</span></div>;
     	}
-    	if (source.cycle) {
-	        <TagFilterConfig field="cycle.raw" id="cycles" title="Format name" operator="AND" searchkit={this.searchkit}/>
-	        var pair = source.cycleCards.length == 1 ? true : false;
-	        // If it's a pair, stick a 'true' in there for the scope to see.
-	        if (pair) {source.cycleCards[0].pair = true;}
-    		cycleInfo = (<div><span className={bemBlocks.item("subtitle")}><b>{"Cycle: "}</b>{source.name + " is part of " + (pair ? "a " : "the \"")}<PatchedTagFilter field="cycle.raw" value={source.cycle} />{(pair ? "" : "\" cycle") + ", along with "}</span>
-    			{ source.cycleCards.map(function(cycleCard, i) {
-    				var j = i + 1;
-    				let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/'+cycleCard.multiId+'.jpg';
-    				if (this.props.result._source.cycleCards.length != j) {
-    					return <a className="tooltipLink" href={"http://mtg-hunter.com/?q="+cycleCard.name} target="_blank">
-    						<img className="tooltipImage" src={imgUrl} />
-    						<span key={i} id={cycleCard.multiId} className={bemBlocks.item("subtitle")}>{cycleCard.name + ", "}</span>
-    					</a>
-    				}
-    				else {
-    					return <a className="tooltipLink" href={"http://mtg-hunter.com/?q="+cycleCard.name} target="_blank">
-    						<img className="tooltipImage" src={imgUrl} />
-    						<span key={i} id={cycleCard.multiId} className={bemBlocks.item("subtitle")}>{(cycleCard.pair ? " " : " and ") + cycleCard.name + "."}</span>
-    					</a>
-    				}
-    			}.bind(this))}
-    			</div>)
+    	if (source.cycles) {
+    		allCycles = (<div> {source.cycles.map(function(cycle, k) {
+		        <TagFilterConfig field="cycles.cycleName.raw" id="cycles" title="Cycles" operator="AND" searchkit={this.searchkit}/>
+		        var pair = cycle.cycleCards.length == 1 ? true : false;
+		        // If it's a pair, stick a 'true' in there for the scope to see.
+		        if (pair) {cycle.pair = true;}
+	    		cycleInfo = (<div><span className={bemBlocks.item("subtitle")}><b>{"Cycle: "}</b>{source.name + " is part of " + (pair ? "a " : "the \"")}<PatchedTagFilter field="cycles.cycleName.raw" value={cycle.cycleName} />{(pair ? "" : "\" cycle") + ", along with "}</span>
+	    			{ cycle.cycleCards.map(function(cycleCard, i) {
+	    				var j = i + 1;
+	    				let imgUrl = 'https://image.deckbrew.com/mtg/multiverseid/'+cycleCard.multiId+'.jpg';
+	    				if (cycle.cycleCards.length != j) {
+	    					return <a className="tooltipLink" href={"http://mtg-hunter.com/?q="+cycleCard.name} target="_blank">
+	    						<img className="tooltipImage" src={imgUrl} />
+	    						<span key={i} id={cycleCard.multiId} className={bemBlocks.item("subtitle")}>{cycleCard.name + ", "}</span>
+	    					</a>
+	    				}
+	    				else {
+	    					return <a className="tooltipLink" href={"http://mtg-hunter.com/?q="+cycleCard.name} target="_blank">
+	    						<img className="tooltipImage" src={imgUrl} />
+	    						<span key={i} id={cycleCard.multiId} className={bemBlocks.item("subtitle")}>{(cycle.pair ? " " : " and ") + cycleCard.name + "."}</span>
+	    					</a>
+	    				}
+	    			}.bind(this))}
+	    		</div>)
+	    		return cycleInfo;
+    		}.bind(this))}</div>)
     	}
-    	else {cycleInfo = <div/>}
+    	else {allCycles = <div/>}
+
+    	if (source.comments) {
+    		oldComments = (<div style={{'height':'500px','overflowY':'scroll','overflowX':'hidden'}}>
+    			{source.comments.map(function(comment, i) {
+    				return <div style={{'padding':'5px'}}><span className={bemBlocks.item("subtitle")}>{this.addCardTags(comment.comment)}<br/><b>{comment.name}</b> ({comment.date})<br/></span></div>
+    			}.bind(this))}
+    		</div>)
+    	}
+		else {oldComments = <div/>}    	
 
     	// Define comments!
 
@@ -558,9 +586,10 @@ var CardHitsListItem = React.createClass({
 	            	<Tab>Languages</Tab>
 	            	<Tab>10 closest cards</Tab>
 	            	<Tab>Comments</Tab>
+	            	<Tab>Gatherer comments</Tab>
 	        	</TabList>
             	<TabPanel>
-					<div className='extraDetails'>{flavour}{extraInfo}{legalities}{cycleInfo}</div> 
+					<div className='extraDetails'>{flavour}{extraInfo}{legalities}{allCycles}</div> 
 		        </TabPanel>
 		        <TabPanel>
 		          <div className='extraDetails'>{rulings}</div>
@@ -579,6 +608,9 @@ var CardHitsListItem = React.createClass({
  		                title={source.name}
  		                url={"http://mtg-hunter.com/?q="+source.name}
  		                category_id="4523863"/>
+		        </TabPanel>
+		        <TabPanel>
+		          {oldComments}
 		        </TabPanel>
         	</Tabs>)
 	    }
@@ -604,6 +636,11 @@ var CardHitsListItem = React.createClass({
 			data-disqus-identifier={(source.multiverseids[result._source.multiverseids.length - 1].multiverseid).toString()} 
 			style={{fontVariant:"small-caps", float:"right", cursor:"pointer", paddingRight:8, fontSize:"smaller"}}>0 Comments</span>
 
+		const ratingSettings = {
+		  size: 18,
+		  value: source.rating,
+		  edit: false
+		}
 	    return (
 	    	<div className={bemBlocks.item().mix(bemBlocks.container("item"))} style={{display: 'block'}} onClick={() => this.props.updateCardName(source)}>
 	    		<div style={{display: 'flex'}}>
@@ -614,6 +651,8 @@ var CardHitsListItem = React.createClass({
 		            		style={{borderRadius: this.props.currentCard == source.name ? "10" : "6", cursor:"pointer"}} 
 		            		width="100"
 		            		/>
+		            	<div style={{'margin':'0 auto', 'display':'table'}}><ReactStars {...ratingSettings}/></div>
+		            	<div style={{'textAlign':'center'}}className={bemBlocks.item("subtitle")}>{source.rating.toFixed(2)} ({source.votes})</div>
 		        	</div>
 	    			{/* Block 2; the title + text, details tabs, and set icons. Width = 100% to stretch it out and 'align right' the set icons. */}
 		        	<div style={{width:'100%'}}>

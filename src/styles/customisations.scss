@@ -145,6 +145,9 @@ body {
 }
 
 /* The cycle card tooltips. */
+.tooltipLink {
+  border-bottom: 1px solid rgba(214, 128, 0, 0.7);
+}
 .tooltipLink img {
   float:left;
   display:none;
@@ -152,6 +155,21 @@ body {
 .tooltipLink:hover img{
   display:block;
   position:fixed;
+  z-index:1000;
+  overflow:hidden;
+  border-radius: 13px;
+}
+
+.tooltipLink2 {
+  border-bottom: 1px solid rgba(214, 128, 0, 0.7);
+}
+.tooltipLink2 img {
+  float:left;
+  display:none;
+}
+.tooltipLink2:hover img{
+  display:inherit;
+  position:absolute;
   z-index:1000;
   overflow:hidden;
   border-radius: 13px;
