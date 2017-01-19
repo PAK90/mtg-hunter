@@ -162,6 +162,7 @@ body {
 
 .tooltipLink2 {
   border-bottom: 1px solid rgba(214, 128, 0, 0.7);
+  position:relative;
 }
 .tooltipLink2 img {
   float:left;
@@ -170,7 +171,9 @@ body {
 .tooltipLink2:hover img{
   display:inherit;
   position:absolute;
-  z-index:1000;
+  top:20px;
+  left:-24px;
+  z-index:1000000;
   overflow:hidden;
   border-radius: 13px;
 }

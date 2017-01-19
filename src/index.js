@@ -523,31 +523,31 @@ export class App extends React.Component<any, any> {
       value: source.rating,
       //edit: false
       onChange: newValue => {
-        var valorous = Firebase.database().ref(source.name);
-        valorous.once('value').then(function(snapshot) {
+        var cardRef = Firebase.database().ref('cards/'+source.name);
+        cardRef.once('value').then(function(snapshot) {
           var data = snapshot.val()
           console.log(data);
           console.log('edition votes + rating: ' + data.multiverseids[data.multiverseids.length-1].rating + ' (' + data.multiverseids[data.multiverseids.length-1].votes + ')');
           console.log('overall votes + rating: ' + data.rating + ' (' + data.votes + ')');
           console.log('new vote: ' + newValue);
           // write new votes. Since this is grid view, it always writes to the last mID.
-          var editionVotes = Firebase.database().ref(source.name+'/multiverseids/'+(data.multiverseids.length-1)+'/votes');
+          var editionVotes = Firebase.database().ref('cards/'+source.name+'/multiverseids/'+(data.multiverseids.length-1)+'/votes');
           editionVotes.transaction(function(votes) {
             return votes + 1;
           });
 
-          var editionRating = Firebase.database().ref(source.name+'/multiverseids/'+(data.multiverseids.length-1)+'/rating');
+          var editionRating = Firebase.database().ref('cards/'+source.name+'/multiverseids/'+(data.multiverseids.length-1)+'/rating');
           editionRating.transaction(function(rating) {
             // ((oldRating * oldVotes) + newRating)/newVotes. Treat old votes*rating as one solid block, add new rating to it, then divide again.
             return ((data.multiverseids[data.multiverseids.length-1].rating * data.multiverseids[data.multiverseids.length-1].votes) + newValue)/(data.multiverseids[data.multiverseids.length-1].votes+1)
           }.bind(this));
 
-          var totalVotes = Firebase.database().ref(source.name+'/votes');
+          var totalVotes = Firebase.database().ref('cards/'+source.name+'/votes');
           totalVotes.transaction(function(votes) {
             return votes + 1;
           });
 
-          var totalRating = Firebase.database().ref(source.name+'/rating');
+          var totalRating = Firebase.database().ref('cards/'+source.name+'/rating');
           totalRating.transaction(function(rating) {
             // ((oldRating * oldVotes) + newRating)/newVotes. Treat old votes*rating as one solid block, add new rating to it, then divide again.
             return ((data.rating * data.votes) + newValue)/(data.votes+1)
