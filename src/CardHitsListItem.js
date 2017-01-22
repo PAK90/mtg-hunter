@@ -678,10 +678,10 @@ var CardHitsListItem = React.createClass({
 		        var cardRef = Firebase.database().ref('cards/'+source.name);
 		        cardRef.once('value').then(function(snapshot) {
 		          var data = snapshot.val()
-		          console.log(data);
+		          /*console.log(data);
 		          console.log('edition votes + rating: ' + data.multiverseids[currentMidIndex].rating + ' (' + data.multiverseids[currentMidIndex].votes + ')');
 		          console.log('overall votes + rating: ' + data.rating + ' (' + data.votes + ')');
-		          console.log('new vote: ' + newValue);
+		          console.log('new vote: ' + newValue);*/
 		          // write new votes. Since this is grid view, it always writes to the last mID.
 		          var editionVotes = Firebase.database().ref('cards/'+source.name+'/multiverseids/'+(currentMidIndex)+'/votes');
 		          editionVotes.transaction(function(votes) {
