@@ -12,7 +12,7 @@ var Tabs = require("./Tabs");
 var TabList = ReactTabs.TabList;
 var TabPanel = ReactTabs.TabPanel;
 var Rating = require('react-rating');
-import ReactStars from 'react-stars';
+import ReactStars from './modReactStars.js';
 var ReactDisqusThread = require('react-disqus-thread');
 var Firebase = require('firebase');
 /*var Disqus = require('disqus');
@@ -301,6 +301,34 @@ var CardHitsListItem = React.createClass({
 	        <img src='https://image.deckbrew.com/mtg/multiverseid/${m2}.jpg' /></a>`
 	    )}}></div>
 	},
+
+	checkForExistingVotes: function(mid) {
+    	if (!this.props.existingRatings) return true; // the case of the fresh user.
+    	else {
+    		for (var votes of this.props.existingRatings.votedCards) {
+    			if (_.includes(votes, mid)) {
+    				alert("You have already voted on this card; you cannot vote again.");
+    				return false;
+    			}
+    		}
+    		// If it makes it out of the loop, all good.
+    		return true;
+    	}
+    },
+    checkForLogin: function(evt) {
+    	this.suppressClick(evt);
+    	if (!this.props.loggedIn) {
+    		alert("Please log in before voting.");
+    	}
+    },
+
+    getMidIndex: function(source, mid) {
+    	var value;
+    	source.multiverseids.map(function(multiID, i) {
+    		if (multiID.multiverseid == mid) value = i;
+    	}.bind(this));
+    	return value;
+    },
 
 	render: function() {
 	    var {bemBlocks, result} = this.props;
@@ -637,42 +665,48 @@ var CardHitsListItem = React.createClass({
 			data-disqus-identifier={(source.multiverseids[result._source.multiverseids.length - 1].multiverseid).toString()} 
 			style={{fontVariant:"small-caps", float:"right", cursor:"pointer", paddingRight:8, fontSize:"smaller"}}>0 Comments</span>
 
-		const ratingSettings = {
+		var currentMidIndex = this.getMidIndex(source, this.state.currentMultiId);
+
+		var ratingSettings = {
 		  size: 18,
-		  value: source.rating,
-		  //edit: false
+		  value: source.multiverseids[currentMidIndex].rating,
+		  edit: this.props.loggedIn, // If yes, edit! If not, no.
 	      onChange: newValue => {
-	        var cardRef = Firebase.database().ref('cards/'+source.name);
-	        cardRef.once('value').then(function(snapshot) {
-	          var data = snapshot.val()
-	          console.log(data);
-	          console.log('edition votes + rating: ' + data.multiverseids[data.multiverseids.length-1].rating + ' (' + data.multiverseids[data.multiverseids.length-1].votes + ')');
-	          console.log('overall votes + rating: ' + data.rating + ' (' + data.votes + ')');
-	          console.log('new vote: ' + newValue);
-	          // write new votes. Since this is grid view, it always writes to the last mID.
-	          var editionVotes = Firebase.database().ref('cards/'+source.name+'/multiverseids/'+(data.multiverseids.length-1)+'/votes');
-	          editionVotes.transaction(function(votes) {
-	            return votes + 1;
-	          });
+	      	if (this.checkForExistingVotes(this.state.currentMultiId)) {
+	      		// Writes the rating to the user's data. If the user is new, pass an empty array as the existing votes.
+	      		this.props.handleRatingWrite(this.state.currentMultiId, newValue, this.props.existingRatings ? this.props.existingRatings.votedCards : []); 
+		        var cardRef = Firebase.database().ref('cards/'+source.name);
+		        cardRef.once('value').then(function(snapshot) {
+		          var data = snapshot.val()
+		          console.log(data);
+		          console.log('edition votes + rating: ' + data.multiverseids[currentMidIndex].rating + ' (' + data.multiverseids[currentMidIndex].votes + ')');
+		          console.log('overall votes + rating: ' + data.rating + ' (' + data.votes + ')');
+		          console.log('new vote: ' + newValue);
+		          // write new votes. Since this is grid view, it always writes to the last mID.
+		          var editionVotes = Firebase.database().ref('cards/'+source.name+'/multiverseids/'+(currentMidIndex)+'/votes');
+		          editionVotes.transaction(function(votes) {
+		            return votes + 1;
+		          });
 
-	          var editionRating = Firebase.database().ref('cards/'+source.name+'/multiverseids/'+(data.multiverseids.length-1)+'/rating');
-	          editionRating.transaction(function(rating) {
-	            // ((oldRating * oldVotes) + newRating)/newVotes. Treat old votes*rating as one solid block, add new rating to it, then divide again.
-	            return ((data.multiverseids[data.multiverseids.length-1].rating * data.multiverseids[data.multiverseids.length-1].votes) + newValue)/(data.multiverseids[data.multiverseids.length-1].votes+1)
-	          }.bind(this));
+		          var editionRating = Firebase.database().ref('cards/'+source.name+'/multiverseids/'+(currentMidIndex)+'/rating');
+		          editionRating.transaction(function(rating) {
+		            // ((oldRating * oldVotes) + newRating)/newVotes. Treat old votes*rating as one solid block, add new rating to it, then divide again.
+		            return ((data.multiverseids[currentMidIndex].rating * data.multiverseids[currentMidIndex].votes) + newValue)/(data.multiverseids[currentMidIndex].votes+1)
+		          }.bind(this));
 
-	          var totalVotes = Firebase.database().ref('cards/'+source.name+'/votes');
-	          totalVotes.transaction(function(votes) {
-	            return votes + 1;
-	          });
+		          var totalVotes = Firebase.database().ref('cards/'+source.name+'/votes');
+		          totalVotes.transaction(function(votes) {
+		            return votes + 1;
+		          });
 
-	          var totalRating = Firebase.database().ref('cards/'+source.name+'/rating');
-	          totalRating.transaction(function(rating) {
-	            // ((oldRating * oldVotes) + newRating)/newVotes. Treat old votes*rating as one solid block, add new rating to it, then divide again.
-	            return ((data.rating * data.votes) + newValue)/(data.votes+1)
-	          }.bind(this));
+		          var totalRating = Firebase.database().ref('cards/'+source.name+'/rating');
+		          totalRating.transaction(function(rating) {
+		            // ((oldRating * oldVotes) + newRating)/newVotes. Treat old votes*rating as one solid block, add new rating to it, then divide again.
+		            return ((data.rating * data.votes) + newValue)/(data.votes+1)
+		          }.bind(this));
 
-	        }.bind(this));
+		        }.bind(this));
+		    }
 	      }
 		}
 	    return (
@@ -685,8 +719,8 @@ var CardHitsListItem = React.createClass({
 		            		style={{borderRadius: this.props.currentCard == source.name ? "10" : "6", cursor:"pointer"}} 
 		            		width="100"
 		            		/>
-		            	<div style={{'margin':'0 auto', 'display':'table'}} onClick={(evt)=>this.suppressClick(evt)}><ReactStars {...ratingSettings}/></div>
-		            	<div style={{'textAlign':'center'}}className={bemBlocks.item("subtitle")}>{source.rating.toFixed(2)} ({source.votes})</div>
+		            	<div style={{'margin':'0 auto', 'display':'table'}} onClick={this.checkForLogin}><ReactStars {...ratingSettings}/></div>
+		            	<div style={{'textAlign':'center'}}className={bemBlocks.item("subtitle")}>{source.multiverseids[currentMidIndex].rating.toFixed(2)} ({source.multiverseids[currentMidIndex].votes})</div>
 		        	</div>
 	    			{/* Block 2; the title + text, details tabs, and set icons. Width = 100% to stretch it out and 'align right' the set icons. */}
 		        	<div style={{width:'100%'}}>

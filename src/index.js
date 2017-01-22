@@ -15,8 +15,9 @@ const nl2br = require('react-nl2br');
 const omit = require("lodash/omit");
 const map = require("lodash/map");
 import Modal from 'react-overlays/lib/Modal';
-import ReactStars from 'react-stars';
+import ReactStars from './modReactStars.js';
 var Firebase = require('firebase');
+var firebaseui = require('firebaseui');
 var fbconfig = require('./fbConfig.js');
 
 //   InputFilter,
@@ -151,6 +152,17 @@ export function QueryTypeString(query, options:QueryStringOptions={}){
   };*/
   return {
     "queryString":assign({"fields":["type"],"query":query, "defaultOperator":options.defaultOperator})
+  };
+}
+
+export function GathererTypeString(query, options:QueryStringOptions={}){
+  if(!query){
+    return;
+  }
+  // Add escapes to the query's +, - and / chars.
+  query = query.replace(/\//g, "\\/").replace(/\+/g, "\\+").replace(/\-/g, "\\-");
+  return {
+    "queryString":assign({"fields":["comments.comment"],"query":query, "defaultOperator":options.defaultOperator})
   };
 }
 
@@ -387,6 +399,7 @@ const CycleMultiSelect = <MultiSelect
     ({option.doc_count})</span>}
    />
 
+
 const modalStyle = {
   position: 'fixed',
   zIndex: 1040,
@@ -400,23 +413,6 @@ const backdropStyle = {
   opacity: 0.5
 };
 
-const dialogStyle = function() {
-  // we use some psuedo random coords so nested modals
-  // don't sit right on top of each other.
-  let top = 50 + Math.random();
-  let left = 50 + Math.random();
-
-  return {
-    position: 'absolute',
-    width: 400,
-    top: top + '%', left: left + '%',
-    transform: `translate(-${top}%, -${left}%)`,
-    border: '1px solid #e5e5e5',
-    backgroundColor: 'white',
-    boxShadow: '0 5px 15px rgba(0,0,0,.5)',
-    padding: 20
-  };
-};
 
 export class App extends React.Component<any, any> {
 
@@ -425,7 +421,11 @@ export class App extends React.Component<any, any> {
     const host = "http://localhost:9200/testcards/card";
     this.searchkit = new SearchkitManager(host);
     this.state = {hoveredId: '',
+      currentUser: null,
+      currentUserData: null,
+      loggedIn: false,
       showModal: false,
+      showLoginModal: false,
       clickedCard: '',
       matchPercent: '100%',
       all: 'collapse',
@@ -449,17 +449,76 @@ export class App extends React.Component<any, any> {
       rulesTextOperator: "AND",
       flavourTextOperator: "AND",
       typeLineOperator: "AND",
+      gathererOperator: "AND",
       coloursOnly: false,
       colourIdentityOnly: false};
     // Bind the prop function to this scope.
     this.handleClick = this.handleClick.bind(this)
     
     Firebase.initializeApp(fbconfig[0]);
+
+    // Initialize the FirebaseUI Widget using Firebase.
+    // Need to 'this' them so they can be used by the modal popup.
+    this.ui = new firebaseui.auth.AuthUI(Firebase.auth());
+    this.uiConfig = {
+      //'signInSuccessUrl': 'mtg-hunter.com',
+      'signInSuccessUrl': 'localhost:3333',
+      'signInOptions': [
+        // Leave the lines as is for the providers you want to offer your users.
+        Firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+        Firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+        Firebase.auth.TwitterAuthProvider.PROVIDER_ID,
+        Firebase.auth.GithubAuthProvider.PROVIDER_ID,
+        //Firebase.auth.EmailAuthProvider.PROVIDER_ID
+      ],
+      'signInFlow': 'popup',
+      callbacks: {
+        signInSuccess: function(currentUser, credential, redirectUrl) {
+          //alert("Signed in as "+currentUser + " with credential " + credential);
+        this.setState({"showLoginModal":false}); // For now going to use email as 
+        }.bind(this)
+      }
+    };
+
+    // Add a listener for the logging in/out which technically should set the logged in/out state.
+    Firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        this.setState({"loggedIn":true, "currentUser":user.uid})
+        // Logged in! Now grab the vote history so that can be passed down to the components.
+        this.getUserVoteHistory(user.uid);
+        //alert("Logged in!")
+      }
+      else {
+        this.setState({"loggedIn":false, "currentUser":null})
+        //alert("Logged out!")
+      }
+      // Force a re-render for the stars.
+      this.forceUpdate();
+    }.bind(this));
+
   }
 
   hide() {
     this.setState({clickedCard: ''});
   }
+
+  dialogStyle() {
+    // we use some psuedo random coords so nested modals
+    // don't sit right on top of each other.
+    let top = 50 + Math.random();
+    let left = 50 + Math.random();
+
+    return {
+      position: 'absolute',
+      width: 400,
+      top: top + '%', left: left + '%',
+      transform: `translate(-${top}%, -${left}%)`,
+      border: '1px solid #e5e5e5',
+      backgroundColor: 'white',
+      boxShadow: '0 5px 15px rgba(0,0,0,.5)',
+      padding: 20
+    };
+  };
 
   handleClick(source) {
     // If clicked on a different card, change the name.
@@ -515,13 +574,14 @@ export class App extends React.Component<any, any> {
     this.setState({ showModal: true });
   }
 
-  CardHitsGridItem = (props)=> {
+  /*CardHitsGridItem = (props)=> {
     const {bemBlocks, result} = props;
     const source = result._source;
-    const ratingSettings = {
+    var ratingSettings = {
       size: 18,
       value: source.rating,
-      //edit: false
+      edit: this.state.loggedIn, // If yes, edit! If not, no.
+      //edit: true,
       onChange: newValue => {
         var cardRef = Firebase.database().ref('cards/'+source.name);
         cardRef.once('value').then(function(snapshot) {
@@ -563,15 +623,54 @@ export class App extends React.Component<any, any> {
           <img className='gridImg'
             style={{height: 311}}
             src={imgUrl}
-            onClick={this.handleClick.bind(this, source)}
-            onMouseOver={this.handleHoverIn.bind(this, source)}
-            onMouseOut={this.handleHoverOut.bind(this, source)}/>
+            onClick={this.handleClick.bind(this, source)}/>
 
         </a>
         <div style={{'margin':'0 auto', 'display':'table'}}><ReactStars {...ratingSettings}/></div>
         <div style={{'textAlign':'center'}}className={bemBlocks.item("subtitle")}>{source.rating.toFixed(2)} ({source.votes})</div>  
       </div>
     )
+  }*/
+
+  openLogin(){
+    // If not logged in, open the box to allow login.
+    if (!this.state.loggedIn) {
+      this.setState({ showLoginModal: true });
+    }
+    else { // Else log them out.
+      Firebase.auth().signOut();
+      //this.setState({ loggedIn: false });
+    }
+  }
+  closeLogin(){
+    this.setState({ showLoginModal: false });
+  }
+
+  getUserVoteHistory(uid) {
+    // If that multiID already exists for that user, block the write by returning false.
+    var userRef = Firebase.database().ref('users/'+uid);
+    userRef.once('value').then(function(snapshot) {
+      //console.log(snapshot.val());
+      this.setState({"currentUserData":snapshot.val()});
+    }.bind(this));
+  }
+
+  handleRatingWrite(mid, rating, existingRatings) {
+    // Here, write to firebase/user/UID the multiID of the vote, and what the vote was.
+    var userRef = Firebase.database().ref('users/'+this.state.currentUser);
+    existingRatings.push({"multiverseid":mid,"rating":rating});
+    var thingToWrite = {};
+    thingToWrite.votedCards = existingRatings;
+    userRef.set(thingToWrite);
+    // After voting, need to update this.state.currentUserData with the new info.
+    this.getUserVoteHistory(this.state.currentUser);
+  }
+
+  componentDidUpdate() {
+    if (this.refs.loginBox) {
+      //console.log("div exists! loading logins.");
+      this.ui.start('#firebaseui-auth-container', this.uiConfig)
+    }
   }
 
   CardHitsTable = (props)=> {
@@ -695,6 +794,12 @@ export class App extends React.Component<any, any> {
                             )} collapsable={true} defaultCollapsed={true}/>}/>
 
  <DynamicRangeFilter rangeFormatter={(count) => count.toFixed(2)} field="multiverseids.mtgoPrice" id="mtgoPrice" title="MTGO Price"/>
+
+
+
+              <RangeFilter field="reminderlessWordCount" id="reminderlessWordCount" title="Word count" showHistogram={true} min={0} max={114}
+                containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
+
               */
 
   render() {
@@ -720,6 +825,17 @@ export class App extends React.Component<any, any> {
                 </form>
               </div>
               <div className="my-logo"><button style={{backgroundColor: 'transparent', border: '0px', font: "inherit", color: "#eee", cursor:"pointer"}}
+                 onClick={this.openLogin.bind(this)}>{this.state.loggedIn ? "Logout" : "Login"}</button><br/></div>
+                 <Modal
+                   aria-labelledby='modal-label'
+                   style={modalStyle}
+                   backdropStyle={backdropStyle}
+                   show={this.state.showLoginModal}
+                   onHide={this.closeLogin.bind(this)}
+                 >
+                   <div id="firebaseui-auth-container" ref="loginBox" style={this.dialogStyle()} />
+                 </Modal>  
+              <div className="my-logo"><button style={{backgroundColor: 'transparent', border: '0px', font: "inherit", color: "#eee", cursor:"pointer"}}
                 onClick={this.open.bind(this)}>About</button><br/></div>
                 <Modal
                   aria-labelledby='modal-label'
@@ -728,7 +844,7 @@ export class App extends React.Component<any, any> {
                   show={this.state.showModal}
                   onHide={this.close.bind(this)}
                 >
-                  <div style={dialogStyle()} >
+                  <div style={this.dialogStyle()} >
                     <p>MtG:Hunter is made with <a href="https://facebook.github.io/react/tips/introduction.html"style={{textDecoration:"none"}}>ReactJS</a>,
                       <a href="http://searchkit.co/" style={{textDecoration:"none"}}> Searchkit</a> and a veritable smorgasbord of webpack doing unholy things with CSS files.</p>
                     <p>To report a bug or request a feature, send a message to <a href="mailto:admin@mtg-hunter.com" style={{textDecoration:"none"}}>admin@mtg-hunter.com</a></p>
@@ -783,12 +899,21 @@ export class App extends React.Component<any, any> {
                               </div>
                             )} collapsable={true} defaultCollapsed={true}/>}
               />
-
+              <InputFilter
+                queryBuilder={GathererTypeString} id="gathererComments" searchThrottleTime={1000} title="Gatherer comments" placeholder="" searchOnChange={true} 
+                queryOptions={{"minimum_should_match": this.state.matchPercent, "defaultOperator":this.state.gathererOperator}} queryFields={["comments.comment"]} prefixQueryFields={["comments.comment"]}
+                containerComponent={<TogglePanel rightComponent={(<div style={{display:"flex", maxHeight: 23}} onClick={(evt) => this.suppressClick(evt)}>
+                              <Toggle className={"darkToggle"} items={[{key:"AND",title:"And"},{key:"OR",title:"Or"}]} selectedItems={this.state.gathererOperator} 
+                              toggleItem={this.handleToggleOperatorChange.bind(this, "gathererOperator")}/>
+                              </div>
+                            )} collapsable={true} defaultCollapsed={true}/>}
+              />
+                
               <DynamicRangeFilter field="reminderlessWordCount" id="wordCount" title="Word count" containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
 
               <DynamicRangeFilter field="printingCount" id="printingCount" title="Printing count" containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
 
-              <RangeFilter field="rating" id="rating" title="Gatherer rating" showHistogram={true} min={0} max={5}
+              <RangeFilter field="rating" id="rating" title="Rating" showHistogram={true} min={0} max={5}
                 containerComponent={<TogglePanel collapsable={true} defaultCollapsed={true}/>}/>
 
               <OnlyRefinementListFilter id="colours" title="Colours" field="colors.raw" size={6} operator={this.state.coloursOperator} only={this.state.coloursOnly}
@@ -898,8 +1023,8 @@ export class App extends React.Component<any, any> {
                     {label:"Name (descending)", field: "name.raw", order: "desc"},
                     {label:"Relevance (ascending)", field:"_score", order:"asc"},
                     {label:"Relevance (descending)", field:"_score", order:"desc"},
-                    {label:"Gatherer rating (ascending)", field:"rating", order:"asc"},
-                    {label:"Gatherer rating (descending)", field:"rating", order:"desc"},
+                    {label:"Rating (ascending)", field:"rating", order:"asc"},
+                    {label:"Rating (descending)", field:"rating", order:"desc", defaultOption:true},
                     {label:"Colour (ascending)", field:"colors", order:"asc"},
                     {label:"Colour (descending)", field:"colors", order:"desc"},
                     {label:"CMC (ascending)", field:"cmc", order:"asc"},
@@ -909,7 +1034,7 @@ export class App extends React.Component<any, any> {
                     {label:"Paper Price (ascending)", field:"multiverseids.medPrice", order:"asc"},
                     {label:"Paper Price (descending)", field:"multiverseids.medPrice", order:"desc"},
                     {label:"MTGO Price (ascending)",  field:"multiverseids.mtgoPrice", order:"asc"},
-                    {label:"MTGO Price (descending)",  field:"multiverseids.mtgoPrice", order:"desc", defaultOption:true}
+                    {label:"MTGO Price (descending)",  field:"multiverseids.mtgoPrice", order:"desc"}
                   ]} />
                   <PageSizeSelector options={[12,24, 48, 96]} listComponent={Toggle}/>
                 </div>
@@ -923,8 +1048,8 @@ export class App extends React.Component<any, any> {
                 <NewViewSwitcher
                     hitsPerPage={12}
                     hitComponents = {[
-                      {key:"grid", title:"Grid", itemComponent:this.CardHitsGridItem},
-                      {key:"list", title:"List", itemComponent:<CardHitsListItem updateCardName={this.handleClick} currentCard={this.state.clickedCard}/>, defaultOption:true},
+                      {key:"grid", title:"Grid", itemComponent:<CardHitsGridItem handleRatingWrite={this.handleRatingWrite.bind(this)} existingRatings={this.state.currentUserData} loggedIn={this.state.loggedIn}/>},
+                      {key:"list", title:"List", itemComponent:<CardHitsListItem handleRatingWrite={this.handleRatingWrite.bind(this)} existingRatings={this.state.currentUserData} updateCardName={this.handleClick} currentCard={this.state.clickedCard} loggedIn={this.state.loggedIn}/>, defaultOption:true},
                       {key:"table", title:"Table", listComponent:this.CardHitsTable}
                     ]}
                     scrollTo="body"

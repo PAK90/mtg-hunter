@@ -28,6 +28,7 @@
     "ent": "2.2.0",
     "firebase": "^3.4.1",
     "firebase-elasticsearch-indexer": "^1.0.2",
+    "firebaseui": "^1.0.0",
     "highcharts-release": "4.2.6",
     "invariant": "2.2.1",
     "js-stylesheet": "0.0.1",

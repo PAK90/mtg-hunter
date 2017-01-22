@@ -13,6 +13,38 @@ body {
   background-color: $backgroundColour;
 }
 
+.firebaseui-idp-icon {
+  height: 20px;
+  padding-right: 5px;
+}
+
+.firebaseui-idp-list {
+  list-style: none;
+}
+
+.firebaseui-list-item {
+  padding: 2px;
+}
+
+.firebaseui-idp-text-short {
+  visibility: hidden;
+}
+
+.firebaseui-idp-button {
+  width: 300px;
+  background-color: #34547f;
+  border: 0px; 
+  font: inherit;
+  color: white;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: 0.3s;
+}
+
+.firebaseui-idp-button:hover {
+ background-color: #3d6496; 
+}
+
 .my-logo {
   color: white;
   flex :0 0 60px;
