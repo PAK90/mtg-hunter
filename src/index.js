@@ -461,8 +461,8 @@ export class App extends React.Component<any, any> {
     // Need to 'this' them so they can be used by the modal popup.
     this.ui = new firebaseui.auth.AuthUI(Firebase.auth());
     this.uiConfig = {
-      //'signInSuccessUrl': 'mtg-hunter.com',
-      'signInSuccessUrl': 'localhost:3333',
+      'signInSuccessUrl': 'mtg-hunter.com',
+      //'signInSuccessUrl': 'localhost:3333',
       'signInOptions': [
         // Leave the lines as is for the providers you want to offer your users.
         Firebase.auth.GoogleAuthProvider.PROVIDER_ID,
