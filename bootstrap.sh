@@ -7,8 +7,9 @@ sudo apt-get update
 sudo apt-get install openjdk-7-jre-headless -y
 
 # install elasticsearch
-wget https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/2.2.0/elasticsearch-2.2.0.deb
-sudo dpkg -i elasticsearch-2.2.0.deb
+#wget https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/2.2.0/elasticsearch-2.2.0.deb
+wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.4.0.deb
+sudo dpkg -i elasticsearch-5.4.0.deb
 sudo sed -i '54anetwork.host: 0.0.0.0' /etc/elasticsearch/elasticsearch.yml
 sudo cat >> /etc/elasticsearch/elasticsearch.yml << ENDOFTEXT
 http.cors.enabled : true  
@@ -20,5 +21,12 @@ sudo systemctl enable elasticsearch.service
 sudo systemctl daemon-reload
 sudo systemctl restart elasticsearch.service
 
-# install head
-sudo /usr/share/elasticsearch/bin/plugin install mobz/elasticsearch-head
+# install head. no worky for 5.4. instead clone and install.
+#sudo /usr/share/elasticsearch/bin/plugin install mobz/elasticsearch-head
+sudo apt-get --assume-yes install curl
+curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+sudo apt-get --assume-yes install git nodejs
+git clone git://github.com/mobz/elasticsearch-head.git
+cd elasticsearch-head
+npm install
+#npm run start
