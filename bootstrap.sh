@@ -4,13 +4,12 @@
 sudo apt-get update
 
 # install java
-sudo apt-get install openjdk-7-jre-headless -y
+sudo apt-get install openjdk-8-jre-headless -y
 
 # install elasticsearch
-#wget https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/2.2.0/elasticsearch-2.2.0.deb
 wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.4.0.deb
 sudo dpkg -i elasticsearch-5.4.0.deb
-sudo sed -i '54anetwork.host: 0.0.0.0' /etc/elasticsearch/elasticsearch.yml
+sudo sed -i '55anetwork.host: 0.0.0.0' /etc/elasticsearch/elasticsearch.yml
 sudo cat >> /etc/elasticsearch/elasticsearch.yml << ENDOFTEXT
 http.cors.enabled : true  
 http.cors.allow-origin : "*"
